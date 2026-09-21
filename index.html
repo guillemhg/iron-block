@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="theme-color" content="#111827" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<link rel="manifest" href="manifest.webmanifest" />
+<link rel="icon" href="icon-192.png" />
+<title>Iron Block V2.2 · 10 semanas</title>
+<style>
+:root{
+  --bg:#0b1020; --panel:#121a2e; --panel2:#18233c; --text:#f4f7fb;
+  --muted:#9ba8bf; --accent:#72e6a3; --accent2:#5fb3ff; --danger:#ff6b6b;
+  --border:#263451; --warn:#ffd166;
+}
+*{box-sizing:border-box}
+body{margin:0;background:linear-gradient(180deg,#080d18,#0e1628);color:var(--text);
+font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+.app{max-width:900px;margin:0 auto;padding:16px 14px 90px}
+header{position:sticky;top:0;z-index:10;background:rgba(11,16,32,.92);backdrop-filter:blur(10px);
+padding:12px 0 10px;border-bottom:1px solid var(--border)}
+h1{font-size:22px;margin:0 0 4px}.sub{color:var(--muted);font-size:13px}
+.tabs{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:12px}
+.tab{border:1px solid var(--border);background:var(--panel);color:var(--muted);padding:10px 6px;
+border-radius:12px;font-weight:700;font-size:12px}
+.tab.active{color:#06130c;background:var(--accent);border-color:var(--accent)}
+.card{background:rgba(18,26,46,.96);border:1px solid var(--border);border-radius:16px;padding:14px;margin-top:14px;
+box-shadow:0 10px 30px rgba(0,0,0,.15)}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+label{display:block;color:var(--muted);font-size:12px;margin-bottom:5px}
+input,select,textarea,button{font:inherit}
+input,select,textarea{width:100%;background:#0d1527;color:var(--text);border:1px solid var(--border);
+border-radius:10px;padding:10px}
+textarea{min-height:70px}
+button{cursor:pointer}
+.btn{background:var(--accent);color:#06130c;border:0;border-radius:11px;padding:10px 14px;font-weight:800}
+.btn.secondary{background:var(--panel2);color:var(--text);border:1px solid var(--border)}
+.btn.danger{background:transparent;color:var(--danger);border:1px solid var(--danger)}
+.badge{display:inline-block;border:1px solid var(--border);border-radius:999px;padding:5px 8px;font-size:12px;color:var(--muted)}
+.badge.green{color:#07170f;background:var(--accent);border-color:var(--accent);font-weight:800}
+.section-title{font-size:17px;margin:0 0 10px}
+.exercise{border-top:1px solid var(--border);padding:14px 0}.exercise:first-child{border-top:0}
+.ex-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.ex-name{font-weight:800}.ex-meta{font-size:12px;color:var(--muted);margin-top:3px}
+.sets{margin-top:10px;display:grid;gap:8px}
+.setrow{display:grid;grid-template-columns:48px 1fr 1fr 1fr;gap:7px;align-items:center}
+.setnum{color:var(--muted);font-size:12px;text-align:center}
+.small{font-size:12px;color:var(--muted)}
+.kpi{background:#0e1729;border:1px solid var(--border);border-radius:12px;padding:11px}
+.kpi b{display:block;font-size:20px;margin-top:4px}
+.progress{height:10px;background:#0c1425;border:1px solid var(--border);border-radius:999px;overflow:hidden}
+.progress > div{height:100%;background:linear-gradient(90deg,var(--accent2),var(--accent))}
+.week-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.week{padding:10px 6px;text-align:center;background:#0d1527;border:1px solid var(--border);border-radius:10px;
+font-size:12px}
+.week.current{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset}
+.week.deload{border-color:var(--warn);color:var(--warn)}
+table{width:100%;border-collapse:collapse;font-size:12px}th,td{padding:8px;border-bottom:1px solid var(--border);text-align:left}
+.hidden{display:none !important}
+.notice{border-left:4px solid var(--accent2);padding:10px 12px;background:#0e1729;border-radius:8px;color:#c8d4e6;font-size:13px}
+.footer-note{text-align:center;color:var(--muted);font-size:11px;margin-top:20px}
+@media(max-width:620px){
+  .grid2,.grid3{grid-template-columns:1fr}
+  .setrow{grid-template-columns:42px 1fr 1fr 1fr}
+  .week-grid{grid-template-columns:repeat(2,1fr)}
+  .app{padding-left:10px;padding-right:10px}
+}
+
+.timerbar{position:fixed;left:0;right:0;bottom:0;z-index:30;background:rgba(8,13,24,.97);border-top:1px solid var(--border);backdrop-filter:blur(12px)}
+.timerinner{max-width:900px;margin:0 auto;padding:10px 14px;display:flex;gap:8px;align-items:center}
+.timerdisplay{font-weight:900;font-size:23px;letter-spacing:1px;min-width:72px;text-align:center}
+.timerlabel{flex:1;min-width:100px}.timerlabel b{display:block}.timerlabel span{font-size:11px;color:var(--muted)}
+.donebtn{width:42px;height:42px;border-radius:12px;border:1px solid var(--border);background:#0e1729;color:var(--accent);font-size:20px;font-weight:900}
+.donebtn.done{background:var(--accent);color:#06130c}
+.pr{font-size:11px;color:var(--warn);font-weight:800;margin-top:4px}
+.suggest{font-size:11px;color:var(--accent2);margin-top:4px}
+.chartbox{background:#0d1527;border:1px solid var(--border);border-radius:12px;padding:10px;overflow:hidden}
+canvas{width:100%;height:220px;display:block}
+.metric-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+@media(max-width:620px){.metric-grid{grid-template-columns:repeat(2,1fr)}.timerlabel{display:none}.timerinner{padding:8px}.timerdisplay{font-size:20px}}
+
+
+.planweek{background:#0d1527;border:1px solid var(--border);border-radius:12px;padding:12px;margin-top:10px}
+.planweek h3{margin:0 0 6px;font-size:15px}
+.planweek p{margin:4px 0;color:#c8d4e6;font-size:12px;line-height:1.55}
+.glossary-item{border-top:1px solid var(--border);padding:12px 0}
+.glossary-item:first-child{border-top:0}
+.glossary-item b{display:block;margin-bottom:5px}
+.glossary-item p{margin:0;color:#c8d4e6;font-size:12px;line-height:1.55}
+
+
+.storage-ok{color:var(--accent);font-weight:800}
+.storage-warn{color:var(--warn);font-weight:800}
+.storage-bad{color:var(--danger);font-weight:800}
+.install-card{border:1px solid var(--accent2);background:#0e1729}
+
+</style>
+</head>
+<body>
+<div class="app">
+<header>
+  <h1>IRON BLOCK V2.2</h1>
+  <div class="sub">Programa de fuerza + hipertrofia · 4 días · 10 semanas · seguimiento avanzado</div>
+  <div class="tabs">
+    <button class="tab active" data-tab="today">Entreno</button>
+    <button class="tab" data-tab="plan">Plan</button>
+    <button class="tab" data-tab="progress">Progreso</button>
+    <button class="tab" data-tab="analytics">Analítica</button>
+    <button class="tab" data-tab="settings">Ajustes</button>
+  </div>
+</header>
+
+<section id="today" class="view">
+  <div class="card">
+    <div class="grid2">
+      <div><label>Atleta</label><select id="athlete"></select></div>
+      <div><label>Semana</label><select id="week"></select></div>
+      <div><label>Sesión</label><select id="session"></select></div>
+      <div><label>Fecha</label><input id="date" type="date"></div>
+    </div>
+    <div id="weekNote" class="notice" style="margin-top:12px"></div>
+  </div>
+
+  <div class="card">
+    <div class="row" style="justify-content:space-between">
+      <div><h2 class="section-title" id="sessionTitle">Sesión</h2><div class="small" id="sessionDesc"></div></div>
+      <span class="badge green" id="rirBadge">RIR</span>
+    </div>
+    <div id="exerciseList"></div>
+    <div style="margin-top:12px">
+      <label>Notas de la sesión</label>
+      <textarea id="sessionNotes" placeholder="Sensaciones, molestias, sueño, tenis, cambios..."></textarea>
+    </div>
+    <div class="row" style="margin-top:12px">
+      <button class="btn" id="saveWorkout">Guardar entrenamiento</button>
+      <button class="btn secondary" id="loadPrevious">Cargar última sesión</button>
+    </div>
+  </div>
+</section>
+
+
+<section id="plan" class="view hidden">
+  <div class="card">
+    <h2 class="section-title">Bloque de 10 semanas</h2>
+    <div class="week-grid" id="weekGrid"></div>
+  </div>
+
+  <div class="card">
+    <h2 class="section-title">Qué buscamos en cada semana</h2>
+
+    <div class="planweek">
+      <h3>Semana 1 · Adaptación</h3>
+      <p><b>Objetivo:</b> volver a coger sensaciones con la rutina, los ejercicios y los rangos de repeticiones.</p>
+      <p><b>Intensidad:</b> aproximadamente RIR 3. No buscamos récords ni acabar al límite.</p>
+      <p><b>Qué hacer:</b> elegir cargas conservadoras, trabajar técnica y anotar pesos para tener una referencia inicial fiable.</p>
+    </div>
+
+    <div class="planweek">
+      <h3>Semana 2 · Adaptación +</h3>
+      <p><b>Objetivo:</b> acercarnos más a las cargas reales de trabajo.</p>
+      <p><b>Intensidad:</b> aproximadamente RIR 2.</p>
+      <p><b>Qué hacer:</b> subir peso si la semana 1 fue demasiado cómoda, pero todavía sin forzar series lentas o descontroladas.</p>
+    </div>
+
+    <div class="planweek">
+      <h3>Semana 3 · Inicio de progresión</h3>
+      <p><b>Objetivo:</b> empieza el bloque serio de mejora.</p>
+      <p><b>Intensidad:</b> RIR 1-2.</p>
+      <p><b>Qué hacer:</b> intentar superar alguna repetición o aumentar carga respecto a semanas anteriores.</p>
+    </div>
+
+    <div class="planweek">
+      <h3>Semana 4 · Progresión</h3>
+      <p><b>Objetivo:</b> consolidar cargas y seguir sumando repeticiones.</p>
+      <p><b>Intensidad:</b> RIR 1-2.</p>
+      <p><b>Qué hacer:</b> buscar pequeñas mejoras sin sacrificar técnica. Una repetición más ya es progreso.</p>
+    </div>
+
+    <div class="planweek">
+      <h3>Semana 5 · Carga alta</h3>
+      <p><b>Objetivo:</b> semana más exigente del primer bloque.</p>
+      <p><b>Intensidad:</b> normalmente RIR 1.</p>
+      <p><b>Qué hacer:</b> apretar de verdad, pero evitando fallos innecesarios en sentadilla, banca, peso muerto y press militar.</p>
+    </div>
+
+    <div class="planweek" style="border-color:var(--warn)">
+      <h3>Semana 6 · Deload / descarga</h3>
+      <p><b>Objetivo:</b> reducir fatiga acumulada y llegar fresco al segundo bloque.</p>
+      <p><b>Intensidad:</b> aproximadamente RIR 4.</p>
+      <p><b>Qué hacer:</b> reducir alrededor del 40-50% de las series y usar cargas cómodas. Esta semana no se pierde progreso: se facilita la recuperación.</p>
+    </div>
+
+    <div class="planweek">
+      <h3>Semana 7 · Segundo bloque</h3>
+      <p><b>Objetivo:</b> volver a cargas serias después de la descarga.</p>
+      <p><b>Intensidad:</b> RIR 2.</p>
+      <p><b>Qué hacer:</b> usar como referencia las semanas 4-5 e intentar volver rápidamente a esos números.</p>
+    </div>
+
+    <div class="planweek">
+      <h3>Semana 8 · Progresión 2</h3>
+      <p><b>Objetivo:</b> superar las marcas del primer bloque.</p>
+      <p><b>Intensidad:</b> RIR 1-2.</p>
+      <p><b>Qué hacer:</b> intentar mejorar carga, repeticiones o ambas respecto a semanas 4-5.</p>
+    </div>
+
+    <div class="planweek">
+      <h3>Semana 9 · Pico de carga</h3>
+      <p><b>Objetivo:</b> semana más dura del programa.</p>
+      <p><b>Intensidad:</b> cerca de RIR 1.</p>
+      <p><b>Qué hacer:</b> buscar tus mejores series del bloque sin necesidad de llegar al fallo.</p>
+    </div>
+
+    <div class="planweek">
+      <h3>Semana 10 · Consolidación</h3>
+      <p><b>Objetivo:</b> cerrar el bloque comprobando cuánto habéis progresado.</p>
+      <p><b>Intensidad:</b> RIR 1 aproximadamente.</p>
+      <p><b>Qué hacer:</b> buscar PRs de repeticiones o de carga dentro de los rangos del programa. No hace falta probar un 1RM real.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2 class="section-title">Cómo funciona la rutina</h2>
+    <div class="small" style="line-height:1.7">
+      <p><b>Upper A:</b> torso con mayor énfasis en fuerza. Press banca y tirones pesados son protagonistas.</p>
+      <p><b>Lower A:</b> pierna con mayor énfasis en fuerza. La sentadilla es el movimiento principal.</p>
+      <p><b>Upper B:</b> torso con algo más de volumen y enfoque en hipertrofia, manteniendo trabajo pesado.</p>
+      <p><b>Lower B:</b> cadena posterior y pierna, con peso muerto/trap bar, hack squat y accesorios.</p>
+      <p><b>Frecuencia:</b> cada grupo muscular recibe estímulo dos veces por semana.</p>
+      <p><b>Tenis:</b> evita colocar el día Lower B justo antes de un partido o sesión intensa.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2 class="section-title">Glosario</h2>
+
+    <div class="glossary-item">
+      <b>RIR · Repeticiones en reserva</b>
+      <p>Indica cuántas repeticiones crees que todavía podrías haber hecho antes de fallar. RIR 3 = podrías hacer unas 3 más. RIR 2 = 2 más. RIR 1 = 1 más. RIR 0 = fallo.</p>
+    </div>
+
+    <div class="glossary-item">
+      <b>Upper</b>
+      <p>Entrenamiento de tren superior: pecho, espalda, hombros, bíceps y tríceps.</p>
+    </div>
+
+    <div class="glossary-item">
+      <b>Lower</b>
+      <p>Entrenamiento de tren inferior: cuádriceps, isquios, glúteos, gemelos y cadena posterior.</p>
+    </div>
+
+    <div class="glossary-item">
+      <b>PR · Personal Record</b>
+      <p>Tu mejor marca personal. Puede ser más peso, más repeticiones con el mismo peso o un mejor 1RM estimado.</p>
+    </div>
+
+    <div class="glossary-item">
+      <b>1RM estimado</b>
+      <p>Estimación del peso máximo que podrías mover una vez. La app lo calcula a partir del peso y repeticiones de tus mejores series; no significa que debas probarlo físicamente.</p>
+    </div>
+
+    <div class="glossary-item">
+      <b>Volumen</b>
+      <p>Cantidad total de trabajo realizada. En la app se aproxima sumando peso × repeticiones de todas las series registradas.</p>
+    </div>
+
+    <div class="glossary-item">
+      <b>Hipertrofia</b>
+      <p>Aumento del tamaño muscular. Normalmente se trabaja con un volumen relativamente alto, repeticiones moderadas y series cerca del fallo.</p>
+    </div>
+
+    <div class="glossary-item">
+      <b>Fuerza</b>
+      <p>Capacidad de mover cargas altas. En este programa los ejercicios principales usan rangos bajos o medios de repeticiones y descansos más largos.</p>
+    </div>
+
+    <div class="glossary-item">
+      <b>Deload / descarga</b>
+      <p>Semana intencionadamente más fácil para reducir fatiga. Se baja volumen e intensidad para recuperar articulaciones, musculatura y rendimiento.</p>
+    </div>
+
+    <div class="glossary-item">
+      <b>Doble progresión</b>
+      <p>Primero intentas aumentar repeticiones dentro del rango. Cuando completas el máximo del rango en todas las series con el RIR adecuado, subes peso y vuelves a progresar desde abajo.</p>
+    </div>
+
+    <div class="glossary-item">
+      <b>Fallo muscular</b>
+      <p>Momento en el que ya no puedes completar otra repetición con buena técnica. No es necesario buscarlo constantemente, especialmente en ejercicios pesados.</p>
+    </div>
+
+    <div class="glossary-item">
+      <b>Serie efectiva</b>
+      <p>Serie suficientemente exigente como para generar un estímulo relevante. Generalmente las series realizadas cerca del fallo, sin perder técnica, cuentan como trabajo efectivo.</p>
+    </div>
+
+    <div class="glossary-item">
+      <b>Cadena posterior</b>
+      <p>Conjunto de músculos de la parte posterior del cuerpo, especialmente glúteos, isquiosurales y erectores espinales.</p>
+    </div>
+
+    <div class="glossary-item">
+      <b>Ejercicio compuesto</b>
+      <p>Movimiento que utiliza varias articulaciones y grupos musculares a la vez, como sentadilla, press banca, peso muerto o dominadas.</p>
+    </div>
+
+    <div class="glossary-item">
+      <b>Ejercicio accesorio</b>
+      <p>Movimiento más específico usado para añadir volumen o trabajar un músculo concreto, como curl de bíceps, extensiones de tríceps o elevaciones laterales.</p>
+    </div>
+
+    <div class="glossary-item">
+      <b>Grinder</b>
+      <p>Repetición extremadamente lenta y forzada que apenas se consigue completar. Puede aparecer puntualmente, pero no queremos entrenar así de forma habitual.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2 class="section-title">Regla rápida de progresión</h2>
+    <div class="notice">
+      Si completas todas las series en el extremo superior del rango con buena técnica y aproximadamente RIR 1, la siguiente vez sube peso. Como referencia: +2-2,5 kg en tren superior y +2,5-5 kg en tren inferior.
+    </div>
+  </div>
+</section>
+
+<section id="progress" class="view hidden">
+  <div class="card">
+    <h2 class="section-title">Peso corporal</h2>
+    <div class="grid3">
+      <div><label>Fecha</label><input id="bwDate" type="date"></div>
+      <div><label>Peso (kg)</label><input id="bwValue" type="number" step="0.1"></div>
+      <div style="align-self:end"><button class="btn" id="saveBW">Guardar peso</button></div>
+    </div>
+    <div class="grid3" style="margin-top:12px">
+      <div class="kpi"><span class="small">Inicial</span><b id="bwStart">—</b></div>
+      <div class="kpi"><span class="small">Último</span><b id="bwLast">—</b></div>
+      <div class="kpi"><span class="small">Cambio</span><b id="bwChange">—</b></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2 class="section-title">Entrenamientos guardados</h2>
+    <div style="overflow:auto">
+      <table>
+        <thead><tr><th>Fecha</th><th>Semana</th><th>Sesión</th><th>Atleta</th></tr></thead>
+        <tbody id="history"></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+
+<section id="analytics" class="view hidden">
+  <div class="card">
+    <div class="row" style="justify-content:space-between">
+      <div>
+        <h2 class="section-title">Analítica del atleta</h2>
+        <div class="small">Usa el atleta seleccionado en Entreno.</div>
+      </div>
+      <button class="btn secondary" id="refreshAnalytics">Actualizar</button>
+    </div>
+    <div class="metric-grid" style="margin-top:12px">
+      <div class="kpi"><span class="small">Sesiones</span><b id="kpiSessions">0</b></div>
+      <div class="kpi"><span class="small">Volumen total</span><b id="kpiVolume">0 kg</b></div>
+      <div class="kpi"><span class="small">Ejercicios con PR</span><b id="kpiPRs">0</b></div>
+      <div class="kpi"><span class="small">Objetivo peso</span><b id="kpiGoal">—</b></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2 class="section-title">Evolución del peso corporal</h2>
+    <div class="chartbox"><canvas id="weightChart" width="840" height="220"></canvas></div>
+  </div>
+
+  <div class="card">
+    <h2 class="section-title">Fuerza estimada (1RM)</h2>
+    <div class="grid2">
+      <div><label>Ejercicio</label><select id="strengthExercise"></select></div>
+      <div style="align-self:end"><div class="small">Estimación Epley: peso × (1 + reps/30).</div></div>
+    </div>
+    <div class="chartbox" style="margin-top:12px"><canvas id="strengthChart" width="840" height="220"></canvas></div>
+  </div>
+
+  <div class="card">
+    <h2 class="section-title">PRs actuales</h2>
+    <div style="overflow:auto">
+      <table>
+        <thead><tr><th>Ejercicio</th><th>Mejor serie</th><th>1RM est.</th><th>Fecha</th></tr></thead>
+        <tbody id="prTable"></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+
+<section id="settings" class="view hidden">
+  <div class="card install-card">
+    <h2 class="section-title">Persistencia y modo app</h2>
+    <div id="storageStatus" class="small">Comprobando almacenamiento...</div>
+    <div class="row" style="margin-top:12px">
+      <button class="btn" id="installApp" style="display:none">Instalar IRON BLOCK</button>
+      <button class="btn secondary" id="forceSave">Forzar guardado ahora</button>
+    </div>
+    <p class="small" style="margin-top:10px">
+      Para que los datos sobrevivan de forma fiable entre cierres, abre esta V2.2 desde una URL HTTPS estable o instálala como PWA.
+      Si la abres directamente desde Descargas como <code>file://</code> o <code>content://</code>, Android/Chrome puede aislar el almacenamiento entre aperturas.
+    </p>
+  </div>
+  <div class="card">
+    <h2 class="section-title">Atletas</h2>
+    <div class="grid2">
+      <div><label>Atleta 1</label><input id="athlete1"></div>
+      <div><label>Atleta 2</label><input id="athlete2"></div>
+      <div><label>Objetivo atleta 1 (kg)</label><input id="goal1" type="number" step="0.1"></div>
+      <div><label>Objetivo atleta 2 (kg)</label><input id="goal2" type="number" step="0.1"></div>
+    </div>
+    <button class="btn" id="saveSettings" style="margin-top:12px">Guardar ajustes</button>
+  </div>
+
+  <div class="card">
+    <h2 class="section-title">Datos</h2>
+    <div class="row">
+      <button class="btn secondary" id="exportData">Exportar copia</button>
+      <label class="btn secondary" style="display:inline-block;margin:0">
+        Importar copia
+        <input type="file" id="importData" accept=".json" style="display:none">
+      </label>
+      <button class="btn danger" id="resetData">Borrar todos los datos</button>
+    </div>
+    <p class="small">Los datos se guardan localmente en este dispositivo/navegador. Exportad una copia de vez en cuando.</p>
+  </div>
+</section>
+
+<div class="footer-note">IRON BLOCK V2.2 · Entrenad duro, progresad con cabeza y registrad todo.</div>
+</div>
+
+<script>
+const program = {
+  "Upper A": {
+    desc:"Fuerza torso · prioridad banca + tirón vertical",
+    exercises:[
+      ["Press banca barra",4,"4-6","3 min"],
+      ["Dominadas lastradas / jalón",4,"5-8","2-3 min"],
+      ["Press militar",3,"6-8","2-3 min"],
+      ["Remo apoyado en pecho",3,"6-10","2 min"],
+      ["Elevaciones laterales",3,"12-20","60-90 s"],
+      ["Extensión tríceps polea",2,"10-15","60-90 s"],
+      ["Curl bíceps",2,"10-15","60-90 s"]
+    ]
+  },
+  "Lower A": {
+    desc:"Fuerza pierna · sentadilla como principal",
+    exercises:[
+      ["Sentadilla trasera",4,"4-6","3-4 min"],
+      ["Peso muerto rumano",3,"6-8","2-3 min"],
+      ["Prensa",3,"8-10","2 min"],
+      ["Curl femoral",3,"8-12","90 s"],
+      ["Gemelos",3,"8-15","60-90 s"],
+      ["Abdominal pesado",3,"8-15","60-90 s"]
+    ]
+  },
+  "Upper B": {
+    desc:"Hipertrofia torso + trabajo de fuerza secundaria",
+    exercises:[
+      ["Press inclinado barra/mancuernas",3,"6-10","2-3 min"],
+      ["Remo barra / máquina",4,"6-10","2 min"],
+      ["Press banca con pausa",3,"6-8","2-3 min"],
+      ["Jalón al pecho",3,"8-12","90-120 s"],
+      ["Peck deck / aperturas",2,"10-15","90 s"],
+      ["Elevaciones laterales",3,"12-20","60 s"],
+      ["Curl bíceps",2,"8-12","60-90 s"],
+      ["Tríceps polea/copa",2,"8-12","60-90 s"]
+    ]
+  },
+  "Lower B": {
+    desc:"Cadena posterior + hipertrofia pierna",
+    exercises:[
+      ["Peso muerto / trap bar",3,"3-5","3-4 min"],
+      ["Hack squat",3,"6-10","2-3 min"],
+      ["Búlgara",3,"8-12/pierna","2 min"],
+      ["Curl femoral",3,"10-15","90 s"],
+      ["Extensión cuádriceps",2,"12-15","60-90 s"],
+      ["Gemelos",3,"10-15","60-90 s"],
+      ["Core",3,"10-20","60-90 s"]
+    ]
+  }
+};
+
+const weekInfo = {
+  1:["Adaptación","RIR 3","Aprender cargas. Nada de grinders."],
+  2:["Adaptación+","RIR 2","Sube algo si la técnica fue limpia."],
+  3:["Carga","RIR 1-2","Empieza la progresión real."],
+  4:["Carga","RIR 1-2","Busca superar reps o peso."],
+  5:["Carga alta","RIR 1","Semana exigente, sin destruir técnica."],
+  6:["DELOAD","RIR 4","Haz ~50-60% del volumen habitual."],
+  7:["Carga 2","RIR 2","Retoma por encima de semana 4 si procede."],
+  8:["Carga 2","RIR 1-2","Progresión agresiva pero limpia."],
+  9:["Pico","RIR 1","Semana más dura del bloque."],
+  10:["Consolidación","RIR 1","PRs de reps; no hace falta 1RM."]
+};
+
+const key="ironBlockV1";
+const dbName="IronBlockDB";
+const dbStore="state";
+const defaultState={
+  settings:{athlete1:"Guillem",athlete2:"Biel",goal1:"95",goal2:"80"},
+  workouts:[], bodyweights:[]
+};
+let state = (()=> {
+  try { return JSON.parse(localStorage.getItem(key) || "null") || structuredClone(defaultState); }
+  catch(e){ return structuredClone(defaultState); }
+})();
+
+
+function openDB(){
+  return new Promise((resolve,reject)=>{
+    if(!("indexedDB" in window)){reject(new Error("IndexedDB no disponible"));return}
+    const req=indexedDB.open(dbName,1);
+    req.onupgradeneeded=()=>{const db=req.result;if(!db.objectStoreNames.contains(dbStore))db.createObjectStore(dbStore)};
+    req.onsuccess=()=>resolve(req.result);
+    req.onerror=()=>reject(req.error);
+  });
+}
+async function saveToIndexedDB(){
+  const db=await openDB();
+  return new Promise((resolve,reject)=>{
+    const tx=db.transaction(dbStore,"readwrite");
+    tx.objectStore(dbStore).put(JSON.parse(JSON.stringify(state)),"appState");
+    tx.oncomplete=()=>{db.close();resolve(true)};
+    tx.onerror=()=>{db.close();reject(tx.error)};
+  });
+}
+async function loadFromIndexedDB(){
+  try{
+    const db=await openDB();
+    const result=await new Promise((resolve,reject)=>{
+      const tx=db.transaction(dbStore,"readonly");
+      const req=tx.objectStore(dbStore).get("appState");
+      req.onsuccess=()=>resolve(req.result||null);
+      req.onerror=()=>reject(req.error);
+    });
+    db.close(); return result;
+  }catch(e){return null}
+}
+function save(){
+  try{ localStorage.setItem(key,JSON.stringify(state)); }catch(e){}
+  saveToIndexedDB().catch(()=>{});
+}
+
+// Migración automática de V1 a V2
+if(state.settings.athlete2==="Amigo"){
+  state.workouts.forEach(x=>{if(x.athlete==="Amigo")x.athlete="Biel"});
+  state.bodyweights.forEach(x=>{if(x.athlete==="Amigo")x.athlete="Biel"});
+  state.settings.athlete2="Biel";
+}
+if(!state.settings.goal1)state.settings.goal1="95";
+if(!state.settings.goal2)state.settings.goal2="80";
+save();
+
+function todayISO(){ return new Date().toISOString().slice(0,10); }
+
+const el=id=>document.getElementById(id);
+
+function initSelectors(){
+  el("athlete").innerHTML = `<option>${state.settings.athlete1}</option><option>${state.settings.athlete2}</option>`;
+  el("week").innerHTML = Array.from({length:10},(_,i)=>`<option value="${i+1}">Semana ${i+1}</option>`).join("");
+  el("session").innerHTML = Object.keys(program).map(x=>`<option>${x}</option>`).join("");
+  el("date").value=todayISO(); el("bwDate").value=todayISO();
+  el("athlete1").value=state.settings.athlete1; el("athlete2").value=state.settings.athlete2;
+  el("goal1").value=state.settings.goal1; el("goal2").value=state.settings.goal2;
+}
+
+function getWeekSets(base,w){return w===6?Math.max(1,Math.ceil(base*0.55)):base}
+function parseRestSeconds(rest){
+  if(rest.includes("3-4"))return 210;if(rest.includes("2-3"))return 150;
+  if(rest.includes("90-120"))return 105;if(rest.includes("60-90"))return 75;
+  if(rest.includes("3 min"))return 180;if(rest.includes("2 min"))return 120;
+  if(rest.includes("90 s"))return 90;if(rest.includes("60 s"))return 60;return 90;
+}
+function bestEstimated1RM(athlete,exercise){
+  let best=null;
+  state.workouts.filter(x=>x.athlete===athlete).forEach(w=>{
+    (w.exercises||[]).filter(e=>e.name===exercise).forEach(e=>{
+      (e.sets||[]).forEach(s=>{
+        const kg=parseFloat(s.kg),reps=parseInt(s.reps);
+        if(kg>0&&reps>0){const e1rm=kg*(1+reps/30);if(!best||e1rm>best.e1rm)best={e1rm,kg,reps,date:w.date}}
+      })
+    })
+  });
+  return best;
+}
+function lastExercisePerformance(athlete,session,exercise){
+  const ws=state.workouts.filter(x=>x.athlete===athlete&&x.session===session).sort((a,b)=>b.date.localeCompare(a.date));
+  for(const w of ws){const ex=(w.exercises||[]).find(e=>e.name===exercise);if(ex)return ex}
+  return null;
+}
+function progressionSuggestion(athlete,session,exercise,repRange,week){
+  if(week<=2)return "Prioridad: técnica y margen.";
+  if(week===6)return "Descarga: peso cómodo y menos volumen.";
+  const last=lastExercisePerformance(athlete,session,exercise);
+  if(!last)return "Primera referencia: encuentra una carga exigente pero limpia.";
+  const nums=String(repRange).match(/\d+/g)||[];
+  const maxRep=parseInt(nums[nums.length-1]||"0");
+  const valid=(last.sets||[]).filter(s=>parseFloat(s.kg)>0&&parseInt(s.reps)>0);
+  if(!valid.length)return "Sin datos suficientes.";
+  const allTop=valid.every(s=>parseInt(s.reps)>=maxRep&&(s.rir===""||parseFloat(s.rir)<=1.5));
+  if(allTop){
+    const lower=/sentadilla|peso muerto|prensa|hack|búlgara|femoral|cuádriceps|gemelos/i.test(exercise);
+    return `✓ Toca subir carga: +${lower?"2,5-5":"2-2,5"} kg aprox.`;
+  }
+  return "Intenta mejorar 1-2 reps totales antes de subir peso.";
+}
+function renderWorkout(){
+  const w=+el("week").value,s=el("session").value,p=program[s],athlete=el("athlete").value;
+  const wi=weekInfo[w];
+  el("sessionTitle").textContent=s;el("sessionDesc").textContent=p.desc;el("rirBadge").textContent=wi[1];
+  el("weekNote").innerHTML=`<b>Semana ${w} · ${wi[0]}</b><br>${wi[2]}`;
+  el("exerciseList").innerHTML=p.exercises.map((e,idx)=>{
+    const sets=getWeekSets(e[1],w),best=bestEstimated1RM(athlete,e[0]);
+    const prText=best?`PR est.: ${best.e1rm.toFixed(1)} kg (${best.kg}×${best.reps})`:"Sin PR registrado";
+    const suggestion=progressionSuggestion(athlete,s,e[0],e[2],w),restSec=parseRestSeconds(e[3]);
+    return `<div class="exercise" data-ex="${idx}" data-rest="${restSec}" data-name="${e[0]}">
+      <div class="ex-head"><div><div class="ex-name">${e[0]}</div>
+      <div class="ex-meta">${sets} series · ${e[2]} reps · descanso ${e[3]}</div>
+      <div class="pr">${prText}</div><div class="suggest">${suggestion}</div></div><span class="badge">${wi[1]}</span></div>
+      <div class="sets">${Array.from({length:sets},(_,i)=>`
+        <div class="setrow">
+          <button class="donebtn" type="button" data-done="${i}" title="Serie completada">✓</button>
+          <input type="number" step="0.5" inputmode="decimal" placeholder="kg" data-field="kg" data-set="${i}">
+          <input type="text" inputmode="numeric" placeholder="reps" data-field="reps" data-set="${i}">
+          <input type="number" step="1" min="0" max="5" placeholder="RIR" data-field="rir" data-set="${i}">
+        </div>`).join("")}</div>
+    </div>`;
+  }).join("");
+  document.querySelectorAll(".donebtn").forEach(btn=>btn.addEventListener("click",()=>{
+    btn.classList.toggle("done");
+    if(btn.classList.contains("done")){const ex=btn.closest(".exercise");startTimer(+ex.dataset.rest,ex.dataset.name)}
+  }));
+  el("sessionNotes").value="";
+}
+
+function collectWorkout(){
+  const s=el("session").value, p=program[s];
+  const exercises=[...document.querySelectorAll(".exercise")].map((box,idx)=>{
+    const sets=[...box.querySelectorAll(".setrow")].map(row=>({
+      kg:row.querySelector('[data-field="kg"]').value,
+      reps:row.querySelector('[data-field="reps"]').value,
+      rir:row.querySelector('[data-field="rir"]').value
+    }));
+    return {name:p.exercises[idx][0],sets};
+  });
+  return {
+    id:Date.now(), athlete:el("athlete").value, week:+el("week").value,
+    session:s,date:el("date").value,notes:el("sessionNotes").value,exercises
+  };
+}
+
+function renderHistory(){
+  const ath=el("athlete").value;
+  const rows=state.workouts.filter(x=>x.athlete===ath).sort((a,b)=>b.date.localeCompare(a.date));
+  el("history").innerHTML=rows.length?rows.map(x=>`<tr><td>${x.date}</td><td>${x.week}</td><td>${x.session}</td><td>${x.athlete}</td></tr>`).join("")
+  :`<tr><td colspan="4" class="small">Todavía no hay entrenamientos guardados.</td></tr>`;
+
+  const bw=state.bodyweights.filter(x=>x.athlete===ath).sort((a,b)=>a.date.localeCompare(b.date));
+  if(bw.length){
+    const first=+bw[0].weight,last=+bw[bw.length-1].weight,d=last-first;
+    el("bwStart").textContent=first.toFixed(1)+" kg";
+    el("bwLast").textContent=last.toFixed(1)+" kg";
+    el("bwChange").textContent=(d>0?"+":"")+d.toFixed(1)+" kg";
+  }else{
+    ["bwStart","bwLast","bwChange"].forEach(id=>el(id).textContent="—");
+  }
+}
+
+function renderWeeks(){
+  el("weekGrid").innerHTML=Object.entries(weekInfo).map(([n,v])=>
+    `<div class="week ${+n===6?'deload':''}"><b>Semana ${n}</b><br>${v[0]}<br><span class="small">${v[1]}</span></div>`
+  ).join("");
+}
+
+function loadPrevious(){
+  const ath=el("athlete").value,ses=el("session").value;
+  const prev=state.workouts.filter(x=>x.athlete===ath&&x.session===ses).sort((a,b)=>b.date.localeCompare(a.date))[0];
+  if(!prev){alert("No hay una sesión anterior de este día.");return}
+  const boxes=[...document.querySelectorAll(".exercise")];
+  boxes.forEach((box,ei)=>{
+    const rows=[...box.querySelectorAll(".setrow")];
+    const saved=prev.exercises?.[ei]?.sets||[];
+    rows.forEach((row,si)=>{
+      if(saved[si]){
+        row.querySelector('[data-field="kg"]').value=saved[si].kg||"";
+        row.querySelector('[data-field="reps"]').value=saved[si].reps||"";
+        row.querySelector('[data-field="rir"]').value=saved[si].rir||"";
+      }
+    });
+  });
+  el("sessionNotes").value=`Referencia cargada desde ${prev.date}. `;
+}
+
+document.querySelectorAll(".tab").forEach(btn=>btn.addEventListener("click",()=>{
+  document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
+  document.querySelectorAll(".view").forEach(x=>x.classList.add("hidden"));
+  btn.classList.add("active"); el(btn.dataset.tab).classList.remove("hidden");
+  if(btn.dataset.tab==="progress")renderHistory();if(btn.dataset.tab==="analytics")renderAnalytics();
+}));
+
+["week","session"].forEach(id=>el(id).addEventListener("change",renderWorkout));
+el("athlete").addEventListener("change",renderHistory);
+
+el("saveWorkout").addEventListener("click",()=>{
+  const w=collectWorkout();
+  const duplicate=state.workouts.findIndex(x=>x.athlete===w.athlete&&x.date===w.date&&x.session===w.session);
+  if(duplicate>=0){
+    if(confirm("Ya hay un entrenamiento de esta sesión en esta fecha. ¿Sobrescribir?")) state.workouts[duplicate]=w;
+    else return;
+  } else state.workouts.push(w);
+  save();renderHistory();renderAnalytics();renderWorkout();alert("Entrenamiento guardado.");
+});
+
+el("loadPrevious").addEventListener("click",loadPrevious);
+
+el("saveBW").addEventListener("click",()=>{
+  const weight=parseFloat(el("bwValue").value);
+  if(!weight){alert("Introduce un peso válido.");return}
+  const rec={athlete:el("athlete").value,date:el("bwDate").value,weight};
+  const idx=state.bodyweights.findIndex(x=>x.athlete===rec.athlete&&x.date===rec.date);
+  if(idx>=0)state.bodyweights[idx]=rec; else state.bodyweights.push(rec);
+  save();renderHistory();renderAnalytics();el("bwValue").value="";alert("Peso guardado.");
+});
+
+el("saveSettings").addEventListener("click",()=>{
+  const old1=state.settings.athlete1, old2=state.settings.athlete2;
+  const n1=el("athlete1").value.trim()||"Atleta 1";
+  const n2=el("athlete2").value.trim()||"Atleta 2";
+  state.workouts.forEach(x=>{if(x.athlete===old1)x.athlete=n1;if(x.athlete===old2)x.athlete=n2});
+  state.bodyweights.forEach(x=>{if(x.athlete===old1)x.athlete=n1;if(x.athlete===old2)x.athlete=n2});
+  state.settings={athlete1:n1,athlete2:n2,goal1:el("goal1").value,goal2:el("goal2").value};
+  save();initSelectors();renderWorkout();renderAnalytics();alert("Ajustes guardados.");
+});
+
+el("exportData").addEventListener("click",()=>{
+  const blob=new Blob([JSON.stringify(state,null,2)],{type:"application/json"});
+  const a=document.createElement("a"); a.href=URL.createObjectURL(blob);
+  a.download="iron-block-backup.json"; a.click(); URL.revokeObjectURL(a.href);
+});
+
+el("importData").addEventListener("change",async e=>{
+  const f=e.target.files[0]; if(!f)return;
+  try{
+    const imported=JSON.parse(await f.text());
+    if(!imported.settings||!Array.isArray(imported.workouts))throw new Error();
+    state=imported; save(); initSelectors(); renderWorkout(); renderHistory(); alert("Copia importada.");
+  }catch{alert("El archivo no parece una copia válida.");}
+});
+
+el("resetData").addEventListener("click",()=>{
+  if(confirm("Esto borrará todos los entrenamientos y pesos guardados. ¿Continuar?")){
+    localStorage.removeItem(key); location.reload();
+  }
+});
+
+
+function workoutVolume(w){
+  let total=0;(w.exercises||[]).forEach(e=>(e.sets||[]).forEach(s=>{
+    const kg=parseFloat(s.kg),reps=parseInt(s.reps);if(kg>0&&reps>0)total+=kg*reps;
+  }));return total;
+}
+function allExerciseNames(){return [...new Set(Object.values(program).flatMap(p=>p.exercises.map(e=>e[0])))]}
+function athleteGoal(ath){return ath===state.settings.athlete1?state.settings.goal1:state.settings.goal2}
+function getPRs(ath){
+  const out={};state.workouts.filter(w=>w.athlete===ath).forEach(w=>(w.exercises||[]).forEach(e=>(e.sets||[]).forEach(s=>{
+    const kg=parseFloat(s.kg),reps=parseInt(s.reps);
+    if(kg>0&&reps>0){const e1rm=kg*(1+reps/30);if(!out[e.name]||e1rm>out[e.name].e1rm)out[e.name]={e1rm,kg,reps,date:w.date}}
+  })));return out;
+}
+function drawLineChart(canvas,points,suffix=""){
+  const ctx=canvas.getContext("2d"),W=canvas.width,H=canvas.height,pad=34;
+  ctx.clearRect(0,0,W,H);ctx.strokeStyle="#263451";ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(pad,pad);ctx.lineTo(pad,H-pad);ctx.lineTo(W-pad,H-pad);ctx.stroke();
+  if(!points.length){ctx.fillStyle="#9ba8bf";ctx.font="14px system-ui";ctx.fillText("Sin datos suficientes",pad+10,H/2);return}
+  const ys=points.map(p=>p.y);let ymin=Math.min(...ys),ymax=Math.max(...ys);if(ymin===ymax){ymin-=1;ymax+=1}
+  const step=points.length===1?0:(W-pad*2)/(points.length-1),yp=v=>H-pad-(v-ymin)/(ymax-ymin)*(H-pad*2);
+  ctx.strokeStyle="#72e6a3";ctx.lineWidth=3;ctx.beginPath();
+  points.forEach((p,i)=>{const x=pad+i*step,y=yp(p.y);i===0?ctx.moveTo(x,y):ctx.lineTo(x,y)});ctx.stroke();
+  ctx.fillStyle="#72e6a3";points.forEach((p,i)=>{const x=pad+i*step,y=yp(p.y);ctx.beginPath();ctx.arc(x,y,4,0,Math.PI*2);ctx.fill()});
+  ctx.fillStyle="#9ba8bf";ctx.font="11px system-ui";ctx.fillText(ymax.toFixed(1)+suffix,4,pad+3);ctx.fillText(ymin.toFixed(1)+suffix,4,H-pad+3);
+  [...new Set([0,Math.floor((points.length-1)/2),points.length-1])].forEach(i=>ctx.fillText(points[i].label,pad+i*step-18,H-8));
+}
+function renderAnalytics(){
+  const ath=el("athlete").value,workouts=state.workouts.filter(w=>w.athlete===ath).sort((a,b)=>a.date.localeCompare(b.date)),prs=getPRs(ath);
+  el("kpiSessions").textContent=workouts.length;
+  el("kpiVolume").textContent=Math.round(workouts.reduce((s,w)=>s+workoutVolume(w),0)).toLocaleString("es-ES")+" kg";
+  el("kpiPRs").textContent=Object.keys(prs).length;
+  const goal=athleteGoal(ath);el("kpiGoal").textContent=goal?goal+" kg":"—";
+  const bw=state.bodyweights.filter(x=>x.athlete===ath).sort((a,b)=>a.date.localeCompare(b.date));
+  drawLineChart(el("weightChart"),bw.map(x=>({label:x.date.slice(5),y:+x.weight}))," kg");
+  const exSel=el("strengthExercise"),names=allExerciseNames(),prev=exSel.value;
+  exSel.innerHTML=names.map(n=>`<option>${n}</option>`).join("");if(names.includes(prev))exSel.value=prev;renderStrengthChart();
+  const rows=Object.entries(prs).sort((a,b)=>b[1].e1rm-a[1].e1rm);
+  el("prTable").innerHTML=rows.length?rows.map(([name,p])=>`<tr><td>${name}</td><td>${p.kg} × ${p.reps}</td><td>${p.e1rm.toFixed(1)} kg</td><td>${p.date}</td></tr>`).join(""):`<tr><td colspan="4" class="small">Aún no hay PRs registrados.</td></tr>`;
+}
+function renderStrengthChart(){
+  const ath=el("athlete").value,name=el("strengthExercise").value;if(!name)return;const pts=[];
+  state.workouts.filter(w=>w.athlete===ath).sort((a,b)=>a.date.localeCompare(b.date)).forEach(w=>{
+    const ex=(w.exercises||[]).find(e=>e.name===name);if(!ex)return;let best=0;
+    (ex.sets||[]).forEach(s=>{const kg=parseFloat(s.kg),reps=parseInt(s.reps);if(kg>0&&reps>0)best=Math.max(best,kg*(1+reps/30))});
+    if(best>0)pts.push({label:w.date.slice(5),y:best});
+  });drawLineChart(el("strengthChart"),pts," kg");
+}
+el("refreshAnalytics").addEventListener("click",renderAnalytics);
+el("strengthExercise").addEventListener("change",renderStrengthChart);
+
+let timerSeconds=0,timerInterval=null;
+function formatTime(s){const m=Math.floor(s/60),sec=s%60;return `${String(m).padStart(2,"0")}:${String(sec).padStart(2,"0")}`}
+function updateTimer(){
+  el("timerDisplay").textContent=formatTime(Math.max(0,timerSeconds));
+  if(timerSeconds<=0&&timerInterval){clearInterval(timerInterval);timerInterval=null;el("timerSub").textContent="Descanso terminado";if(navigator.vibrate)navigator.vibrate([200,100,200])}
+}
+function startTimer(sec,name){
+  if(timerInterval)clearInterval(timerInterval);timerSeconds=sec;el("timerTitle").textContent=name;el("timerSub").textContent="Descanso recomendado";updateTimer();
+  timerInterval=setInterval(()=>{timerSeconds--;updateTimer()},1000);
+}
+el("timerPlus").addEventListener("click",()=>{timerSeconds+=15;updateTimer()});
+el("timerMinus").addEventListener("click",()=>{timerSeconds=Math.max(0,timerSeconds-15);updateTimer()});
+el("timerStop").addEventListener("click",()=>{if(timerInterval)clearInterval(timerInterval);timerInterval=null;timerSeconds=0;el("timerTitle").textContent="Descanso";el("timerSub").textContent="Pulsa ✓ al terminar una serie";updateTimer()});
+
+
+
+let deferredInstallPrompt=null;
+
+function renderStorageStatus(){
+  const node=el("storageStatus");
+  if(!node)return;
+  const proto=location.protocol;
+  if(proto==="https:" || proto==="http:"){
+    node.innerHTML='<span class="storage-ok">✓ Origen estable.</span> Guardado duplicado en IndexedDB + localStorage. Esta es la forma recomendada.';
+  }else{
+    node.innerHTML='<span class="storage-warn">⚠ Archivo local detectado.</span> La app guardará igualmente, pero Android/Chrome puede asignar un origen distinto al reabrirlo. Para persistencia fiable, usa la versión PWA alojada.';
+  }
+}
+
+async function bootPersistentState(){
+  const fromDB=await loadFromIndexedDB();
+  if(fromDB && fromDB.settings){
+    state=fromDB;
+  }else{
+    try{
+      const ls=JSON.parse(localStorage.getItem(key)||"null");
+      if(ls && ls.settings) state=ls;
+    }catch(e){}
+  }
+
+  // Migraciones/valores por defecto
+  if(!state.settings)state.settings=structuredClone(defaultState.settings);
+  if(!state.workouts)state.workouts=[];
+  if(!state.bodyweights)state.bodyweights=[];
+  if(state.settings.athlete2==="Amigo"){
+    state.workouts.forEach(x=>{if(x.athlete==="Amigo")x.athlete="Biel"});
+    state.bodyweights.forEach(x=>{if(x.athlete==="Amigo")x.athlete="Biel"});
+    state.settings.athlete2="Biel";
+  }
+  if(!state.settings.goal1)state.settings.goal1="95";
+  if(!state.settings.goal2)state.settings.goal2="80";
+  save();
+
+  initSelectors();
+  renderWorkout();
+  renderWeeks();
+  renderHistory();
+  renderAnalytics();
+  renderStorageStatus();
+}
+
+window.addEventListener("beforeinstallprompt",(e)=>{
+  e.preventDefault();
+  deferredInstallPrompt=e;
+  const btn=el("installApp"); if(btn)btn.style.display="inline-block";
+});
+
+window.addEventListener("appinstalled",()=>{
+  const btn=el("installApp"); if(btn)btn.style.display="none";
+  deferredInstallPrompt=null;
+});
+
+document.addEventListener("visibilitychange",()=>{
+  if(document.visibilityState==="hidden") save();
+});
+window.addEventListener("pagehide",()=>save());
+window.addEventListener("beforeunload",()=>save());
+
+if("serviceWorker" in navigator && (location.protocol==="https:" || location.hostname==="localhost")){
+  window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));
+}
+
+document.addEventListener("DOMContentLoaded",()=>{
+  const installBtn=el("installApp");
+  if(installBtn)installBtn.addEventListener("click",async()=>{
+    if(!deferredInstallPrompt){alert("La instalación aparecerá cuando abras la app desde una URL HTTPS compatible.");return}
+    deferredInstallPrompt.prompt();
+    try{await deferredInstallPrompt.userChoice}catch(e){}
+    deferredInstallPrompt=null;
+    installBtn.style.display="none";
+  });
+
+  const force=el("forceSave");
+  if(force)force.addEventListener("click",async()=>{
+    save();
+    try{await saveToIndexedDB();alert("Datos guardados en IndexedDB y localStorage.");}
+    catch(e){alert("Guardado local realizado. IndexedDB no está disponible en este contexto.");}
+  });
+
+  bootPersistentState();
+});
+</script>
+
+<div class="timerbar">
+  <div class="timerinner">
+    <div class="timerdisplay" id="timerDisplay">00:00</div>
+    <div class="timerlabel"><b id="timerTitle">Descanso</b><span id="timerSub">Pulsa ✓ al terminar una serie</span></div>
+    <button class="btn secondary" id="timerMinus">-15s</button>
+    <button class="btn secondary" id="timerPlus">+15s</button>
+    <button class="btn danger" id="timerStop">Parar</button>
+  </div>
+</div>
+
+</body>
+</html>
