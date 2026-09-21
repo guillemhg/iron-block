@@ -1,8 +1,8 @@
-const CACHE="iron-block-v2-2";
-const ASSETS=["./","./index.html","./manifest.webmanifest","./icon-192.png","./icon-512.png"];
+const CACHE="iron-block-v2-3";
+const STATIC_ASSETS=["./manifest.webmanifest","./icon-192.png","./icon-512.png"];
 
 self.addEventListener("install",event=>{
-  event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(ASSETS)));
+  event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(STATIC_ASSETS)));
   self.skipWaiting();
 });
 
@@ -15,11 +15,25 @@ self.addEventListener("activate",event=>{
 
 self.addEventListener("fetch",event=>{
   if(event.request.method!=="GET")return;
+
+  // HTML/navegación: red primero para que las nuevas versiones lleguen enseguida.
+  if(event.request.mode==="navigate"){
+    event.respondWith(
+      fetch(event.request).then(response=>{
+        const copy=response.clone();
+        caches.open(CACHE).then(cache=>cache.put("./index.html",copy));
+        return response;
+      }).catch(()=>caches.match("./index.html"))
+    );
+    return;
+  }
+
+  // Recursos estáticos: caché primero.
   event.respondWith(
-    caches.match(event.request).then(cached=>cached || fetch(event.request).then(resp=>{
-      const clone=resp.clone();
-      caches.open(CACHE).then(cache=>cache.put(event.request,clone));
-      return resp;
-    }).catch(()=>caches.match("./index.html")))
+    caches.match(event.request).then(cached=>cached||fetch(event.request).then(response=>{
+      const copy=response.clone();
+      caches.open(CACHE).then(cache=>cache.put(event.request,copy));
+      return response;
+    }))
   );
 });
