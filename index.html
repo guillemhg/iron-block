@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <link rel="manifest" href="manifest.webmanifest" />
 <link rel="icon" href="icon-192.png" />
-<title>Iron Block V2.3 · 10 semanas</title>
+<title>Iron Block V2.4 · 10 semanas</title>
 <style>
 :root{
   --bg:#0b1020; --panel:#121a2e; --panel2:#18233c; --text:#f4f7fb;
@@ -107,7 +107,7 @@ canvas{width:100%;height:220px;display:block}
 <body>
 <div class="app">
 <header>
-  <h1>IRON BLOCK V2.3</h1>
+  <h1>IRON BLOCK V2.4</h1>
   <div class="sub">Programa de fuerza + hipertrofia · 4 días · 10 semanas · seguimiento avanzado</div>
   <div class="tabs">
     <button class="tab active" data-tab="today">Entreno</button>
@@ -412,7 +412,7 @@ canvas{width:100%;height:220px;display:block}
     </div>
     <div id="storageDetail" class="persist-detail small">Esperando carga inicial...</div>
     <p class="small" style="margin-top:10px">
-      Para que los datos sobrevivan de forma fiable entre cierres, abre esta V2.2 desde una URL HTTPS estable o instálala como PWA.
+      Para que los datos sobrevivan de forma fiable entre cierres, abre esta V2.4 desde una URL HTTPS estable o instálala como PWA.
       Si la abres directamente desde Descargas como <code>file://</code> o <code>content://</code>, Android/Chrome puede aislar el almacenamiento entre aperturas.
     </p>
   </div>
@@ -441,7 +441,17 @@ canvas{width:100%;height:220px;display:block}
   </div>
 </section>
 
-<div class="footer-note">IRON BLOCK V2.3 · Entrenad duro, progresad con cabeza y registrad todo.</div>
+<div class="footer-note">IRON BLOCK V2.4 · Entrenad duro, progresad con cabeza y registrad todo.</div>
+</div>
+
+<div class="timerbar">
+  <div class="timerinner">
+    <div class="timerdisplay" id="timerDisplay">00:00</div>
+    <div class="timerlabel"><b id="timerTitle">Descanso</b><span id="timerSub">Pulsa ✓ al terminar una serie</span></div>
+    <button class="btn secondary" id="timerMinus">-15s</button>
+    <button class="btn secondary" id="timerPlus">+15s</button>
+    <button class="btn danger" id="timerStop">Parar</button>
+  </div>
 </div>
 
 <script>
@@ -510,68 +520,21 @@ const weekInfo = {
 };
 
 const key="ironBlockV1";
-const dbName="IronBlockDB";
-const dbStore="state";
+const backupKey="ironBlockV1_backup";
 const defaultState={
   settings:{athlete1:"Guillem",athlete2:"Biel",goal1:"95",goal2:"80"},
   workouts:[], bodyweights:[], _savedAt:0
 };
 
-// IMPORTANTE V2.3:
-// No leemos ni escribimos almacenamiento antes de terminar el arranque.
-// En V2.2 existía un save() prematuro que podía sobrescribir IndexedDB.
 let state=structuredClone(defaultState);
 let bootComplete=false;
-let idbSaveQueue=Promise.resolve();
 let bootSource="sin datos previos";
 
-function openDB(){
-  return new Promise((resolve,reject)=>{
-    if(!("indexedDB" in window)){reject(new Error("IndexedDB no disponible"));return}
-    const req=indexedDB.open(dbName,1);
-    req.onupgradeneeded=()=>{
-      const db=req.result;
-      if(!db.objectStoreNames.contains(dbStore))db.createObjectStore(dbStore);
-    };
-    req.onsuccess=()=>resolve(req.result);
-    req.onerror=()=>reject(req.error);
-  });
-}
-
-async function writeSnapshotToIndexedDB(snapshot){
-  const db=await openDB();
-  return new Promise((resolve,reject)=>{
-    const tx=db.transaction(dbStore,"readwrite");
-    tx.objectStore(dbStore).put(snapshot,"appState");
-    tx.oncomplete=()=>{db.close();resolve(true)};
-    tx.onerror=()=>{db.close();reject(tx.error)};
-    tx.onabort=()=>{db.close();reject(tx.error||new Error("Transacción abortada"))};
-  });
-}
-
-async function loadFromIndexedDB(){
+function safeParse(raw){
   try{
-    const db=await openDB();
-    const result=await new Promise((resolve,reject)=>{
-      const tx=db.transaction(dbStore,"readonly");
-      const req=tx.objectStore(dbStore).get("appState");
-      req.onsuccess=()=>resolve(req.result||null);
-      req.onerror=()=>reject(req.error);
-    });
-    db.close();
-    return result;
-  }catch(e){
-    return null;
-  }
-}
-
-function loadFromLocalStorage(){
-  try{
-    const parsed=JSON.parse(localStorage.getItem(key)||"null");
+    const parsed=JSON.parse(raw||"null");
     return parsed && typeof parsed==="object" ? parsed : null;
-  }catch(e){
-    return null;
-  }
+  }catch(e){return null}
 }
 
 function informationScore(s){
@@ -580,18 +543,20 @@ function informationScore(s){
   score+=(Array.isArray(s.workouts)?s.workouts.length:0)*100;
   score+=(Array.isArray(s.bodyweights)?s.bodyweights.length:0)*20;
   if(s.settings){
-    if(s.settings.athlete1 && s.settings.athlete1!=="Guillem")score+=5;
-    if(s.settings.athlete2 && s.settings.athlete2!=="Biel")score+=5;
-    if(String(s.settings.goal1||"")!=="95")score+=3;
-    if(String(s.settings.goal2||"")!=="80")score+=3;
+    if(s.settings.athlete1)score+=2;
+    if(s.settings.athlete2)score+=2;
+    if(s.settings.goal1)score+=1;
+    if(s.settings.goal2)score+=1;
   }
   return score;
 }
 
-function chooseNewestState(ls,db){
+function chooseStoredState(){
+  const primary=safeParse(localStorage.getItem(key));
+  const backup=safeParse(localStorage.getItem(backupKey));
   const candidates=[
-    {name:"localStorage",data:ls},
-    {name:"IndexedDB",data:db}
+    {name:"principal",data:primary},
+    {name:"backup",data:backup}
   ].filter(x=>x.data && x.data.settings);
 
   if(!candidates.length){
@@ -628,28 +593,20 @@ function migrateState(s){
   return s;
 }
 
-function persistSnapshot(snapshot){
-  try{
-    localStorage.setItem(key,JSON.stringify(snapshot));
-  }catch(e){}
-
-  idbSaveQueue=idbSaveQueue
-    .catch(()=>{})
-    .then(()=>writeSnapshotToIndexedDB(snapshot))
-    .catch(()=>false);
-
-  return idbSaveQueue;
-}
-
 function save(){
-  // Durante el arranque jamás escribimos: primero hay que recuperar lo existente.
-  if(!bootComplete)return Promise.resolve(false);
-
+  if(!bootComplete)return false;
   state._savedAt=Date.now();
-  const snapshot=JSON.parse(JSON.stringify(state));
-  persistSnapshot(snapshot);
-  renderStorageDetail();
-  return idbSaveQueue;
+  const snapshot=JSON.stringify(state);
+  try{
+    // Escribimos dos copias. Si una queda dañada, la otra sigue disponible.
+    localStorage.setItem(backupKey,snapshot);
+    localStorage.setItem(key,snapshot);
+    renderStorageDetail();
+    return true;
+  }catch(e){
+    renderStorageDetail("ERROR al escribir: "+(e?.message||String(e)));
+    return false;
+  }
 }
 
 function formatSavedAt(ts){
@@ -850,22 +807,15 @@ el("importData").addEventListener("change",async e=>{
   try{
     const imported=JSON.parse(await f.text());
     if(!imported.settings||!Array.isArray(imported.workouts))throw new Error();
-    state=migrateState(imported); await save(); initSelectors(); renderWorkout(); renderHistory(); renderAnalytics(); alert("Copia importada y guardada.");
+    state=migrateState(imported); save(); initSelectors(); renderWorkout(); renderHistory(); renderAnalytics(); alert("Copia importada y guardada.");
   }catch{alert("El archivo no parece una copia válida.");}
 });
 
-el("resetData").addEventListener("click",async()=>{
+el("resetData").addEventListener("click",()=>{
   if(confirm("Esto borrará todos los entrenamientos y pesos guardados. ¿Continuar?")){
-    try{localStorage.removeItem(key)}catch(e){}
     try{
-      const db=await openDB();
-      await new Promise((resolve,reject)=>{
-        const tx=db.transaction(dbStore,"readwrite");
-        tx.objectStore(dbStore).delete("appState");
-        tx.oncomplete=()=>resolve();
-        tx.onerror=()=>reject(tx.error);
-      });
-      db.close();
+      localStorage.removeItem(key);
+      localStorage.removeItem(backupKey);
     }catch(e){}
     location.reload();
   }
@@ -943,80 +893,60 @@ let deferredInstallPrompt=null;
 function renderStorageStatus(){
   const node=el("storageStatus");
   if(!node)return;
-  const proto=location.protocol;
-  if(proto==="https:" || proto==="http:"){
-    node.innerHTML='<span class="storage-ok">✓ Origen HTTPS estable.</span> Los datos se duplican en IndexedDB + localStorage.';
+  if(location.protocol==="https:"){
+    node.innerHTML='<span class="storage-ok">✓ HTTPS estable.</span> Guardado local persistente activado.';
   }else{
-    node.innerHTML='<span class="storage-warn">⚠ Archivo local detectado.</span> Para persistencia fiable usa la URL de GitHub Pages.';
+    node.innerHTML='<span class="storage-warn">⚠ No estás en HTTPS.</span> Usa la dirección de GitHub Pages para guardar de forma fiable.';
   }
 }
 
 function renderStorageDetail(extra=""){
   const node=el("storageDetail");
   if(!node)return;
-  const workouts=Array.isArray(state.workouts)?state.workouts.length:0;
-  const weights=Array.isArray(state.bodyweights)?state.bodyweights.length:0;
   node.innerHTML=
     `<b>Estado actual</b><br>`+
-    `Origen recuperado al abrir: ${bootSource}<br>`+
-    `Entrenamientos en memoria: ${workouts}<br>`+
-    `Pesos corporales: ${weights}<br>`+
+    `Copia cargada al abrir: ${bootSource}<br>`+
+    `Entrenamientos: ${state.workouts.length}<br>`+
+    `Pesos corporales: ${state.bodyweights.length}<br>`+
     `Último guardado: ${formatSavedAt(state._savedAt)}`+
     (extra?`<br>${extra}`:"");
 }
 
-async function verifyStorage(){
-  const probeKey="ironBlockPersistenceProbe";
-  const token=`IB-${Date.now()}`;
-  let lsOK=false,idbOK=false;
-
+function verifyStorage(){
+  const probeKey="ironBlockProbe";
+  const token="IB-"+Date.now();
+  let ok=false;
   try{
     localStorage.setItem(probeKey,token);
-    lsOK=localStorage.getItem(probeKey)===token;
+    ok=localStorage.getItem(probeKey)===token;
     localStorage.removeItem(probeKey);
   }catch(e){}
-
-  try{
-    const snapshot=JSON.parse(JSON.stringify(state));
-    snapshot._probe=token;
-    await writeSnapshotToIndexedDB(snapshot);
-    const reread=await loadFromIndexedDB();
-    idbOK=!!reread && reread._probe===token;
-
-    // Restauramos inmediatamente el estado real sin el probe.
-    const clean=JSON.parse(JSON.stringify(state));
-    await writeSnapshotToIndexedDB(clean);
-  }catch(e){}
-
-  renderStorageDetail(
-    `<b>Prueba:</b> localStorage ${lsOK?"✓":"✗"} · IndexedDB ${idbOK?"✓":"✗"}`
-  );
-  return {lsOK,idbOK};
+  renderStorageDetail(`<b>Prueba de persistencia:</b> ${ok?"✓ OK":"✗ ERROR"}`);
+  return ok;
 }
 
-async function bootPersistentState(){
-  // PRIMERO leer ambos almacenes. Ninguna escritura ocurre antes de esta línea.
-  const ls=loadFromLocalStorage();
-  const db=await loadFromIndexedDB();
+function bootPersistentState(){
+  try{
+    state=migrateState(chooseStoredState());
+    bootComplete=true;
 
-  state=migrateState(chooseNewestState(ls,db));
+    // Sincroniza principal y backup solo DESPUÉS de haber leído lo existente.
+    save();
 
-  // Solo después de recuperar/migrar los datos permitimos guardar.
-  bootComplete=true;
-
-  // Marcamos esta versión como último estado válido y sincronizamos ambos almacenes.
-  state._savedAt=Math.max(Number(state._savedAt||0),Date.now());
-  const initialSnapshot=JSON.parse(JSON.stringify(state));
-  try{localStorage.setItem(key,JSON.stringify(initialSnapshot))}catch(e){}
-  await writeSnapshotToIndexedDB(initialSnapshot).catch(()=>false);
-
-  initSelectors();
-  renderWorkout();
-  renderWeeks();
-  renderHistory();
-  renderAnalytics();
-  renderStorageStatus();
-  renderStorageDetail();
+    initSelectors();
+    renderWorkout();
+    renderWeeks();
+    renderHistory();
+    renderAnalytics();
+    renderStorageStatus();
+    renderStorageDetail();
+  }catch(err){
+    console.error("IRON BLOCK boot error",err);
+    const status=el("storageStatus");
+    const detail=el("storageDetail");
+    if(status)status.innerHTML='<span class="storage-bad">✗ Error al iniciar.</span>';
+    if(detail)detail.textContent="Error: "+(err?.message||String(err));
+  }
 }
 
 window.addEventListener("beforeinstallprompt",(e)=>{
@@ -1051,31 +981,21 @@ document.addEventListener("DOMContentLoaded",()=>{
   });
 
   const force=el("forceSave");
-  if(force)force.addEventListener("click",async()=>{
-    if(!bootComplete){alert("La app todavía está cargando los datos.");return}
-    await save();
-    alert("Datos sincronizados en localStorage e IndexedDB.");
+  if(force)force.addEventListener("click",()=>{
+    const ok=save();
+    alert(ok?"Datos guardados correctamente en las dos copias locales.":"No se pudo escribir en el almacenamiento.");
   });
 
   const verify=el("verifyStorage");
-  if(verify)verify.addEventListener("click",async()=>{
-    const r=await verifyStorage();
-    alert(`Prueba de almacenamiento: localStorage ${r.lsOK?"OK":"ERROR"} · IndexedDB ${r.idbOK?"OK":"ERROR"}`);
+  if(verify)verify.addEventListener("click",()=>{
+    const ok=verifyStorage();
+    alert(ok?"Prueba de almacenamiento: OK":"Prueba de almacenamiento: ERROR");
   });
 
   bootPersistentState();
 });
 </script>
 
-<div class="timerbar">
-  <div class="timerinner">
-    <div class="timerdisplay" id="timerDisplay">00:00</div>
-    <div class="timerlabel"><b id="timerTitle">Descanso</b><span id="timerSub">Pulsa ✓ al terminar una serie</span></div>
-    <button class="btn secondary" id="timerMinus">-15s</button>
-    <button class="btn secondary" id="timerPlus">+15s</button>
-    <button class="btn danger" id="timerStop">Parar</button>
-  </div>
-</div>
 
 </body>
 </html>
