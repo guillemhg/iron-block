@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <link rel="manifest" href="manifest.webmanifest" />
 <link rel="icon" href="icon-192.png" />
-<title>Iron Block V3.0 · Cloud Sync</title>
+<title>Iron Block V3.2 · Flexible Profiles</title>
 <style>
 :root{
   --bg:#0b1020; --panel:#121a2e; --panel2:#18233c; --text:#f4f7fb;
@@ -102,12 +102,25 @@ canvas{width:100%;height:220px;display:block}
 
 .persist-detail{margin-top:8px;padding:9px 10px;border-radius:10px;background:#0b1324;border:1px solid var(--border);line-height:1.55}
 
+
+.workoutdock{position:fixed;left:0;right:0;bottom:64px;z-index:29;background:rgba(11,16,32,.97);border-top:1px solid var(--border);backdrop-filter:blur(12px)}
+.workoutdock-inner{max-width:900px;margin:0 auto;padding:8px 12px;display:flex;gap:8px;align-items:center}
+.workoutdock .btn{padding:10px 12px}.workoutdock-status{flex:1;min-width:90px;font-size:11px;color:var(--muted);line-height:1.3}
+.exercise-tools{display:flex;gap:7px;flex-wrap:wrap;margin-top:9px}.exercise-tools .btn{padding:7px 10px;font-size:12px}.exercise-note{margin-top:9px}
+.variant-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:9px}.exercise.custom-exercise{border:1px dashed var(--accent2);padding:12px;border-radius:12px;margin-top:10px}
+.mode-readonly{border:1px solid var(--warn);background:#241d0c;color:var(--warn);padding:8px 10px;border-radius:10px;font-size:12px;margin-top:10px}
+.modal-backdrop{position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.72);display:flex;align-items:center;justify-content:center;padding:18px}
+.modal-card{width:min(520px,100%);max-height:90vh;overflow:auto;background:var(--panel);border:1px solid var(--border);border-radius:18px;padding:16px}.modal-card h2{margin:0 0 12px}
+.modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:14px;flex-wrap:wrap}.device-choice{display:grid;grid-template-columns:1fr 1fr;gap:10px}.device-choice button{padding:16px;font-size:16px}
+.activity-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+@media(max-width:620px){.variant-row{grid-template-columns:1fr}.activity-summary{grid-template-columns:1fr 1fr}.app{padding-bottom:150px}}
+
 </style>
 </head>
 <body>
 <div class="app">
 <header>
-  <h1>IRON BLOCK V3.0</h1>
+  <h1>IRON BLOCK V3.2</h1>
   <div class="sub">Programa de fuerza + hipertrofia · 4 días · 10 semanas · seguimiento avanzado</div>
   <div class="tabs">
     <button class="tab active" data-tab="today">Entreno</button>
@@ -127,6 +140,7 @@ canvas{width:100%;height:220px;display:block}
       <div><label>Fecha</label><input id="date" type="date"></div>
     </div>
     <div id="weekNote" class="notice" style="margin-top:12px"></div>
+    <div id="deviceModeNotice" class="mode-readonly hidden"></div>
   </div>
 
   <div class="card">
@@ -135,8 +149,9 @@ canvas{width:100%;height:220px;display:block}
       <span class="badge green" id="rirBadge">RIR</span>
     </div>
     <div id="exerciseList"></div>
+    <div class="row" style="margin-top:12px"><button class="btn secondary" id="addExerciseBtn">+ Añadir ejercicio</button></div>
     <div style="margin-top:12px">
-      <label>Notas de la sesión</label>
+      <label>Notas generales de la sesión</label>
       <textarea id="sessionNotes" placeholder="Sensaciones, molestias, sueño, tenis, cambios..."></textarea>
     </div>
     <div class="row" style="margin-top:12px">
@@ -346,6 +361,22 @@ canvas{width:100%;height:220px;display:block}
     </div>
   </div>
 
+
+  <div class="card">
+    <h2 class="section-title">Actividad diaria</h2>
+    <div class="grid3">
+      <div><label>Fecha</label><input id="activityDate" type="date"></div>
+      <div><label>Pasos</label><input id="activitySteps" type="number" min="0" step="1" inputmode="numeric" placeholder="p. ej. 12500"></div>
+      <div style="align-self:end"><button class="btn" id="saveActivity">Guardar pasos</button></div>
+    </div>
+    <div style="margin-top:10px"><label>Nota opcional</label><input id="activityNotes" type="text" placeholder="Tenis, caminata larga, día de descanso..."></div>
+    <div class="activity-summary">
+      <div class="kpi"><span class="small">Último registro</span><b id="stepsLast">—</b></div>
+      <div class="kpi"><span class="small">Media registrada</span><b id="stepsAvg">—</b></div>
+      <div class="kpi"><span class="small">Máximo</span><b id="stepsMax">—</b></div>
+    </div>
+  </div>
+
   <div class="card">
     <h2 class="section-title">Entrenamientos guardados</h2>
     <div style="overflow:auto">
@@ -401,7 +432,14 @@ canvas{width:100%;height:220px;display:block}
 </section>
 
 
+
 <section id="settings" class="view hidden">
+  <div class="card">
+    <h2 class="section-title">Este dispositivo</h2>
+    <p class="small">Elige qué atleta debe aparecer seleccionado por defecto al abrir este móvil. Podrás cambiar al otro perfil y editarlo cuando lo necesites.</p>
+    <div><label>Perfil predeterminado de este dispositivo</label><select id="deviceAthleteSelect"></select></div>
+    <button class="btn" id="saveDeviceAthlete" style="margin-top:10px">Guardar perfil predeterminado</button>
+  </div>
 
   <div class="card install-card">
     <h2 class="section-title">☁️ Cloud Sync · Guillem + Biel</h2>
@@ -419,13 +457,13 @@ canvas{width:100%;height:220px;display:block}
     <h2 class="section-title">Copia local y modo app</h2>
     <div id="storageStatus" class="small">Comprobando almacenamiento...</div>
     <div class="row" style="margin-top:12px">
-      <button class="btn" id="installApp" style="display:none">Instalar IRON BLOCK</button>
+      <button class="btn" id="installApp">Instalar / cómo instalar</button>
       <button class="btn secondary" id="forceSave">Forzar guardado ahora</button>
       <button class="btn secondary" id="verifyStorage">Verificar almacenamiento</button>
     </div>
     <div id="storageDetail" class="persist-detail small">Esperando carga inicial...</div>
     <p class="small" style="margin-top:10px">
-      Para que los datos sobrevivan de forma fiable entre cierres, abre esta V3.0 desde una URL HTTPS estable o instálala como PWA.
+      Para que los datos sobrevivan de forma fiable entre cierres, abre esta V3.2 desde una URL HTTPS estable o instálala como PWA.
       Si la abres directamente desde Descargas como <code>file://</code> o <code>content://</code>, Android/Chrome puede aislar el almacenamiento entre aperturas.
     </p>
   </div>
@@ -454,7 +492,7 @@ canvas{width:100%;height:220px;display:block}
   </div>
 </section>
 
-<div class="footer-note">IRON BLOCK V3.0 · Entrenad duro, progresad con cabeza y registrad todo.</div>
+<div class="footer-note">IRON BLOCK V3.2 · Entrenad duro, progresad con cabeza y registrad todo.</div>
 </div>
 
 <div class="timerbar">
@@ -466,6 +504,24 @@ canvas{width:100%;height:220px;display:block}
     <button class="btn danger" id="timerStop">Parar</button>
   </div>
 </div>
+
+
+<div class="workoutdock" id="workoutDock">
+  <div class="workoutdock-inner">
+    <button class="btn" id="dockSaveWorkout">💾 Guardar</button>
+    <button class="btn secondary" id="dockSyncCloud">☁ Sync</button>
+    <div class="workoutdock-status" id="workoutDockStatus">Listo para entrenar.</div>
+  </div>
+</div>
+<div class="modal-backdrop hidden" id="deviceModal"><div class="modal-card"><h2>¿Quién usa este dispositivo?</h2><p class="small">Esta elección solo se guarda en este móvil y define qué atleta aparece seleccionado al abrir la app. Podrás cambiar temporalmente al otro atleta y guardar sus datos con normalidad.</p><div class="device-choice" id="deviceModalChoices"></div></div></div>
+<div class="modal-backdrop hidden" id="exerciseModal"><div class="modal-card"><h2>Añadir ejercicio</h2><div class="grid2">
+<div><label>Nombre</label><input id="customExName" placeholder="Ej. Fondos en paralelas"></div>
+<div><label>Tipo</label><select id="customExVariant"><option>Barra</option><option>Mancuernas</option><option>Máquina</option><option>Polea</option><option>Peso corporal</option><option>Trap bar</option><option>Otro</option></select></div>
+<div><label>Series</label><input id="customExSets" type="number" min="1" max="10" value="3"></div>
+<div><label>Repeticiones objetivo</label><input id="customExReps" value="8-12"></div>
+<div><label>Descanso</label><input id="customExRest" value="90 s"></div>
+<div><label>RIR objetivo</label><input id="customExRir" value="1-2"></div>
+</div><div class="modal-actions"><button class="btn secondary" id="cancelCustomExercise">Cancelar</button><button class="btn" id="confirmCustomExercise">Añadir</button></div></div></div>
 
 <script>
 const program = {
@@ -536,7 +592,7 @@ const key="ironBlockV1";
 const backupKey="ironBlockV1_backup";
 const defaultState={
   settings:{athlete1:"Guillem",athlete2:"Biel",goal1:"95",goal2:"80"},
-  workouts:[], bodyweights:[], _savedAt:0
+  workouts:[], bodyweights:[], activity:[], _savedAt:0
 };
 
 let state=structuredClone(defaultState);
@@ -592,6 +648,7 @@ function migrateState(s){
   if(!s.settings)s.settings=structuredClone(defaultState.settings);
   if(!Array.isArray(s.workouts))s.workouts=[];
   if(!Array.isArray(s.bodyweights))s.bodyweights=[];
+  if(!Array.isArray(s.activity))s.activity=[];
 
   if(s.settings.athlete2==="Amigo"){
     s.workouts.forEach(x=>{if(x.athlete==="Amigo")x.athlete="Biel"});
@@ -682,12 +739,14 @@ function renderCloudStatus(extra=""){
   const pendingW=(state.workouts||[]).filter(x=>x._cloudDirty).length;
   const pendingB=(state.bodyweights||[]).filter(x=>x._cloudDirty).length;
   const pendingS=state.settings?._cloudDirty?1:0;
+  const pendingA=(state.activity||[]).filter(x=>x._cloudDirty).length;
   detail.innerHTML=
     `<b>Estado cloud</b><br>`+
     `Última sincronización: ${lastCloudSync?new Date(lastCloudSync).toLocaleString("es-ES"):"todavía no"}<br>`+
     `Entrenamientos locales: ${(state.workouts||[]).length}<br>`+
     `Pesos locales: ${(state.bodyweights||[]).length}<br>`+
-    `Pendientes de subir: ${pendingW+pendingB+pendingS}`+
+    `Días con pasos: ${(state.activity||[]).length}<br>`+
+    `Pendientes de subir: ${pendingW+pendingB+pendingS+pendingA}`+
     (extra?`<br>${extra}`:"");
 }
 
@@ -738,6 +797,10 @@ async function cloudUpsertBodyweight(w){
   });
 }
 
+async function cloudUpsertActivity(a){const payload={athlete:a.athlete,activity_date:a.date,steps:Number(a.steps)||0,notes:a.notes||"",updated_at:new Date().toISOString()};await cloudRequest("iron_block_activity?on_conflict=athlete,activity_date",{method:"POST",body:payload,prefer:"resolution=merge-duplicates,return=minimal"})}
+async function saveActivityToCloud(rec){rec._cloudDirty=true;save();try{await cloudUpsertActivity(rec);delete rec._cloudDirty;cloudOnline=true;lastCloudSync=Date.now();save();renderCloudStatus("Actividad subida.");return true}catch(err){cloudOnline=false;renderCloudStatus("Actividad guardada localmente; pendiente de subir.");return false}}
+
+
 async function pushPendingToCloud(){
   if(state.settings?._cloudDirty){
     await cloudUpsertSettings();
@@ -751,44 +814,37 @@ async function pushPendingToCloud(){
     save();
   }
 
-  for(const b of (state.bodyweights||[]).filter(x=>x._cloudDirty)){
-    await cloudUpsertBodyweight(b);
-    delete b._cloudDirty;
-    save();
-  }
+  for(const b of (state.bodyweights||[]).filter(x=>x._cloudDirty)){await cloudUpsertBodyweight(b);delete b._cloudDirty;save()}
+  for(const a of (state.activity||[]).filter(x=>x._cloudDirty)){await cloudUpsertActivity(a);delete a._cloudDirty;save()}
 }
 
-async function seedLocalOnlyRecords(cloudWorkouts,cloudWeights){
+async function seedLocalOnlyRecords(cloudWorkouts,cloudWeights,cloudActivity){
   const cw=new Set(cloudWorkouts.map(x=>`${x.athlete}|||${x.workout_date}|||${x.session}`));
   const cb=new Set(cloudWeights.map(x=>`${x.athlete}|||${x.weight_date}`));
+  const ca=new Set((cloudActivity||[]).map(x=>`${x.athlete}|||${x.activity_date}`));
 
   for(const w of state.workouts||[]){
     if(!cw.has(workoutCloudKey(w))){
       try{await cloudUpsertWorkout(w)}catch(e){w._cloudDirty=true}
     }
   }
-  for(const b of state.bodyweights||[]){
-    if(!cb.has(weightCloudKey(b))){
-      try{await cloudUpsertBodyweight(b)}catch(e){b._cloudDirty=true}
-    }
-  }
+  for(const b of state.bodyweights||[]){if(!cb.has(weightCloudKey(b))){try{await cloudUpsertBodyweight(b)}catch(e){b._cloudDirty=true}}}
+  for(const a of state.activity||[]){const k=`${a.athlete}|||${a.date}`;if(!ca.has(k)){try{await cloudUpsertActivity(a)}catch(e){a._cloudDirty=true}}}
 }
 
 async function pullCloudIntoState(){
-  const [settingsRows,cloudWorkouts,cloudWeights]=await Promise.all([
+  const [settingsRows,cloudWorkouts,cloudWeights,cloudActivity]=await Promise.all([
     cloudRequest("iron_block_settings?id=eq.shared&select=*"),
     cloudRequest("iron_block_workouts?select=athlete,workout_date,week,session,notes,exercises,updated_at&order=workout_date.asc"),
-    cloudRequest("iron_block_bodyweights?select=athlete,weight_date,weight,updated_at&order=weight_date.asc")
+    cloudRequest("iron_block_bodyweights?select=athlete,weight_date,weight,updated_at&order=weight_date.asc"),
+    cloudRequest("iron_block_activity?select=athlete,activity_date,steps,notes,updated_at&order=activity_date.asc")
   ]);
-
-  // Si este móvil trae datos locales que aún no existen en la nube, los sembramos.
-  await seedLocalOnlyRecords(cloudWorkouts||[],cloudWeights||[]);
-
-  // Volvemos a leer después del seed para que el estado quede exactamente como la nube.
-  const [freshSettings,freshWorkouts,freshWeights]=await Promise.all([
+  await seedLocalOnlyRecords(cloudWorkouts||[],cloudWeights||[],cloudActivity||[]);
+  const [freshSettings,freshWorkouts,freshWeights,freshActivity]=await Promise.all([
     cloudRequest("iron_block_settings?id=eq.shared&select=*"),
     cloudRequest("iron_block_workouts?select=athlete,workout_date,week,session,notes,exercises,updated_at&order=workout_date.asc"),
-    cloudRequest("iron_block_bodyweights?select=athlete,weight_date,weight,updated_at&order=weight_date.asc")
+    cloudRequest("iron_block_bodyweights?select=athlete,weight_date,weight,updated_at&order=weight_date.asc"),
+    cloudRequest("iron_block_activity?select=athlete,activity_date,steps,notes,updated_at&order=activity_date.asc")
   ]);
 
   if(freshSettings?.[0] && !state.settings?._cloudDirty){
@@ -814,24 +870,16 @@ async function pullCloudIntoState(){
     exercises:Array.isArray(x.exercises)?x.exercises:[]
   }));
 
-  const mappedB=(freshWeights||[]).map(x=>({
-    athlete:x.athlete,
-    date:x.weight_date,
-    weight:Number(x.weight)
-  }));
-
-  // Mantener cualquier cambio offline que aún no haya conseguido subir.
-  const wk=new Set(mappedW.map(workoutCloudKey));
-  stillDirtyW.forEach(x=>{if(!wk.has(workoutCloudKey(x)))mappedW.push(x)});
-
-  const bk=new Set(mappedB.map(weightCloudKey));
-  stillDirtyB.forEach(x=>{if(!bk.has(weightCloudKey(x)))mappedB.push(x)});
-
-  state.workouts=mappedW;
-  state.bodyweights=mappedB;
-  save();
+  const mappedB=(freshWeights||[]).map(x=>({athlete:x.athlete,date:x.weight_date,weight:Number(x.weight)}));
+  const mappedA=(freshActivity||[]).map(x=>({athlete:x.athlete,date:x.activity_date,steps:Number(x.steps)||0,notes:x.notes||""}));
+  const wk=new Set(mappedW.map(workoutCloudKey));stillDirtyW.forEach(x=>{if(!wk.has(workoutCloudKey(x)))mappedW.push(x)});
+  const bk=new Set(mappedB.map(weightCloudKey));stillDirtyB.forEach(x=>{if(!bk.has(weightCloudKey(x)))mappedB.push(x)});
+  const stillDirtyA=(state.activity||[]).filter(x=>x._cloudDirty),ak=new Set(mappedA.map(x=>`${x.athlete}|||${x.date}`));stillDirtyA.forEach(x=>{if(!ak.has(`${x.athlete}|||${x.date}`))mappedA.push(x)});
+  state.workouts=mappedW;state.bodyweights=mappedB;state.activity=mappedA;save();
 }
 
+
+function refreshAthleteSelectorPreserve(){const s=el("athlete");if(!s)return;const previous=s.value||deviceAthlete||state.settings.athlete1;s.innerHTML=`<option>${state.settings.athlete1}</option><option>${state.settings.athlete2}</option>`;if([...s.options].some(o=>o.value===previous))s.value=previous;else if(deviceAthlete&&[...s.options].some(o=>o.value===deviceAthlete))s.value=deviceAthlete;renderDeviceControls();renderDeviceModeNotice()}
 async function syncCloud({quiet=false}={}){
   if(cloudSyncing)return;
   cloudSyncing=true;
@@ -843,10 +891,11 @@ async function syncCloud({quiet=false}={}){
     cloudOnline=true;
     lastCloudSync=Date.now();
 
-    initSelectors();
+    refreshAthleteSelectorPreserve();
     renderHistory();
     renderAnalytics();
     renderCloudStatus("Sincronización completada.");
+    setWorkoutDockStatus("✓ Nube sincronizada.","ok");
     if(!quiet)alert("Cloud Sync completado.");
   }catch(err){
     console.error("Cloud sync error",err);
@@ -913,6 +962,14 @@ async function saveSettingsToCloud(){
   }
 }
 
+
+const deviceAthleteKey="ironBlockDeviceAthlete";
+let deviceAthlete=localStorage.getItem(deviceAthleteKey)||"";
+function setWorkoutDockStatus(message,type="normal"){const node=el("workoutDockStatus");if(!node)return;node.textContent=message;node.style.color=type==="ok"?"var(--accent)":type==="warn"?"var(--warn)":type==="bad"?"var(--danger)":"var(--muted)"}
+function saveDeviceAthleteValue(name){deviceAthlete=name;localStorage.setItem(deviceAthleteKey,name);renderDeviceControls();renderDeviceModeNotice();const s=el("athlete");if(s&&[...s.options].some(o=>o.value===name)){s.value=name;renderWorkout();renderHistory();renderAnalytics()}}
+function renderDeviceControls(){const s=el("deviceAthleteSelect");if(!s)return;const current=deviceAthlete;s.innerHTML=`<option>${state.settings.athlete1}</option><option>${state.settings.athlete2}</option>`;if([...s.options].some(o=>o.value===current))s.value=current}
+function ensureDeviceAthlete(){const valid=[state.settings.athlete1,state.settings.athlete2];if(deviceAthlete&&valid.includes(deviceAthlete))return true;deviceAthlete="";const modal=el("deviceModal"),choices=el("deviceModalChoices");if(modal&&choices){choices.innerHTML=valid.map(n=>`<button class="btn" type="button" data-device-choice="${n}">${n}</button>`).join("");choices.querySelectorAll("[data-device-choice]").forEach(b=>b.addEventListener("click",()=>{saveDeviceAthleteValue(b.dataset.deviceChoice);modal.classList.add("hidden")}));modal.classList.remove("hidden")}return false}
+function renderDeviceModeNotice(){const n=el("deviceModeNotice");if(!n)return;const selected=el("athlete")?.value;if(!deviceAthlete){n.textContent="Aún no has elegido el perfil predeterminado de este dispositivo.";n.classList.remove("hidden");return}if(selected&&selected!==deviceAthlete){n.innerHTML=`<b>Este dispositivo: ${deviceAthlete}</b> · Perfil activo: <b>${selected}</b>. Puedes editarlo y guardar normalmente. Al volver a abrir la app se seleccionará ${deviceAthlete}.`;n.classList.remove("hidden")}else{n.innerHTML=`<b>Este dispositivo: ${deviceAthlete}</b> · Perfil activo: ${deviceAthlete}.`;n.classList.remove("hidden")}}
 function todayISO(){ return new Date().toISOString().slice(0,10); }
 
 const el=id=>document.getElementById(id);
@@ -921,8 +978,10 @@ function initSelectors(){
   el("athlete").innerHTML = `<option>${state.settings.athlete1}</option><option>${state.settings.athlete2}</option>`;
   el("week").innerHTML = Array.from({length:10},(_,i)=>`<option value="${i+1}">Semana ${i+1}</option>`).join("");
   el("session").innerHTML = Object.keys(program).map(x=>`<option>${x}</option>`).join("");
-  el("date").value=todayISO(); el("bwDate").value=todayISO();
+  el("date").value=todayISO(); el("bwDate").value=todayISO(); if(el("activityDate"))el("activityDate").value=todayISO();
   el("athlete1").value=state.settings.athlete1; el("athlete2").value=state.settings.athlete2;
+  if(deviceAthlete && [...el("athlete").options].some(o=>o.value===deviceAthlete))el("athlete").value=deviceAthlete;
+  renderDeviceControls();
   el("goal1").value=state.settings.goal1; el("goal2").value=state.settings.goal2;
 }
 
@@ -933,83 +992,19 @@ function parseRestSeconds(rest){
   if(rest.includes("3 min"))return 180;if(rest.includes("2 min"))return 120;
   if(rest.includes("90 s"))return 90;if(rest.includes("60 s"))return 60;return 90;
 }
-function bestEstimated1RM(athlete,exercise){
-  let best=null;
-  state.workouts.filter(x=>x.athlete===athlete).forEach(w=>{
-    (w.exercises||[]).filter(e=>e.name===exercise).forEach(e=>{
-      (e.sets||[]).forEach(s=>{
-        const kg=parseFloat(s.kg),reps=parseInt(s.reps);
-        if(kg>0&&reps>0){const e1rm=kg*(1+reps/30);if(!best||e1rm>best.e1rm)best={e1rm,kg,reps,date:w.date}}
-      })
-    })
-  });
-  return best;
-}
-function lastExercisePerformance(athlete,session,exercise){
-  const ws=state.workouts.filter(x=>x.athlete===athlete&&x.session===session).sort((a,b)=>b.date.localeCompare(a.date));
-  for(const w of ws){const ex=(w.exercises||[]).find(e=>e.name===exercise);if(ex)return ex}
-  return null;
-}
-function progressionSuggestion(athlete,session,exercise,repRange,week){
-  if(week<=2)return "Prioridad: técnica y margen.";
-  if(week===6)return "Descarga: peso cómodo y menos volumen.";
-  const last=lastExercisePerformance(athlete,session,exercise);
-  if(!last)return "Primera referencia: encuentra una carga exigente pero limpia.";
-  const nums=String(repRange).match(/\d+/g)||[];
-  const maxRep=parseInt(nums[nums.length-1]||"0");
-  const valid=(last.sets||[]).filter(s=>parseFloat(s.kg)>0&&parseInt(s.reps)>0);
-  if(!valid.length)return "Sin datos suficientes.";
-  const allTop=valid.every(s=>parseInt(s.reps)>=maxRep&&(s.rir===""||parseFloat(s.rir)<=1.5));
-  if(allTop){
-    const lower=/sentadilla|peso muerto|prensa|hack|búlgara|femoral|cuádriceps|gemelos/i.test(exercise);
-    return `✓ Toca subir carga: +${lower?"2,5-5":"2-2,5"} kg aprox.`;
-  }
-  return "Intenta mejorar 1-2 reps totales antes de subir peso.";
-}
-function renderWorkout(){
-  const w=+el("week").value,s=el("session").value,p=program[s],athlete=el("athlete").value;
-  const wi=weekInfo[w];
-  el("sessionTitle").textContent=s;el("sessionDesc").textContent=p.desc;el("rirBadge").textContent=wi[1];
-  el("weekNote").innerHTML=`<b>Semana ${w} · ${wi[0]}</b><br>${wi[2]}`;
-  el("exerciseList").innerHTML=p.exercises.map((e,idx)=>{
-    const sets=getWeekSets(e[1],w),best=bestEstimated1RM(athlete,e[0]);
-    const prText=best?`PR est.: ${best.e1rm.toFixed(1)} kg (${best.kg}×${best.reps})`:"Sin PR registrado";
-    const suggestion=progressionSuggestion(athlete,s,e[0],e[2],w),restSec=parseRestSeconds(e[3]);
-    return `<div class="exercise" data-ex="${idx}" data-rest="${restSec}" data-name="${e[0]}">
-      <div class="ex-head"><div><div class="ex-name">${e[0]}</div>
-      <div class="ex-meta">${sets} series · ${e[2]} reps · descanso ${e[3]}</div>
-      <div class="pr">${prText}</div><div class="suggest">${suggestion}</div></div><span class="badge">${wi[1]}</span></div>
-      <div class="sets">${Array.from({length:sets},(_,i)=>`
-        <div class="setrow">
-          <button class="donebtn" type="button" data-done="${i}" title="Serie completada">✓</button>
-          <input type="number" step="0.5" inputmode="decimal" placeholder="kg" data-field="kg" data-set="${i}">
-          <input type="text" inputmode="numeric" placeholder="reps" data-field="reps" data-set="${i}">
-          <input type="number" step="1" min="0" max="5" placeholder="RIR" data-field="rir" data-set="${i}">
-        </div>`).join("")}</div>
-    </div>`;
-  }).join("");
-  document.querySelectorAll(".donebtn").forEach(btn=>btn.addEventListener("click",()=>{
-    btn.classList.toggle("done");
-    if(btn.classList.contains("done")){const ex=btn.closest(".exercise");startTimer(+ex.dataset.rest,ex.dataset.name)}
-  }));
-  el("sessionNotes").value="";
-}
 
-function collectWorkout(){
-  const s=el("session").value, p=program[s];
-  const exercises=[...document.querySelectorAll(".exercise")].map((box,idx)=>{
-    const sets=[...box.querySelectorAll(".setrow")].map(row=>({
-      kg:row.querySelector('[data-field="kg"]').value,
-      reps:row.querySelector('[data-field="reps"]').value,
-      rir:row.querySelector('[data-field="rir"]').value
-    }));
-    return {name:p.exercises[idx][0],sets};
-  });
-  return {
-    id:Date.now(), athlete:el("athlete").value, week:+el("week").value,
-    session:s,date:el("date").value,notes:el("sessionNotes").value,exercises
-  };
-}
+const exerciseVariants=["Barra","Mancuernas","Máquina","Polea","Peso corporal","Trap bar","Otro"];
+function inferVariant(name){const n=(name||"").toLowerCase();if(n.includes("mancuerna"))return "Mancuernas";if(n.includes("máquina")||n.includes("maquina")||n.includes("prensa")||n.includes("hack")||n.includes("peck deck"))return "Máquina";if(n.includes("polea")||n.includes("jalón")||n.includes("jalon"))return "Polea";if(n.includes("dominada")||n.includes("core")||n.includes("abdominal"))return "Peso corporal";if(n.includes("trap bar"))return "Trap bar";return "Barra"}
+function exerciseLabel(name,variant){return `${name} · ${variant||inferVariant(name)}`}
+function bestEstimated1RM(athlete,exercise,variant){let best=null,target=exerciseLabel(exercise,variant);state.workouts.filter(x=>x.athlete===athlete).forEach(w=>(w.exercises||[]).forEach(e=>{if(exerciseLabel(e.name,e.variant)!==target)return;(e.sets||[]).forEach(s=>{const kg=parseFloat(s.kg),reps=parseInt(s.reps);if(kg>0&&reps>0){const e1rm=kg*(1+reps/30);if(!best||e1rm>best.e1rm)best={e1rm,kg,reps,date:w.date}}})}));return best}
+function lastExercisePerformance(athlete,session,exercise,variant){const target=exerciseLabel(exercise,variant),ws=state.workouts.filter(x=>x.athlete===athlete&&x.session===session).sort((a,b)=>b.date.localeCompare(a.date));for(const w of ws){const ex=(w.exercises||[]).find(e=>exerciseLabel(e.name,e.variant)===target);if(ex)return ex}return null}
+function progressionSuggestion(athlete,session,exercise,variant,repRange,week){if(week<=2)return "Prioridad: técnica y margen.";if(week===6)return "Descarga: peso cómodo y menos volumen.";const last=lastExercisePerformance(athlete,session,exercise,variant);if(!last)return "Primera referencia para esta variante.";const nums=String(repRange).match(/\d+/g)||[],maxRep=parseInt(nums[nums.length-1]||"0"),valid=(last.sets||[]).filter(s=>parseFloat(s.kg)>0&&parseInt(s.reps)>0);if(!valid.length)return "Sin datos suficientes.";const allTop=valid.every(s=>parseInt(s.reps)>=maxRep&&(s.rir===""||parseFloat(s.rir)<=1.5));if(allTop){const lower=/sentadilla|peso muerto|prensa|hack|búlgara|femoral|cuádriceps|gemelos/i.test(exercise);return `✓ Toca subir carga: +${lower?"2,5-5":"2-2,5"} kg aprox.`}return "Intenta mejorar 1-2 reps totales antes de subir peso."}
+function templateModels(){const w=+el("week").value,s=el("session").value,p=program[s];return p.exercises.map(e=>({name:e[0],baseSets:getWeekSets(e[1],w),targetReps:e[2],rest:e[3],variant:inferVariant(e[0]),note:"",custom:false,sets:Array.from({length:getWeekSets(e[1],w)},()=>({kg:"",reps:"",rir:""}))}))}
+function makeSetRow(set={},idx=0){return `<div class="setrow"><button class="donebtn" type="button" data-done="${idx}" title="Serie completada">✓</button><input type="number" step="0.5" inputmode="decimal" placeholder="kg" data-field="kg" value="${set.kg??""}"><input type="text" inputmode="numeric" placeholder="reps" data-field="reps" value="${set.reps??""}"><input type="number" step="1" min="0" max="5" placeholder="RIR" data-field="rir" value="${set.rir??""}"></div>`}
+function bindExerciseButtons(box){box.querySelectorAll(".donebtn").forEach(btn=>{btn.onclick=()=>{btn.classList.toggle("done");if(btn.classList.contains("done"))startTimer(+box.dataset.restSec,box.dataset.name)}});const plus=box.querySelector(".add-set");if(plus)plus.onclick=()=>{const sets=box.querySelector(".sets");sets.insertAdjacentHTML("beforeend",makeSetRow({},sets.querySelectorAll(".setrow").length));bindExerciseButtons(box)};const minus=box.querySelector(".remove-set");if(minus)minus.onclick=()=>{const rows=box.querySelectorAll(".setrow");if(rows.length<=1){alert("El ejercicio debe tener al menos una serie.");return}rows[rows.length-1].remove()};const removeEx=box.querySelector(".remove-exercise");if(removeEx)removeEx.onclick=()=>{if(confirm(`¿Quitar ${box.dataset.name} de esta sesión?`))box.remove()};const variant=box.querySelector(".variant-select");if(variant)variant.onchange=()=>{const athlete=el("athlete").value,name=box.dataset.name,targetReps=box.dataset.targetReps,week=+el("week").value,best=bestEstimated1RM(athlete,name,variant.value);box.querySelector(".pr").textContent=best?`PR est.: ${best.e1rm.toFixed(1)} kg (${best.kg}×${best.reps})`:"Sin PR para esta variante";box.querySelector(".suggest").textContent=progressionSuggestion(athlete,el("session").value,name,variant.value,targetReps,week)}}
+function renderWorkout(models=null,{keepNotes=false}={}){const w=+el("week").value,s=el("session").value,p=program[s],athlete=el("athlete").value,wi=weekInfo[w];el("sessionTitle").textContent=s;el("sessionDesc").textContent=p.desc;el("rirBadge").textContent=wi[1];el("weekNote").innerHTML=`<b>Semana ${w} · ${wi[0]}</b><br>${wi[2]}`;const list=models||templateModels();el("exerciseList").innerHTML=list.map((m,idx)=>{const variant=m.variant||inferVariant(m.name),sets=(m.sets&&m.sets.length)?m.sets:Array.from({length:m.baseSets||3},()=>({kg:"",reps:"",rir:""})),best=bestEstimated1RM(athlete,m.name,variant),suggestion=progressionSuggestion(athlete,s,m.name,variant,m.targetReps||"8-12",w),restSec=parseRestSeconds(m.rest||"90 s");return `<div class="exercise ${m.custom?"custom-exercise":""}" data-ex="${idx}" data-name="${m.name.replaceAll('"','&quot;')}" data-target-reps="${m.targetReps||"8-12"}" data-rest-label="${m.rest||"90 s"}" data-rest-sec="${restSec}" data-custom="${m.custom?"1":"0"}"><div class="ex-head"><div><div class="ex-name">${m.name}</div><div class="ex-meta">${sets.length} series · ${m.targetReps||"8-12"} reps · descanso ${m.rest||"90 s"}</div><div class="pr">${best?`PR est.: ${best.e1rm.toFixed(1)} kg (${best.kg}×${best.reps})`:"Sin PR para esta variante"}</div><div class="suggest">${suggestion}</div></div><span class="badge">${m.rirTarget||wi[1]}</span></div><div class="variant-row"><div><label>Material / variante</label><select class="variant-select">${exerciseVariants.map(v=>`<option ${v===variant?"selected":""}>${v}</option>`).join("")}</select></div><div><label>Referencia</label><input value="${m.targetReps||"8-12"} reps · ${m.rest||"90 s"}" readonly></div></div><div class="sets">${sets.map((set,i)=>makeSetRow(set,i)).join("")}</div><div class="exercise-tools"><button class="btn secondary add-set" type="button">+ Serie</button><button class="btn secondary remove-set" type="button">− Serie</button>${m.custom?'<button class="btn danger remove-exercise" type="button">Quitar ejercicio</button>':""}</div><div class="exercise-note"><label>Nota de este ejercicio</label><input type="text" data-field="exnote" placeholder="Ajuste de máquina, sensaciones, agarre..." value="${(m.note||"").replaceAll('"','&quot;')}"></div></div>`}).join("");document.querySelectorAll(".exercise").forEach(bindExerciseButtons);if(!keepNotes)el("sessionNotes").value="";renderDeviceModeNotice()}
+
+function collectWorkout(){const s=el("session").value,exercises=[...document.querySelectorAll(".exercise")].map(box=>({name:box.dataset.name,variant:box.querySelector(".variant-select")?.value||inferVariant(box.dataset.name),targetReps:box.dataset.targetReps||"8-12",rest:box.dataset.restLabel||"90 s",note:box.querySelector('[data-field="exnote"]')?.value||"",custom:box.dataset.custom==="1",sets:[...box.querySelectorAll(".setrow")].map(row=>({kg:row.querySelector('[data-field="kg"]').value,reps:row.querySelector('[data-field="reps"]').value,rir:row.querySelector('[data-field="rir"]').value}))}));return{id:Date.now(),athlete:el("athlete").value,week:+el("week").value,session:s,date:el("date").value,notes:el("sessionNotes").value,exercises}}
 
 function renderHistory(){
   const ath=el("athlete").value;
@@ -1026,6 +1021,8 @@ function renderHistory(){
   }else{
     ["bwStart","bwLast","bwChange"].forEach(id=>el(id).textContent="—");
   }
+  const acts=(state.activity||[]).filter(x=>x.athlete===ath).sort((a,b)=>a.date.localeCompare(b.date));
+  if(acts.length){const last=acts[acts.length-1],vals=acts.map(x=>Number(x.steps)||0);if(el("stepsLast"))el("stepsLast").textContent=(Number(last.steps)||0).toLocaleString("es-ES");if(el("stepsAvg"))el("stepsAvg").textContent=Math.round(vals.reduce((a,b)=>a+b,0)/vals.length).toLocaleString("es-ES");if(el("stepsMax"))el("stepsMax").textContent=Math.max(...vals).toLocaleString("es-ES")}else ["stepsLast","stepsAvg","stepsMax"].forEach(id=>{if(el(id))el(id).textContent="—"});
 }
 
 function renderWeeks(){
@@ -1034,50 +1031,21 @@ function renderWeeks(){
   ).join("");
 }
 
-function loadPrevious(){
-  const ath=el("athlete").value,ses=el("session").value;
-  const prev=state.workouts.filter(x=>x.athlete===ath&&x.session===ses).sort((a,b)=>b.date.localeCompare(a.date))[0];
-  if(!prev){alert("No hay una sesión anterior de este día.");return}
-  const boxes=[...document.querySelectorAll(".exercise")];
-  boxes.forEach((box,ei)=>{
-    const rows=[...box.querySelectorAll(".setrow")];
-    const saved=prev.exercises?.[ei]?.sets||[];
-    rows.forEach((row,si)=>{
-      if(saved[si]){
-        row.querySelector('[data-field="kg"]').value=saved[si].kg||"";
-        row.querySelector('[data-field="reps"]').value=saved[si].reps||"";
-        row.querySelector('[data-field="rir"]').value=saved[si].rir||"";
-      }
-    });
-  });
-  el("sessionNotes").value=`Referencia cargada desde ${prev.date}. `;
-}
+
+function loadPrevious(){const ath=el("athlete").value,ses=el("session").value,prev=state.workouts.filter(x=>x.athlete===ath&&x.session===ses).sort((a,b)=>b.date.localeCompare(a.date))[0];if(!prev){alert("No hay una sesión anterior de este día.");return}const models=(prev.exercises||[]).map(e=>({name:e.name,variant:e.variant||inferVariant(e.name),targetReps:e.targetReps||"8-12",rest:e.rest||"90 s",note:e.note||"",custom:!!e.custom,sets:(e.sets||[]).map(s=>({...s}))}));renderWorkout(models,{keepNotes:true});el("sessionNotes").value=prev.notes||"";setWorkoutDockStatus(`Cargada referencia del ${prev.date}.`,"ok")}
 
 document.querySelectorAll(".tab").forEach(btn=>btn.addEventListener("click",()=>{
   document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
   document.querySelectorAll(".view").forEach(x=>x.classList.add("hidden"));
   btn.classList.add("active"); el(btn.dataset.tab).classList.remove("hidden");
+  el("workoutDock").classList.toggle("hidden",btn.dataset.tab!=="today");
   if(btn.dataset.tab==="progress")renderHistory();if(btn.dataset.tab==="analytics")renderAnalytics();
 }));
 
 ["week","session"].forEach(id=>el(id).addEventListener("change",renderWorkout));
-el("athlete").addEventListener("change",renderHistory);
+el("athlete").addEventListener("change",()=>{renderHistory();renderAnalytics();renderWorkout();renderDeviceModeNotice();});
 
-el("saveWorkout").addEventListener("click",async()=>{
-  const w=collectWorkout();
-  const duplicate=state.workouts.findIndex(x=>x.athlete===w.athlete&&x.date===w.date&&x.session===w.session);
-  if(duplicate>=0){
-    if(confirm("Ya hay un entrenamiento de esta sesión en esta fecha. ¿Sobrescribir?")) state.workouts[duplicate]=w;
-    else return;
-  } else state.workouts.push(w);
-
-  save();
-  renderHistory();
-  renderAnalytics();
-  const uploaded=await saveWorkoutToCloud(w);
-  renderWorkout();
-  alert(uploaded?"Entrenamiento guardado y sincronizado.":"Entrenamiento guardado en el móvil. Se sincronizará cuando vuelva Internet.");
-});
+el("saveWorkout").addEventListener("click",async()=>{const w=collectWorkout(),duplicate=state.workouts.findIndex(x=>x.athlete===w.athlete&&x.date===w.date&&x.session===w.session);if(duplicate>=0)state.workouts[duplicate]=w;else state.workouts.push(w);save();renderHistory();renderAnalytics();setWorkoutDockStatus("Guardado local. Subiendo a la nube…","warn");const uploaded=await saveWorkoutToCloud(w);setWorkoutDockStatus(uploaded?"✓ Guardado y sincronizado.":"✓ Guardado local · pendiente de nube",uploaded?"ok":"warn")});
 
 el("loadPrevious").addEventListener("click",loadPrevious);
 
@@ -1096,13 +1064,16 @@ el("saveBW").addEventListener("click",async()=>{
   alert(uploaded?"Peso guardado y sincronizado.":"Peso guardado localmente; pendiente de sincronizar.");
 });
 
+
+el("saveActivity").addEventListener("click",async()=>{const steps=parseInt(el("activitySteps").value);if(!Number.isFinite(steps)||steps<0){alert("Introduce un número de pasos válido.");return}const rec={athlete:el("athlete").value,date:el("activityDate").value,steps,notes:el("activityNotes").value.trim()},i=state.activity.findIndex(x=>x.athlete===rec.athlete&&x.date===rec.date);if(i>=0)state.activity[i]=rec;else state.activity.push(rec);save();renderHistory();const uploaded=await saveActivityToCloud(rec);setWorkoutDockStatus(uploaded?"✓ Pasos sincronizados.":"Pasos guardados localmente.",uploaded?"ok":"warn")});
+
 el("saveSettings").addEventListener("click",async()=>{
   const old1=state.settings.athlete1, old2=state.settings.athlete2;
   const n1=el("athlete1").value.trim()||"Atleta 1";
   const n2=el("athlete2").value.trim()||"Atleta 2";
   state.workouts.forEach(x=>{if(x.athlete===old1)x.athlete=n1;if(x.athlete===old2)x.athlete=n2});
   state.bodyweights.forEach(x=>{if(x.athlete===old1)x.athlete=n1;if(x.athlete===old2)x.athlete=n2});
-  state.settings={athlete1:n1,athlete2:n2,goal1:el("goal1").value,goal2:el("goal2").value,_cloudDirty:true};
+  if(deviceAthlete===old1)saveDeviceAthleteValue(n1);if(deviceAthlete===old2)saveDeviceAthleteValue(n2);state.settings={athlete1:n1,athlete2:n2,goal1:el("goal1").value,goal2:el("goal2").value,_cloudDirty:true};
 
   save();
   initSelectors();
@@ -1127,6 +1098,7 @@ el("importData").addEventListener("change",async e=>{
     state.settings._cloudDirty=true;
     state.workouts.forEach(x=>x._cloudDirty=true);
     state.bodyweights.forEach(x=>x._cloudDirty=true);
+    (state.activity||[]).forEach(x=>x._cloudDirty=true);
     save(); initSelectors(); renderWorkout(); renderHistory(); renderAnalytics();
     await syncCloud({quiet:true});
     alert("Copia importada y enviada a Cloud Sync.");
@@ -1149,14 +1121,9 @@ function workoutVolume(w){
     const kg=parseFloat(s.kg),reps=parseInt(s.reps);if(kg>0&&reps>0)total+=kg*reps;
   }));return total;
 }
-function allExerciseNames(){return [...new Set(Object.values(program).flatMap(p=>p.exercises.map(e=>e[0])))]}
+function allExerciseNames(){const labels=new Set();Object.values(program).forEach(p=>p.exercises.forEach(e=>labels.add(exerciseLabel(e[0],inferVariant(e[0])))));state.workouts.forEach(w=>(w.exercises||[]).forEach(e=>labels.add(exerciseLabel(e.name,e.variant))));return [...labels]}
 function athleteGoal(ath){return ath===state.settings.athlete1?state.settings.goal1:state.settings.goal2}
-function getPRs(ath){
-  const out={};state.workouts.filter(w=>w.athlete===ath).forEach(w=>(w.exercises||[]).forEach(e=>(e.sets||[]).forEach(s=>{
-    const kg=parseFloat(s.kg),reps=parseInt(s.reps);
-    if(kg>0&&reps>0){const e1rm=kg*(1+reps/30);if(!out[e.name]||e1rm>out[e.name].e1rm)out[e.name]={e1rm,kg,reps,date:w.date}}
-  })));return out;
-}
+function getPRs(ath){const out={};state.workouts.filter(w=>w.athlete===ath).forEach(w=>(w.exercises||[]).forEach(e=>(e.sets||[]).forEach(s=>{const kg=parseFloat(s.kg),reps=parseInt(s.reps);if(kg>0&&reps>0){const key=exerciseLabel(e.name,e.variant),e1rm=kg*(1+reps/30);if(!out[key]||e1rm>out[key].e1rm)out[key]={e1rm,kg,reps,date:w.date}}})));return out}
 function drawLineChart(canvas,points,suffix=""){
   const ctx=canvas.getContext("2d"),W=canvas.width,H=canvas.height,pad=34;
   ctx.clearRect(0,0,W,H);ctx.strokeStyle="#263451";ctx.lineWidth=1;
@@ -1183,14 +1150,7 @@ function renderAnalytics(){
   const rows=Object.entries(prs).sort((a,b)=>b[1].e1rm-a[1].e1rm);
   el("prTable").innerHTML=rows.length?rows.map(([name,p])=>`<tr><td>${name}</td><td>${p.kg} × ${p.reps}</td><td>${p.e1rm.toFixed(1)} kg</td><td>${p.date}</td></tr>`).join(""):`<tr><td colspan="4" class="small">Aún no hay PRs registrados.</td></tr>`;
 }
-function renderStrengthChart(){
-  const ath=el("athlete").value,name=el("strengthExercise").value;if(!name)return;const pts=[];
-  state.workouts.filter(w=>w.athlete===ath).sort((a,b)=>a.date.localeCompare(b.date)).forEach(w=>{
-    const ex=(w.exercises||[]).find(e=>e.name===name);if(!ex)return;let best=0;
-    (ex.sets||[]).forEach(s=>{const kg=parseFloat(s.kg),reps=parseInt(s.reps);if(kg>0&&reps>0)best=Math.max(best,kg*(1+reps/30))});
-    if(best>0)pts.push({label:w.date.slice(5),y:best});
-  });drawLineChart(el("strengthChart"),pts," kg");
-}
+function renderStrengthChart(){const ath=el("athlete").value,label=el("strengthExercise").value;if(!label)return;const pts=[];state.workouts.filter(w=>w.athlete===ath).sort((a,b)=>a.date.localeCompare(b.date)).forEach(w=>{const ex=(w.exercises||[]).find(e=>exerciseLabel(e.name,e.variant)===label);if(!ex)return;let best=0;(ex.sets||[]).forEach(s=>{const kg=parseFloat(s.kg),reps=parseInt(s.reps);if(kg>0&&reps>0)best=Math.max(best,kg*(1+reps/30))});if(best>0)pts.push({label:w.date.slice(5),y:best})});drawLineChart(el("strengthChart"),pts," kg")}
 el("refreshAnalytics").addEventListener("click",renderAnalytics);
 el("strengthExercise").addEventListener("change",renderStrengthChart);
 
@@ -1274,22 +1234,12 @@ function bootPersistentState(){
 window.addEventListener("beforeinstallprompt",(e)=>{
   e.preventDefault();
   deferredInstallPrompt=e;
-  const btn=el("installApp"); if(btn)btn.style.display="inline-block";
+  const btn=el("installApp"); if(btn)btn.textContent="Instalar IRON BLOCK";
 });
 
-window.addEventListener("appinstalled",()=>{
-  const btn=el("installApp"); if(btn)btn.style.display="none";
-  deferredInstallPrompt=null;
-});
+window.addEventListener("appinstalled",()=>{const btn=el("installApp");if(btn)btn.textContent="IRON BLOCK instalada";deferredInstallPrompt=null});
 
-document.addEventListener("visibilitychange",()=>{
-  if(!bootComplete)return;
-  if(document.visibilityState==="hidden"){
-    save();
-  }else if(Date.now()-lastCloudSync>15000){
-    syncCloud({quiet:true});
-  }
-});
+document.addEventListener("visibilitychange",()=>{if(!bootComplete)return;if(document.visibilityState==="hidden")save();else if(Date.now()-lastCloudSync>15000)syncCloud({quiet:true})});
 window.addEventListener("pagehide",()=>{if(bootComplete)save()});
 window.addEventListener("beforeunload",()=>{if(bootComplete)save()});
 
@@ -1300,11 +1250,10 @@ if("serviceWorker" in navigator && (location.protocol==="https:" || location.hos
 document.addEventListener("DOMContentLoaded",()=>{
   const installBtn=el("installApp");
   if(installBtn)installBtn.addEventListener("click",async()=>{
-    if(!deferredInstallPrompt){alert("La instalación aparecerá cuando abras la app desde una URL HTTPS compatible.");return}
-    deferredInstallPrompt.prompt();
-    try{await deferredInstallPrompt.userChoice}catch(e){}
-    deferredInstallPrompt=null;
-    installBtn.style.display="none";
+    const standalone=window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone===true;
+    if(standalone){alert("IRON BLOCK ya está instalada en este dispositivo.");return}
+    if(deferredInstallPrompt){deferredInstallPrompt.prompt();try{await deferredInstallPrompt.userChoice}catch(e){}deferredInstallPrompt=null;return}
+    alert("Si Chrome no muestra el aviso automático: pulsa ⋮ arriba a la derecha → Añadir a pantalla de inicio / Instalar aplicación → Instalar.");
   });
 
   const force=el("forceSave");
@@ -1319,12 +1268,14 @@ document.addEventListener("DOMContentLoaded",()=>{
     alert(ok?"Prueba de almacenamiento: OK":"Prueba de almacenamiento: ERROR");
   });
 
-  const syncBtn=el("syncCloudBtn");
-  if(syncBtn)syncBtn.addEventListener("click",()=>syncCloud());
-
-  bootPersistentState();
-  renderCloudStatus();
-  setTimeout(()=>syncCloud({quiet:true}),250);
+  const syncBtn=el("syncCloudBtn");if(syncBtn)syncBtn.addEventListener("click",()=>syncCloud());
+  el("dockSaveWorkout")?.addEventListener("click",()=>el("saveWorkout")?.click());
+  el("dockSyncCloud")?.addEventListener("click",()=>syncCloud());
+  el("addExerciseBtn")?.addEventListener("click",()=>el("exerciseModal").classList.remove("hidden"));
+  el("cancelCustomExercise")?.addEventListener("click",()=>el("exerciseModal").classList.add("hidden"));
+  el("confirmCustomExercise")?.addEventListener("click",()=>{const name=el("customExName").value.trim();if(!name){alert("Pon un nombre al ejercicio.");return}const model={name,variant:el("customExVariant").value,targetReps:el("customExReps").value.trim()||"8-12",rest:el("customExRest").value.trim()||"90 s",rirTarget:`RIR ${el("customExRir").value.trim()||"1-2"}`,custom:true,note:"",sets:Array.from({length:Math.max(1,parseInt(el("customExSets").value)||3)},()=>({kg:"",reps:"",rir:""}))},current=collectWorkout().exercises.map(e=>({...e})),general=el("sessionNotes").value;current.push(model);renderWorkout(current,{keepNotes:true});el("sessionNotes").value=general;el("exerciseModal").classList.add("hidden");el("customExName").value="";setWorkoutDockStatus(`Añadido: ${name}`,"ok")});
+  el("saveDeviceAthlete")?.addEventListener("click",()=>{saveDeviceAthleteValue(el("deviceAthleteSelect").value);alert(`Este dispositivo queda asignado a ${deviceAthlete}.`)});
+  bootPersistentState();renderCloudStatus();setTimeout(()=>{ensureDeviceAthlete();refreshAthleteSelectorPreserve();if(deviceAthlete&&el("athlete"))el("athlete").value=deviceAthlete;renderDeviceModeNotice();setWorkoutDockStatus(`Listo · perfil predeterminado: ${deviceAthlete||"sin elegir"}.`,"ok");syncCloud({quiet:true})},250);
 });
 </script>
 

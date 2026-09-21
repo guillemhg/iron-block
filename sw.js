@@ -1,4 +1,4 @@
-const CACHE="iron-block-v3-0";
+const CACHE="iron-block-v3-2";
 const STATIC_ASSETS=["./manifest.webmanifest","./icon-192.png","./icon-512.png"];
 
 self.addEventListener("install",event=>{
@@ -15,8 +15,6 @@ self.addEventListener("activate",event=>{
 
 self.addEventListener("fetch",event=>{
   if(event.request.method!=="GET")return;
-
-  // Never intercept Supabase: cloud requests must go directly to the network.
   if(event.request.url.includes("supabase.co"))return;
 
   if(event.request.mode==="navigate"){
