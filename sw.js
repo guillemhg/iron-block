@@ -1,4 +1,4 @@
-const CACHE="iron-block-v3-2";
+const CACHE="iron-block-v3-3";
 const STATIC_ASSETS=["./manifest.webmanifest","./icon-192.png","./icon-512.png"];
 
 self.addEventListener("install",event=>{
@@ -16,7 +16,6 @@ self.addEventListener("activate",event=>{
 self.addEventListener("fetch",event=>{
   if(event.request.method!=="GET")return;
   if(event.request.url.includes("supabase.co"))return;
-
   if(event.request.mode==="navigate"){
     event.respondWith(
       fetch(event.request,{cache:"no-store"}).then(response=>{
@@ -27,8 +26,5 @@ self.addEventListener("fetch",event=>{
     );
     return;
   }
-
-  event.respondWith(
-    caches.match(event.request).then(cached=>cached||fetch(event.request))
-  );
+  event.respondWith(caches.match(event.request).then(cached=>cached||fetch(event.request)));
 });

@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <link rel="manifest" href="manifest.webmanifest" />
 <link rel="icon" href="icon-192.png" />
-<title>Iron Block V3.2 · Flexible Profiles</title>
+<title>Iron Block V3.3 · Session Fix</title>
 <style>
 :root{
   --bg:#0b1020; --panel:#121a2e; --panel2:#18233c; --text:#f4f7fb;
@@ -120,7 +120,7 @@ canvas{width:100%;height:220px;display:block}
 <body>
 <div class="app">
 <header>
-  <h1>IRON BLOCK V3.2</h1>
+  <h1>IRON BLOCK V3.3</h1>
   <div class="sub">Programa de fuerza + hipertrofia · 4 días · 10 semanas · seguimiento avanzado</div>
   <div class="tabs">
     <button class="tab active" data-tab="today">Entreno</button>
@@ -463,7 +463,7 @@ canvas{width:100%;height:220px;display:block}
     </div>
     <div id="storageDetail" class="persist-detail small">Esperando carga inicial...</div>
     <p class="small" style="margin-top:10px">
-      Para que los datos sobrevivan de forma fiable entre cierres, abre esta V3.2 desde una URL HTTPS estable o instálala como PWA.
+      Para que los datos sobrevivan de forma fiable entre cierres, abre esta V3.3 desde una URL HTTPS estable o instálala como PWA.
       Si la abres directamente desde Descargas como <code>file://</code> o <code>content://</code>, Android/Chrome puede aislar el almacenamiento entre aperturas.
     </p>
   </div>
@@ -492,7 +492,7 @@ canvas{width:100%;height:220px;display:block}
   </div>
 </section>
 
-<div class="footer-note">IRON BLOCK V3.2 · Entrenad duro, progresad con cabeza y registrad todo.</div>
+<div class="footer-note">IRON BLOCK V3.3 · Entrenad duro, progresad con cabeza y registrad todo.</div>
 </div>
 
 <div class="timerbar">
@@ -1002,7 +1002,7 @@ function progressionSuggestion(athlete,session,exercise,variant,repRange,week){i
 function templateModels(){const w=+el("week").value,s=el("session").value,p=program[s];return p.exercises.map(e=>({name:e[0],baseSets:getWeekSets(e[1],w),targetReps:e[2],rest:e[3],variant:inferVariant(e[0]),note:"",custom:false,sets:Array.from({length:getWeekSets(e[1],w)},()=>({kg:"",reps:"",rir:""}))}))}
 function makeSetRow(set={},idx=0){return `<div class="setrow"><button class="donebtn" type="button" data-done="${idx}" title="Serie completada">✓</button><input type="number" step="0.5" inputmode="decimal" placeholder="kg" data-field="kg" value="${set.kg??""}"><input type="text" inputmode="numeric" placeholder="reps" data-field="reps" value="${set.reps??""}"><input type="number" step="1" min="0" max="5" placeholder="RIR" data-field="rir" value="${set.rir??""}"></div>`}
 function bindExerciseButtons(box){box.querySelectorAll(".donebtn").forEach(btn=>{btn.onclick=()=>{btn.classList.toggle("done");if(btn.classList.contains("done"))startTimer(+box.dataset.restSec,box.dataset.name)}});const plus=box.querySelector(".add-set");if(plus)plus.onclick=()=>{const sets=box.querySelector(".sets");sets.insertAdjacentHTML("beforeend",makeSetRow({},sets.querySelectorAll(".setrow").length));bindExerciseButtons(box)};const minus=box.querySelector(".remove-set");if(minus)minus.onclick=()=>{const rows=box.querySelectorAll(".setrow");if(rows.length<=1){alert("El ejercicio debe tener al menos una serie.");return}rows[rows.length-1].remove()};const removeEx=box.querySelector(".remove-exercise");if(removeEx)removeEx.onclick=()=>{if(confirm(`¿Quitar ${box.dataset.name} de esta sesión?`))box.remove()};const variant=box.querySelector(".variant-select");if(variant)variant.onchange=()=>{const athlete=el("athlete").value,name=box.dataset.name,targetReps=box.dataset.targetReps,week=+el("week").value,best=bestEstimated1RM(athlete,name,variant.value);box.querySelector(".pr").textContent=best?`PR est.: ${best.e1rm.toFixed(1)} kg (${best.kg}×${best.reps})`:"Sin PR para esta variante";box.querySelector(".suggest").textContent=progressionSuggestion(athlete,el("session").value,name,variant.value,targetReps,week)}}
-function renderWorkout(models=null,{keepNotes=false}={}){const w=+el("week").value,s=el("session").value,p=program[s],athlete=el("athlete").value,wi=weekInfo[w];el("sessionTitle").textContent=s;el("sessionDesc").textContent=p.desc;el("rirBadge").textContent=wi[1];el("weekNote").innerHTML=`<b>Semana ${w} · ${wi[0]}</b><br>${wi[2]}`;const list=models||templateModels();el("exerciseList").innerHTML=list.map((m,idx)=>{const variant=m.variant||inferVariant(m.name),sets=(m.sets&&m.sets.length)?m.sets:Array.from({length:m.baseSets||3},()=>({kg:"",reps:"",rir:""})),best=bestEstimated1RM(athlete,m.name,variant),suggestion=progressionSuggestion(athlete,s,m.name,variant,m.targetReps||"8-12",w),restSec=parseRestSeconds(m.rest||"90 s");return `<div class="exercise ${m.custom?"custom-exercise":""}" data-ex="${idx}" data-name="${m.name.replaceAll('"','&quot;')}" data-target-reps="${m.targetReps||"8-12"}" data-rest-label="${m.rest||"90 s"}" data-rest-sec="${restSec}" data-custom="${m.custom?"1":"0"}"><div class="ex-head"><div><div class="ex-name">${m.name}</div><div class="ex-meta">${sets.length} series · ${m.targetReps||"8-12"} reps · descanso ${m.rest||"90 s"}</div><div class="pr">${best?`PR est.: ${best.e1rm.toFixed(1)} kg (${best.kg}×${best.reps})`:"Sin PR para esta variante"}</div><div class="suggest">${suggestion}</div></div><span class="badge">${m.rirTarget||wi[1]}</span></div><div class="variant-row"><div><label>Material / variante</label><select class="variant-select">${exerciseVariants.map(v=>`<option ${v===variant?"selected":""}>${v}</option>`).join("")}</select></div><div><label>Referencia</label><input value="${m.targetReps||"8-12"} reps · ${m.rest||"90 s"}" readonly></div></div><div class="sets">${sets.map((set,i)=>makeSetRow(set,i)).join("")}</div><div class="exercise-tools"><button class="btn secondary add-set" type="button">+ Serie</button><button class="btn secondary remove-set" type="button">− Serie</button>${m.custom?'<button class="btn danger remove-exercise" type="button">Quitar ejercicio</button>':""}</div><div class="exercise-note"><label>Nota de este ejercicio</label><input type="text" data-field="exnote" placeholder="Ajuste de máquina, sensaciones, agarre..." value="${(m.note||"").replaceAll('"','&quot;')}"></div></div>`}).join("");document.querySelectorAll(".exercise").forEach(bindExerciseButtons);if(!keepNotes)el("sessionNotes").value="";renderDeviceModeNotice()}
+function renderWorkout(models=null,{keepNotes=false}={}){if(models&&!Array.isArray(models))models=null;const w=+el("week").value,s=el("session").value,p=program[s],athlete=el("athlete").value,wi=weekInfo[w];el("sessionTitle").textContent=s;el("sessionDesc").textContent=p.desc;el("rirBadge").textContent=wi[1];el("weekNote").innerHTML=`<b>Semana ${w} · ${wi[0]}</b><br>${wi[2]}`;const list=models||templateModels();el("exerciseList").innerHTML=list.map((m,idx)=>{const variant=m.variant||inferVariant(m.name),sets=(m.sets&&m.sets.length)?m.sets:Array.from({length:m.baseSets||3},()=>({kg:"",reps:"",rir:""})),best=bestEstimated1RM(athlete,m.name,variant),suggestion=progressionSuggestion(athlete,s,m.name,variant,m.targetReps||"8-12",w),restSec=parseRestSeconds(m.rest||"90 s");return `<div class="exercise ${m.custom?"custom-exercise":""}" data-ex="${idx}" data-name="${m.name.replaceAll('"','&quot;')}" data-target-reps="${m.targetReps||"8-12"}" data-rest-label="${m.rest||"90 s"}" data-rest-sec="${restSec}" data-custom="${m.custom?"1":"0"}"><div class="ex-head"><div><div class="ex-name">${m.name}</div><div class="ex-meta">${sets.length} series · ${m.targetReps||"8-12"} reps · descanso ${m.rest||"90 s"}</div><div class="pr">${best?`PR est.: ${best.e1rm.toFixed(1)} kg (${best.kg}×${best.reps})`:"Sin PR para esta variante"}</div><div class="suggest">${suggestion}</div></div><span class="badge">${m.rirTarget||wi[1]}</span></div><div class="variant-row"><div><label>Material / variante</label><select class="variant-select">${exerciseVariants.map(v=>`<option ${v===variant?"selected":""}>${v}</option>`).join("")}</select></div><div><label>Referencia</label><input value="${m.targetReps||"8-12"} reps · ${m.rest||"90 s"}" readonly></div></div><div class="sets">${sets.map((set,i)=>makeSetRow(set,i)).join("")}</div><div class="exercise-tools"><button class="btn secondary add-set" type="button">+ Serie</button><button class="btn secondary remove-set" type="button">− Serie</button>${m.custom?'<button class="btn danger remove-exercise" type="button">Quitar ejercicio</button>':""}</div><div class="exercise-note"><label>Nota de este ejercicio</label><input type="text" data-field="exnote" placeholder="Ajuste de máquina, sensaciones, agarre..." value="${(m.note||"").replaceAll('"','&quot;')}"></div></div>`}).join("");document.querySelectorAll(".exercise").forEach(bindExerciseButtons);if(!keepNotes)el("sessionNotes").value="";renderDeviceModeNotice()}
 
 function collectWorkout(){const s=el("session").value,exercises=[...document.querySelectorAll(".exercise")].map(box=>({name:box.dataset.name,variant:box.querySelector(".variant-select")?.value||inferVariant(box.dataset.name),targetReps:box.dataset.targetReps||"8-12",rest:box.dataset.restLabel||"90 s",note:box.querySelector('[data-field="exnote"]')?.value||"",custom:box.dataset.custom==="1",sets:[...box.querySelectorAll(".setrow")].map(row=>({kg:row.querySelector('[data-field="kg"]').value,reps:row.querySelector('[data-field="reps"]').value,rir:row.querySelector('[data-field="rir"]').value}))}));return{id:Date.now(),athlete:el("athlete").value,week:+el("week").value,session:s,date:el("date").value,notes:el("sessionNotes").value,exercises}}
 
@@ -1042,7 +1042,7 @@ document.querySelectorAll(".tab").forEach(btn=>btn.addEventListener("click",()=>
   if(btn.dataset.tab==="progress")renderHistory();if(btn.dataset.tab==="analytics")renderAnalytics();
 }));
 
-["week","session"].forEach(id=>el(id).addEventListener("change",renderWorkout));
+["week","session"].forEach(id=>el(id).addEventListener("change",()=>renderWorkout()));
 el("athlete").addEventListener("change",()=>{renderHistory();renderAnalytics();renderWorkout();renderDeviceModeNotice();});
 
 el("saveWorkout").addEventListener("click",async()=>{const w=collectWorkout(),duplicate=state.workouts.findIndex(x=>x.athlete===w.athlete&&x.date===w.date&&x.session===w.session);if(duplicate>=0)state.workouts[duplicate]=w;else state.workouts.push(w);save();renderHistory();renderAnalytics();setWorkoutDockStatus("Guardado local. Subiendo a la nube…","warn");const uploaded=await saveWorkoutToCloud(w);setWorkoutDockStatus(uploaded?"✓ Guardado y sincronizado.":"✓ Guardado local · pendiente de nube",uploaded?"ok":"warn")});
