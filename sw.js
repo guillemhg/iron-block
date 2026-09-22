@@ -1,4 +1,4 @@
-const CACHE="iron-block-v4-0";
+const CACHE="iron-block-v4-1";
 const STATIC_ASSETS=["./manifest.webmanifest","./icon-192.png","./icon-512.png"];
 self.addEventListener("install",event=>{event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(STATIC_ASSETS)));self.skipWaiting()});
 self.addEventListener("activate",event=>{event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))));self.clients.claim()});
