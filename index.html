@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <link rel="manifest" href="manifest.webmanifest" />
 <link rel="icon" href="icon-192.png" />
-<title>Iron Block V3.3 · Session Fix</title>
+<title>Iron Block V4.0 · Progress Intelligence</title>
 <style>
 :root{
   --bg:#0b1020; --panel:#121a2e; --panel2:#18233c; --text:#f4f7fb;
@@ -23,7 +23,7 @@ font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-ser
 header{position:sticky;top:0;z-index:10;background:rgba(11,16,32,.92);backdrop-filter:blur(10px);
 padding:12px 0 10px;border-bottom:1px solid var(--border)}
 h1{font-size:22px;margin:0 0 4px}.sub{color:var(--muted);font-size:13px}
-.tabs{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:12px}
+.tabs{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-top:12px}
 .tab{border:1px solid var(--border);background:var(--panel);color:var(--muted);padding:10px 6px;
 border-radius:12px;font-weight:700;font-size:12px}
 .tab.active{color:#06130c;background:var(--accent);border-color:var(--accent)}
@@ -65,6 +65,7 @@ table{width:100%;border-collapse:collapse;font-size:12px}th,td{padding:8px;borde
 .notice{border-left:4px solid var(--accent2);padding:10px 12px;background:#0e1729;border-radius:8px;color:#c8d4e6;font-size:13px}
 .footer-note{text-align:center;color:var(--muted);font-size:11px;margin-top:20px}
 @media(max-width:620px){
+  .tabs{grid-template-columns:repeat(3,1fr)}
   .grid2,.grid3{grid-template-columns:1fr}
   .setrow{grid-template-columns:42px 1fr 1fr 1fr}
   .week-grid{grid-template-columns:repeat(2,1fr)}
@@ -115,18 +116,32 @@ canvas{width:100%;height:220px;display:block}
 .activity-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
 @media(max-width:620px){.variant-row{grid-template-columns:1fr}.activity-summary{grid-template-columns:1fr 1fr}.app{padding-bottom:150px}}
 
+
+.prev-session{margin-top:7px;padding:8px 10px;border:1px solid var(--border);border-radius:10px;background:#0b1324;font-size:11px;color:#c8d4e6;line-height:1.5}
+.prev-session b{color:var(--text)}
+.progressbar-wrap{margin-top:8px}.progressbar-head{display:flex;justify-content:space-between;gap:10px;font-size:12px;color:var(--muted);margin-bottom:5px}
+.goal-progress{height:12px;background:#0c1425;border:1px solid var(--border);border-radius:999px;overflow:hidden}.goal-progress>div{height:100%;background:linear-gradient(90deg,var(--accent2),var(--accent));transition:width .25s ease}
+.good{color:var(--accent)!important}.bad{color:var(--danger)!important}.neutral{color:var(--muted)!important}
+.analytics-table td,.analytics-table th{white-space:nowrap}
+.rm-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.report-preview{border:1px solid var(--border);border-radius:12px;background:#0d1527;padding:12px;line-height:1.55}
+.report-preview b{color:var(--accent)}
+.legend{display:flex;gap:12px;flex-wrap:wrap;font-size:11px;color:var(--muted);margin-top:8px}.legend span:before{content:"";display:inline-block;width:9px;height:9px;border-radius:999px;margin-right:5px;background:var(--accent)}.legend span.real:before{background:var(--accent2)}
+@media(max-width:620px){.rm-grid{grid-template-columns:1fr}}
+
 </style>
 </head>
 <body>
 <div class="app">
 <header>
-  <h1>IRON BLOCK V3.3</h1>
+  <h1>IRON BLOCK V4.0</h1>
   <div class="sub">Programa de fuerza + hipertrofia · 4 días · 10 semanas · seguimiento avanzado</div>
   <div class="tabs">
     <button class="tab active" data-tab="today">Entreno</button>
     <button class="tab" data-tab="plan">Plan</button>
     <button class="tab" data-tab="progress">Progreso</button>
     <button class="tab" data-tab="analytics">Analítica</button>
+    <button class="tab" data-tab="reports">Informes</button>
     <button class="tab" data-tab="settings">Ajustes</button>
   </div>
 </header>
@@ -394,15 +409,28 @@ canvas{width:100%;height:220px;display:block}
     <div class="row" style="justify-content:space-between">
       <div>
         <h2 class="section-title">Analítica del atleta</h2>
-        <div class="small">Usa el atleta seleccionado en Entreno.</div>
+        <div class="small">Usa el atleta seleccionado en Entreno. Las variantes se analizan por separado.</div>
       </div>
       <button class="btn secondary" id="refreshAnalytics">Actualizar</button>
     </div>
     <div class="metric-grid" style="margin-top:12px">
       <div class="kpi"><span class="small">Sesiones</span><b id="kpiSessions">0</b></div>
       <div class="kpi"><span class="small">Volumen total</span><b id="kpiVolume">0 kg</b></div>
-      <div class="kpi"><span class="small">Ejercicios con PR</span><b id="kpiPRs">0</b></div>
-      <div class="kpi"><span class="small">Objetivo peso</span><b id="kpiGoal">—</b></div>
+      <div class="kpi"><span class="small">Adherencia</span><b id="kpiAdherence">N/A</b></div>
+      <div class="kpi"><span class="small">Índice progreso</span><b id="kpiProgressIndex">N/A</b></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2 class="section-title">Objetivo de peso corporal</h2>
+    <div class="grid3">
+      <div class="kpi"><span class="small">Inicial</span><b id="goalStartWeight">—</b></div>
+      <div class="kpi"><span class="small">Actual</span><b id="goalCurrentWeight">—</b></div>
+      <div class="kpi"><span class="small">Objetivo</span><b id="goalTargetWeight">—</b></div>
+    </div>
+    <div class="progressbar-wrap">
+      <div class="progressbar-head"><span id="goalProgressText">Sin datos</span><span id="goalRemainingText"></span></div>
+      <div class="goal-progress"><div id="goalProgressBar" style="width:0%"></div></div>
     </div>
   </div>
 
@@ -412,16 +440,58 @@ canvas{width:100%;height:220px;display:block}
   </div>
 
   <div class="card">
-    <h2 class="section-title">Fuerza estimada (1RM)</h2>
-    <div class="grid2">
-      <div><label>Ejercicio</label><select id="strengthExercise"></select></div>
-      <div style="align-self:end"><div class="small">Estimación Epley: peso × (1 + reps/30).</div></div>
-    </div>
-    <div class="chartbox" style="margin-top:12px"><canvas id="strengthChart" width="840" height="220"></canvas></div>
+    <h2 class="section-title">Actividad · pasos</h2>
+    <div class="chartbox"><canvas id="stepsChart" width="840" height="220"></canvas></div>
   </div>
 
   <div class="card">
-    <h2 class="section-title">PRs actuales</h2>
+    <h2 class="section-title">Fuerza estimada + 1RM real</h2>
+    <div class="grid2">
+      <div><label>Ejercicio / variante</label><select id="strengthExercise"></select></div>
+      <div style="align-self:end"><div class="small">Línea: 1RM estimado (Epley). Puntos azules: 1RM real testado.</div></div>
+    </div>
+    <div class="chartbox" style="margin-top:12px"><canvas id="strengthChart" width="840" height="240"></canvas></div>
+    <div class="legend"><span>1RM estimado</span><span class="real">1RM real</span></div>
+  </div>
+
+  <div class="card">
+    <h2 class="section-title">Progreso de fuerza por ejercicio</h2>
+    <div class="small">Actual vs inicio = última sesión válida frente a la primera. Mejor vs inicio = mejor e1RM histórico frente a la primera.</div>
+    <div style="overflow:auto;margin-top:10px">
+      <table class="analytics-table">
+        <thead><tr><th>Ejercicio</th><th>Inicio e1RM</th><th>Actual</th><th>Actual vs inicio</th><th>Mejor</th><th>Mejor vs inicio</th></tr></thead>
+        <tbody id="strengthProgressTable"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2 class="section-title">1RM reales / PR testados</h2>
+    <div class="small">Aquí solo registramos máximos reales de <b>1 repetición</b>. Las series de varias repeticiones ya quedan registradas en los entrenamientos normales.</div>
+    <div class="rm-grid" style="margin-top:12px">
+      <div><label>Atleta</label><select id="rmAthlete"></select></div>
+      <div><label>Ejercicio</label><input id="rmExercise" list="rmExerciseOptions" placeholder="Press banca"></div>
+      <datalist id="rmExerciseOptions"></datalist>
+      <div><label>Variante</label><select id="rmVariant"><option>Barra</option><option>Mancuernas</option><option>Máquina</option><option>Polea</option><option>Peso corporal</option><option>Trap bar</option><option>Otro</option></select></div>
+      <div><label>Fecha</label><input id="rmDate" type="date"></div>
+      <div><label>1RM real (kg)</label><input id="rmWeight" type="number" step="0.5" min="0.5" inputmode="decimal"></div>
+      <div><label>Nota opcional</label><input id="rmNotes" placeholder="Pausa, agarre, sensaciones..."></div>
+    </div>
+    <button class="btn" id="saveRealRM" style="margin-top:12px">Registrar 1RM real</button>
+
+    <h3 style="font-size:14px;margin:18px 0 6px">Mejores 1RM reales</h3>
+    <div style="overflow:auto">
+      <table class="analytics-table"><thead><tr><th>Ejercicio</th><th>Primer RM</th><th>Mejor RM</th><th>Mejora</th><th>Fuerza relativa</th></tr></thead><tbody id="realRMBestTable"></tbody></table>
+    </div>
+
+    <h3 style="font-size:14px;margin:18px 0 6px">Historial completo de 1RM reales</h3>
+    <div style="overflow:auto">
+      <table class="analytics-table"><thead><tr><th>Fecha</th><th>Ejercicio</th><th>1RM real</th><th>Peso corporal</th><th>Relativa</th><th>Nota</th></tr></thead><tbody id="realRMHistoryTable"></tbody></table>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2 class="section-title">PRs estimados actuales</h2>
     <div style="overflow:auto">
       <table>
         <thead><tr><th>Ejercicio</th><th>Mejor serie</th><th>1RM est.</th><th>Fecha</th></tr></thead>
@@ -431,7 +501,21 @@ canvas{width:100%;height:220px;display:block}
   </div>
 </section>
 
-
+<section id="reports" class="view hidden">
+  <div class="card">
+    <h2 class="section-title">Informes · IRON BLOCK Progress Report</h2>
+    <div class="small">Genera un informe listo para PDF con peso corporal, pasos, fuerza, 1RM reales, adherencia y progreso. El PDF no se guarda en Supabase.</div>
+    <div class="grid2" style="margin-top:12px">
+      <div><label>Atleta</label><select id="reportAthlete"></select></div>
+      <div><label>Periodo</label><select id="reportPeriod"><option value="all">Todo el bloque</option><option value="4w">Últimas 4 semanas</option><option value="custom">Personalizado</option></select></div>
+      <div id="reportStartWrap" class="hidden"><label>Desde</label><input id="reportStart" type="date"></div>
+      <div id="reportEndWrap" class="hidden"><label>Hasta</label><input id="reportEnd" type="date"></div>
+    </div>
+    <div class="report-preview" id="reportPreview" style="margin-top:12px">Selecciona atleta y periodo. El informe usa los datos sincronizados que ya están cargados en la app.</div>
+    <button class="btn" id="generateReportPDF" style="margin-top:12px">Generar PDF</button>
+    <p class="small">Se abrirá una versión maquetada para impresión. En Android/Chrome elige <b>Guardar como PDF</b> en el diálogo de impresión.</p>
+  </div>
+</section>
 
 <section id="settings" class="view hidden">
   <div class="card">
@@ -463,7 +547,7 @@ canvas{width:100%;height:220px;display:block}
     </div>
     <div id="storageDetail" class="persist-detail small">Esperando carga inicial...</div>
     <p class="small" style="margin-top:10px">
-      Para que los datos sobrevivan de forma fiable entre cierres, abre esta V3.3 desde una URL HTTPS estable o instálala como PWA.
+      Para que los datos sobrevivan de forma fiable entre cierres, abre esta V4.0 desde una URL HTTPS estable o instálala como PWA.
       Si la abres directamente desde Descargas como <code>file://</code> o <code>content://</code>, Android/Chrome puede aislar el almacenamiento entre aperturas.
     </p>
   </div>
@@ -492,7 +576,7 @@ canvas{width:100%;height:220px;display:block}
   </div>
 </section>
 
-<div class="footer-note">IRON BLOCK V3.3 · Entrenad duro, progresad con cabeza y registrad todo.</div>
+<div class="footer-note">IRON BLOCK V4.0 · Entrenad duro, progresad con cabeza y registrad todo.</div>
 </div>
 
 <div class="timerbar">
@@ -592,7 +676,7 @@ const key="ironBlockV1";
 const backupKey="ironBlockV1_backup";
 const defaultState={
   settings:{athlete1:"Guillem",athlete2:"Biel",goal1:"95",goal2:"80"},
-  workouts:[], bodyweights:[], activity:[], _savedAt:0
+  workouts:[], bodyweights:[], activity:[], real1rms:[], _savedAt:0
 };
 
 let state=structuredClone(defaultState);
@@ -649,6 +733,7 @@ function migrateState(s){
   if(!Array.isArray(s.workouts))s.workouts=[];
   if(!Array.isArray(s.bodyweights))s.bodyweights=[];
   if(!Array.isArray(s.activity))s.activity=[];
+  if(!Array.isArray(s.real1rms))s.real1rms=[];
 
   if(s.settings.athlete2==="Amigo"){
     s.workouts.forEach(x=>{if(x.athlete==="Amigo")x.athlete="Biel"});
@@ -740,13 +825,15 @@ function renderCloudStatus(extra=""){
   const pendingB=(state.bodyweights||[]).filter(x=>x._cloudDirty).length;
   const pendingS=state.settings?._cloudDirty?1:0;
   const pendingA=(state.activity||[]).filter(x=>x._cloudDirty).length;
+  const pendingR=(state.real1rms||[]).filter(x=>x._cloudDirty).length;
   detail.innerHTML=
     `<b>Estado cloud</b><br>`+
     `Última sincronización: ${lastCloudSync?new Date(lastCloudSync).toLocaleString("es-ES"):"todavía no"}<br>`+
     `Entrenamientos locales: ${(state.workouts||[]).length}<br>`+
     `Pesos locales: ${(state.bodyweights||[]).length}<br>`+
     `Días con pasos: ${(state.activity||[]).length}<br>`+
-    `Pendientes de subir: ${pendingW+pendingB+pendingS+pendingA}`+
+    `1RM reales: ${(state.real1rms||[]).length}<br>`+
+    `Pendientes de subir: ${pendingW+pendingB+pendingS+pendingA+pendingR}`+
     (extra?`<br>${extra}`:"");
 }
 
@@ -800,6 +887,12 @@ async function cloudUpsertBodyweight(w){
 async function cloudUpsertActivity(a){const payload={athlete:a.athlete,activity_date:a.date,steps:Number(a.steps)||0,notes:a.notes||"",updated_at:new Date().toISOString()};await cloudRequest("iron_block_activity?on_conflict=athlete,activity_date",{method:"POST",body:payload,prefer:"resolution=merge-duplicates,return=minimal"})}
 async function saveActivityToCloud(rec){rec._cloudDirty=true;save();try{await cloudUpsertActivity(rec);delete rec._cloudDirty;cloudOnline=true;lastCloudSync=Date.now();save();renderCloudStatus("Actividad subida.");return true}catch(err){cloudOnline=false;renderCloudStatus("Actividad guardada localmente; pendiente de subir.");return false}}
 
+async function cloudUpsertRealRM(r){
+  const payload={client_uid:r.clientUid,athlete:r.athlete,exercise_name:r.exercise,variant:r.variant,test_date:r.date,weight:Number(r.weight),bodyweight_at_test:r.bodyweightAtTest==null?null:Number(r.bodyweightAtTest),notes:r.notes||"",updated_at:new Date().toISOString()};
+  await cloudRequest("iron_block_real_1rm?on_conflict=client_uid",{method:"POST",body:payload,prefer:"resolution=merge-duplicates,return=minimal"});
+}
+async function saveRealRMToCloud(rec){rec._cloudDirty=true;save();try{await cloudUpsertRealRM(rec);delete rec._cloudDirty;cloudOnline=true;lastCloudSync=Date.now();save();renderCloudStatus("1RM real subido.");return true}catch(err){cloudOnline=false;renderCloudStatus("1RM real guardado localmente; pendiente de subir.");return false}}
+
 
 async function pushPendingToCloud(){
   if(state.settings?._cloudDirty){
@@ -816,12 +909,14 @@ async function pushPendingToCloud(){
 
   for(const b of (state.bodyweights||[]).filter(x=>x._cloudDirty)){await cloudUpsertBodyweight(b);delete b._cloudDirty;save()}
   for(const a of (state.activity||[]).filter(x=>x._cloudDirty)){await cloudUpsertActivity(a);delete a._cloudDirty;save()}
+  for(const r of (state.real1rms||[]).filter(x=>x._cloudDirty)){await cloudUpsertRealRM(r);delete r._cloudDirty;save()}
 }
 
-async function seedLocalOnlyRecords(cloudWorkouts,cloudWeights,cloudActivity){
+async function seedLocalOnlyRecords(cloudWorkouts,cloudWeights,cloudActivity,cloudRms){
   const cw=new Set(cloudWorkouts.map(x=>`${x.athlete}|||${x.workout_date}|||${x.session}`));
   const cb=new Set(cloudWeights.map(x=>`${x.athlete}|||${x.weight_date}`));
   const ca=new Set((cloudActivity||[]).map(x=>`${x.athlete}|||${x.activity_date}`));
+  const cr=new Set((cloudRms||[]).map(x=>x.client_uid));
 
   for(const w of state.workouts||[]){
     if(!cw.has(workoutCloudKey(w))){
@@ -830,21 +925,24 @@ async function seedLocalOnlyRecords(cloudWorkouts,cloudWeights,cloudActivity){
   }
   for(const b of state.bodyweights||[]){if(!cb.has(weightCloudKey(b))){try{await cloudUpsertBodyweight(b)}catch(e){b._cloudDirty=true}}}
   for(const a of state.activity||[]){const k=`${a.athlete}|||${a.date}`;if(!ca.has(k)){try{await cloudUpsertActivity(a)}catch(e){a._cloudDirty=true}}}
+  for(const r of state.real1rms||[]){if(r.clientUid&&!cr.has(r.clientUid)){try{await cloudUpsertRealRM(r)}catch(e){r._cloudDirty=true}}}
 }
 
 async function pullCloudIntoState(){
-  const [settingsRows,cloudWorkouts,cloudWeights,cloudActivity]=await Promise.all([
+  const [settingsRows,cloudWorkouts,cloudWeights,cloudActivity,cloudRms]=await Promise.all([
     cloudRequest("iron_block_settings?id=eq.shared&select=*"),
     cloudRequest("iron_block_workouts?select=athlete,workout_date,week,session,notes,exercises,updated_at&order=workout_date.asc"),
     cloudRequest("iron_block_bodyweights?select=athlete,weight_date,weight,updated_at&order=weight_date.asc"),
-    cloudRequest("iron_block_activity?select=athlete,activity_date,steps,notes,updated_at&order=activity_date.asc")
+    cloudRequest("iron_block_activity?select=athlete,activity_date,steps,notes,updated_at&order=activity_date.asc"),
+    cloudRequest("iron_block_real_1rm?select=client_uid,athlete,exercise_name,variant,test_date,weight,bodyweight_at_test,notes,updated_at&order=test_date.asc")
   ]);
-  await seedLocalOnlyRecords(cloudWorkouts||[],cloudWeights||[],cloudActivity||[]);
-  const [freshSettings,freshWorkouts,freshWeights,freshActivity]=await Promise.all([
+  await seedLocalOnlyRecords(cloudWorkouts||[],cloudWeights||[],cloudActivity||[],cloudRms||[]);
+  const [freshSettings,freshWorkouts,freshWeights,freshActivity,freshRms]=await Promise.all([
     cloudRequest("iron_block_settings?id=eq.shared&select=*"),
     cloudRequest("iron_block_workouts?select=athlete,workout_date,week,session,notes,exercises,updated_at&order=workout_date.asc"),
     cloudRequest("iron_block_bodyweights?select=athlete,weight_date,weight,updated_at&order=weight_date.asc"),
-    cloudRequest("iron_block_activity?select=athlete,activity_date,steps,notes,updated_at&order=activity_date.asc")
+    cloudRequest("iron_block_activity?select=athlete,activity_date,steps,notes,updated_at&order=activity_date.asc"),
+    cloudRequest("iron_block_real_1rm?select=client_uid,athlete,exercise_name,variant,test_date,weight,bodyweight_at_test,notes,updated_at&order=test_date.asc")
   ]);
 
   if(freshSettings?.[0] && !state.settings?._cloudDirty){
@@ -872,10 +970,12 @@ async function pullCloudIntoState(){
 
   const mappedB=(freshWeights||[]).map(x=>({athlete:x.athlete,date:x.weight_date,weight:Number(x.weight)}));
   const mappedA=(freshActivity||[]).map(x=>({athlete:x.athlete,date:x.activity_date,steps:Number(x.steps)||0,notes:x.notes||""}));
+  const mappedR=(freshRms||[]).map(x=>({clientUid:x.client_uid,athlete:x.athlete,exercise:x.exercise_name,variant:x.variant,date:x.test_date,weight:Number(x.weight),bodyweightAtTest:x.bodyweight_at_test==null?null:Number(x.bodyweight_at_test),notes:x.notes||""}));
   const wk=new Set(mappedW.map(workoutCloudKey));stillDirtyW.forEach(x=>{if(!wk.has(workoutCloudKey(x)))mappedW.push(x)});
   const bk=new Set(mappedB.map(weightCloudKey));stillDirtyB.forEach(x=>{if(!bk.has(weightCloudKey(x)))mappedB.push(x)});
   const stillDirtyA=(state.activity||[]).filter(x=>x._cloudDirty),ak=new Set(mappedA.map(x=>`${x.athlete}|||${x.date}`));stillDirtyA.forEach(x=>{if(!ak.has(`${x.athlete}|||${x.date}`))mappedA.push(x)});
-  state.workouts=mappedW;state.bodyweights=mappedB;state.activity=mappedA;save();
+  const stillDirtyR=(state.real1rms||[]).filter(x=>x._cloudDirty),rk=new Set(mappedR.map(x=>x.clientUid));stillDirtyR.forEach(x=>{if(!rk.has(x.clientUid))mappedR.push(x)});
+  state.workouts=mappedW;state.bodyweights=mappedB;state.activity=mappedA;state.real1rms=mappedR;save();
 }
 
 
@@ -978,7 +1078,7 @@ function initSelectors(){
   el("athlete").innerHTML = `<option>${state.settings.athlete1}</option><option>${state.settings.athlete2}</option>`;
   el("week").innerHTML = Array.from({length:10},(_,i)=>`<option value="${i+1}">Semana ${i+1}</option>`).join("");
   el("session").innerHTML = Object.keys(program).map(x=>`<option>${x}</option>`).join("");
-  el("date").value=todayISO(); el("bwDate").value=todayISO(); if(el("activityDate"))el("activityDate").value=todayISO();
+  el("date").value=todayISO(); el("bwDate").value=todayISO(); if(el("activityDate"))el("activityDate").value=todayISO(); if(el("rmDate"))el("rmDate").value=todayISO();
   el("athlete1").value=state.settings.athlete1; el("athlete2").value=state.settings.athlete2;
   if(deviceAthlete && [...el("athlete").options].some(o=>o.value===deviceAthlete))el("athlete").value=deviceAthlete;
   renderDeviceControls();
@@ -999,10 +1099,38 @@ function exerciseLabel(name,variant){return `${name} · ${variant||inferVariant(
 function bestEstimated1RM(athlete,exercise,variant){let best=null,target=exerciseLabel(exercise,variant);state.workouts.filter(x=>x.athlete===athlete).forEach(w=>(w.exercises||[]).forEach(e=>{if(exerciseLabel(e.name,e.variant)!==target)return;(e.sets||[]).forEach(s=>{const kg=parseFloat(s.kg),reps=parseInt(s.reps);if(kg>0&&reps>0){const e1rm=kg*(1+reps/30);if(!best||e1rm>best.e1rm)best={e1rm,kg,reps,date:w.date}}})}));return best}
 function lastExercisePerformance(athlete,session,exercise,variant){const target=exerciseLabel(exercise,variant),ws=state.workouts.filter(x=>x.athlete===athlete&&x.session===session).sort((a,b)=>b.date.localeCompare(a.date));for(const w of ws){const ex=(w.exercises||[]).find(e=>exerciseLabel(e.name,e.variant)===target);if(ex)return ex}return null}
 function progressionSuggestion(athlete,session,exercise,variant,repRange,week){if(week<=2)return "Prioridad: técnica y margen.";if(week===6)return "Descarga: peso cómodo y menos volumen.";const last=lastExercisePerformance(athlete,session,exercise,variant);if(!last)return "Primera referencia para esta variante.";const nums=String(repRange).match(/\d+/g)||[],maxRep=parseInt(nums[nums.length-1]||"0"),valid=(last.sets||[]).filter(s=>parseFloat(s.kg)>0&&parseInt(s.reps)>0);if(!valid.length)return "Sin datos suficientes.";const allTop=valid.every(s=>parseInt(s.reps)>=maxRep&&(s.rir===""||parseFloat(s.rir)<=1.5));if(allTop){const lower=/sentadilla|peso muerto|prensa|hack|búlgara|femoral|cuádriceps|gemelos/i.test(exercise);return `✓ Toca subir carga: +${lower?"2,5-5":"2-2,5"} kg aprox.`}return "Intenta mejorar 1-2 reps totales antes de subir peso."}
+
+function previousExerciseReference(athlete,exercise,variant,currentDate,currentSession){
+  const target=exerciseLabel(exercise,variant);
+  const candidates=state.workouts.filter(w=>w.athlete===athlete&&w.date<=currentDate&&!(w.date===currentDate&&w.session===currentSession)).sort((a,b)=>b.date.localeCompare(a.date));
+  for(const w of candidates){
+    const ex=(w.exercises||[]).find(e=>exerciseLabel(e.name,e.variant)===target);
+    if(!ex)continue;
+    const valid=(ex.sets||[]).filter(s=>s.kg!==""&&s.kg!=null&&s.reps!==""&&s.reps!=null&&Number(s.reps)>0);
+    if(!valid.length)continue;
+    let best=null;
+    valid.forEach(s=>{const kg=Number(s.kg)||0,reps=Number(s.reps)||0,e1=kg>0?kg*(1+reps/30):reps;if(!best||e1>best.score)best={score:e1,kg,reps,rir:s.rir};});
+    return {date:w.date,sets:valid,best};
+  }
+  return null;
+}
+function previousReferenceHTML(athlete,exercise,variant,currentDate,currentSession){
+  const p=previousExerciseReference(athlete,exercise,variant,currentDate,currentSession);
+  if(!p)return '<b>Anterior:</b> N/A · 0 registros';
+  const compact=p.sets.map(s=>`${Number(s.kg)||0}×${Number(s.reps)||0}`).join(' · ');
+  const rir=p.best&&p.best.rir!==""&&p.best.rir!=null?` · RIR ${p.best.rir}`:"";
+  return `<b>Anterior (${p.date}):</b> ${compact}<br><b>Mejor serie:</b> ${p.best.kg}×${p.best.reps}${rir}`;
+}
+function updateExerciseReference(box){
+  const variant=box.querySelector('.variant-select')?.value||inferVariant(box.dataset.name);
+  const node=box.querySelector('.prev-session');
+  if(node)node.innerHTML=previousReferenceHTML(el('athlete').value,box.dataset.name,variant,el('date').value,el('session').value);
+}
+
 function templateModels(){const w=+el("week").value,s=el("session").value,p=program[s];return p.exercises.map(e=>({name:e[0],baseSets:getWeekSets(e[1],w),targetReps:e[2],rest:e[3],variant:inferVariant(e[0]),note:"",custom:false,sets:Array.from({length:getWeekSets(e[1],w)},()=>({kg:"",reps:"",rir:""}))}))}
 function makeSetRow(set={},idx=0){return `<div class="setrow"><button class="donebtn" type="button" data-done="${idx}" title="Serie completada">✓</button><input type="number" step="0.5" inputmode="decimal" placeholder="kg" data-field="kg" value="${set.kg??""}"><input type="text" inputmode="numeric" placeholder="reps" data-field="reps" value="${set.reps??""}"><input type="number" step="1" min="0" max="5" placeholder="RIR" data-field="rir" value="${set.rir??""}"></div>`}
-function bindExerciseButtons(box){box.querySelectorAll(".donebtn").forEach(btn=>{btn.onclick=()=>{btn.classList.toggle("done");if(btn.classList.contains("done"))startTimer(+box.dataset.restSec,box.dataset.name)}});const plus=box.querySelector(".add-set");if(plus)plus.onclick=()=>{const sets=box.querySelector(".sets");sets.insertAdjacentHTML("beforeend",makeSetRow({},sets.querySelectorAll(".setrow").length));bindExerciseButtons(box)};const minus=box.querySelector(".remove-set");if(minus)minus.onclick=()=>{const rows=box.querySelectorAll(".setrow");if(rows.length<=1){alert("El ejercicio debe tener al menos una serie.");return}rows[rows.length-1].remove()};const removeEx=box.querySelector(".remove-exercise");if(removeEx)removeEx.onclick=()=>{if(confirm(`¿Quitar ${box.dataset.name} de esta sesión?`))box.remove()};const variant=box.querySelector(".variant-select");if(variant)variant.onchange=()=>{const athlete=el("athlete").value,name=box.dataset.name,targetReps=box.dataset.targetReps,week=+el("week").value,best=bestEstimated1RM(athlete,name,variant.value);box.querySelector(".pr").textContent=best?`PR est.: ${best.e1rm.toFixed(1)} kg (${best.kg}×${best.reps})`:"Sin PR para esta variante";box.querySelector(".suggest").textContent=progressionSuggestion(athlete,el("session").value,name,variant.value,targetReps,week)}}
-function renderWorkout(models=null,{keepNotes=false}={}){if(models&&!Array.isArray(models))models=null;const w=+el("week").value,s=el("session").value,p=program[s],athlete=el("athlete").value,wi=weekInfo[w];el("sessionTitle").textContent=s;el("sessionDesc").textContent=p.desc;el("rirBadge").textContent=wi[1];el("weekNote").innerHTML=`<b>Semana ${w} · ${wi[0]}</b><br>${wi[2]}`;const list=models||templateModels();el("exerciseList").innerHTML=list.map((m,idx)=>{const variant=m.variant||inferVariant(m.name),sets=(m.sets&&m.sets.length)?m.sets:Array.from({length:m.baseSets||3},()=>({kg:"",reps:"",rir:""})),best=bestEstimated1RM(athlete,m.name,variant),suggestion=progressionSuggestion(athlete,s,m.name,variant,m.targetReps||"8-12",w),restSec=parseRestSeconds(m.rest||"90 s");return `<div class="exercise ${m.custom?"custom-exercise":""}" data-ex="${idx}" data-name="${m.name.replaceAll('"','&quot;')}" data-target-reps="${m.targetReps||"8-12"}" data-rest-label="${m.rest||"90 s"}" data-rest-sec="${restSec}" data-custom="${m.custom?"1":"0"}"><div class="ex-head"><div><div class="ex-name">${m.name}</div><div class="ex-meta">${sets.length} series · ${m.targetReps||"8-12"} reps · descanso ${m.rest||"90 s"}</div><div class="pr">${best?`PR est.: ${best.e1rm.toFixed(1)} kg (${best.kg}×${best.reps})`:"Sin PR para esta variante"}</div><div class="suggest">${suggestion}</div></div><span class="badge">${m.rirTarget||wi[1]}</span></div><div class="variant-row"><div><label>Material / variante</label><select class="variant-select">${exerciseVariants.map(v=>`<option ${v===variant?"selected":""}>${v}</option>`).join("")}</select></div><div><label>Referencia</label><input value="${m.targetReps||"8-12"} reps · ${m.rest||"90 s"}" readonly></div></div><div class="sets">${sets.map((set,i)=>makeSetRow(set,i)).join("")}</div><div class="exercise-tools"><button class="btn secondary add-set" type="button">+ Serie</button><button class="btn secondary remove-set" type="button">− Serie</button>${m.custom?'<button class="btn danger remove-exercise" type="button">Quitar ejercicio</button>':""}</div><div class="exercise-note"><label>Nota de este ejercicio</label><input type="text" data-field="exnote" placeholder="Ajuste de máquina, sensaciones, agarre..." value="${(m.note||"").replaceAll('"','&quot;')}"></div></div>`}).join("");document.querySelectorAll(".exercise").forEach(bindExerciseButtons);if(!keepNotes)el("sessionNotes").value="";renderDeviceModeNotice()}
+function bindExerciseButtons(box){box.querySelectorAll(".donebtn").forEach(btn=>{btn.onclick=()=>{btn.classList.toggle("done");if(btn.classList.contains("done"))startTimer(+box.dataset.restSec,box.dataset.name)}});const plus=box.querySelector(".add-set");if(plus)plus.onclick=()=>{const sets=box.querySelector(".sets");sets.insertAdjacentHTML("beforeend",makeSetRow({},sets.querySelectorAll(".setrow").length));bindExerciseButtons(box)};const minus=box.querySelector(".remove-set");if(minus)minus.onclick=()=>{const rows=box.querySelectorAll(".setrow");if(rows.length<=1){alert("El ejercicio debe tener al menos una serie.");return}rows[rows.length-1].remove()};const removeEx=box.querySelector(".remove-exercise");if(removeEx)removeEx.onclick=()=>{if(confirm(`¿Quitar ${box.dataset.name} de esta sesión?`))box.remove()};const variant=box.querySelector(".variant-select");if(variant)variant.onchange=()=>{const athlete=el("athlete").value,name=box.dataset.name,targetReps=box.dataset.targetReps,week=+el("week").value,best=bestEstimated1RM(athlete,name,variant.value);box.querySelector(".pr").textContent=best?`PR est.: ${best.e1rm.toFixed(1)} kg (${best.kg}×${best.reps})`:"Sin PR para esta variante";box.querySelector(".suggest").textContent=progressionSuggestion(athlete,el("session").value,name,variant.value,targetReps,week);updateExerciseReference(box)}}
+function renderWorkout(models=null,{keepNotes=false}={}){if(models&&!Array.isArray(models))models=null;const w=+el("week").value,s=el("session").value,p=program[s],athlete=el("athlete").value,wi=weekInfo[w];el("sessionTitle").textContent=s;el("sessionDesc").textContent=p.desc;el("rirBadge").textContent=wi[1];el("weekNote").innerHTML=`<b>Semana ${w} · ${wi[0]}</b><br>${wi[2]}`;const list=models||templateModels();el("exerciseList").innerHTML=list.map((m,idx)=>{const variant=m.variant||inferVariant(m.name),sets=(m.sets&&m.sets.length)?m.sets:Array.from({length:m.baseSets||3},()=>({kg:"",reps:"",rir:""})),best=bestEstimated1RM(athlete,m.name,variant),suggestion=progressionSuggestion(athlete,s,m.name,variant,m.targetReps||"8-12",w),restSec=parseRestSeconds(m.rest||"90 s");return `<div class="exercise ${m.custom?"custom-exercise":""}" data-ex="${idx}" data-name="${m.name.replaceAll('"','&quot;')}" data-target-reps="${m.targetReps||"8-12"}" data-rest-label="${m.rest||"90 s"}" data-rest-sec="${restSec}" data-custom="${m.custom?"1":"0"}"><div class="ex-head"><div><div class="ex-name">${m.name}</div><div class="ex-meta">${sets.length} series · ${m.targetReps||"8-12"} reps · descanso ${m.rest||"90 s"}</div><div class="pr">${best?`PR est.: ${best.e1rm.toFixed(1)} kg (${best.kg}×${best.reps})`:"Sin PR para esta variante"}</div><div class="suggest">${suggestion}</div><div class="prev-session">${previousReferenceHTML(athlete,m.name,variant,el("date").value,s)}</div></div><span class="badge">${m.rirTarget||wi[1]}</span></div><div class="variant-row"><div><label>Material / variante</label><select class="variant-select">${exerciseVariants.map(v=>`<option ${v===variant?"selected":""}>${v}</option>`).join("")}</select></div><div><label>Referencia</label><input value="${m.targetReps||"8-12"} reps · ${m.rest||"90 s"}" readonly></div></div><div class="sets">${sets.map((set,i)=>makeSetRow(set,i)).join("")}</div><div class="exercise-tools"><button class="btn secondary add-set" type="button">+ Serie</button><button class="btn secondary remove-set" type="button">− Serie</button>${m.custom?'<button class="btn danger remove-exercise" type="button">Quitar ejercicio</button>':""}</div><div class="exercise-note"><label>Nota de este ejercicio</label><input type="text" data-field="exnote" placeholder="Ajuste de máquina, sensaciones, agarre..." value="${(m.note||"").replaceAll('"','&quot;')}"></div></div>`}).join("");document.querySelectorAll(".exercise").forEach(bindExerciseButtons);if(!keepNotes)el("sessionNotes").value="";renderDeviceModeNotice()}
 
 function collectWorkout(){const s=el("session").value,exercises=[...document.querySelectorAll(".exercise")].map(box=>({name:box.dataset.name,variant:box.querySelector(".variant-select")?.value||inferVariant(box.dataset.name),targetReps:box.dataset.targetReps||"8-12",rest:box.dataset.restLabel||"90 s",note:box.querySelector('[data-field="exnote"]')?.value||"",custom:box.dataset.custom==="1",sets:[...box.querySelectorAll(".setrow")].map(row=>({kg:row.querySelector('[data-field="kg"]').value,reps:row.querySelector('[data-field="reps"]').value,rir:row.querySelector('[data-field="rir"]').value}))}));return{id:Date.now(),athlete:el("athlete").value,week:+el("week").value,session:s,date:el("date").value,notes:el("sessionNotes").value,exercises}}
 
@@ -1039,11 +1167,12 @@ document.querySelectorAll(".tab").forEach(btn=>btn.addEventListener("click",()=>
   document.querySelectorAll(".view").forEach(x=>x.classList.add("hidden"));
   btn.classList.add("active"); el(btn.dataset.tab).classList.remove("hidden");
   el("workoutDock").classList.toggle("hidden",btn.dataset.tab!=="today");
-  if(btn.dataset.tab==="progress")renderHistory();if(btn.dataset.tab==="analytics")renderAnalytics();
+  if(btn.dataset.tab==="progress")renderHistory();if(btn.dataset.tab==="analytics")renderAnalytics();if(btn.dataset.tab==="reports")renderReportsControls();
 }));
 
 ["week","session"].forEach(id=>el(id).addEventListener("change",()=>renderWorkout()));
-el("athlete").addEventListener("change",()=>{renderHistory();renderAnalytics();renderWorkout();renderDeviceModeNotice();});
+el("date").addEventListener("change",()=>document.querySelectorAll(".exercise").forEach(updateExerciseReference));
+el("athlete").addEventListener("change",()=>{renderHistory();renderAnalytics();renderWorkout();renderDeviceModeNotice();renderReportsControls();});
 
 el("saveWorkout").addEventListener("click",async()=>{const w=collectWorkout(),duplicate=state.workouts.findIndex(x=>x.athlete===w.athlete&&x.date===w.date&&x.session===w.session);if(duplicate>=0)state.workouts[duplicate]=w;else state.workouts.push(w);save();renderHistory();renderAnalytics();setWorkoutDockStatus("Guardado local. Subiendo a la nube…","warn");const uploaded=await saveWorkoutToCloud(w);setWorkoutDockStatus(uploaded?"✓ Guardado y sincronizado.":"✓ Guardado local · pendiente de nube",uploaded?"ok":"warn")});
 
@@ -1073,6 +1202,8 @@ el("saveSettings").addEventListener("click",async()=>{
   const n2=el("athlete2").value.trim()||"Atleta 2";
   state.workouts.forEach(x=>{if(x.athlete===old1)x.athlete=n1;if(x.athlete===old2)x.athlete=n2});
   state.bodyweights.forEach(x=>{if(x.athlete===old1)x.athlete=n1;if(x.athlete===old2)x.athlete=n2});
+  state.activity.forEach(x=>{if(x.athlete===old1)x.athlete=n1;if(x.athlete===old2)x.athlete=n2});
+  state.real1rms.forEach(x=>{if(x.athlete===old1)x.athlete=n1;if(x.athlete===old2)x.athlete=n2});
   if(deviceAthlete===old1)saveDeviceAthleteValue(n1);if(deviceAthlete===old2)saveDeviceAthleteValue(n2);state.settings={athlete1:n1,athlete2:n2,goal1:el("goal1").value,goal2:el("goal2").value,_cloudDirty:true};
 
   save();
@@ -1099,6 +1230,7 @@ el("importData").addEventListener("change",async e=>{
     state.workouts.forEach(x=>x._cloudDirty=true);
     state.bodyweights.forEach(x=>x._cloudDirty=true);
     (state.activity||[]).forEach(x=>x._cloudDirty=true);
+    (state.real1rms||[]).forEach(x=>x._cloudDirty=true);
     save(); initSelectors(); renderWorkout(); renderHistory(); renderAnalytics();
     await syncCloud({quiet:true});
     alert("Copia importada y enviada a Cloud Sync.");
@@ -1116,43 +1248,70 @@ el("resetData").addEventListener("click",()=>{
 });
 
 
-function workoutVolume(w){
-  let total=0;(w.exercises||[]).forEach(e=>(e.sets||[]).forEach(s=>{
-    const kg=parseFloat(s.kg),reps=parseInt(s.reps);if(kg>0&&reps>0)total+=kg*reps;
-  }));return total;
-}
-function allExerciseNames(){const labels=new Set();Object.values(program).forEach(p=>p.exercises.forEach(e=>labels.add(exerciseLabel(e[0],inferVariant(e[0])))));state.workouts.forEach(w=>(w.exercises||[]).forEach(e=>labels.add(exerciseLabel(e.name,e.variant))));return [...labels]}
+
+function workoutVolume(w){let total=0;(w.exercises||[]).forEach(e=>(e.sets||[]).forEach(s=>{const kg=parseFloat(s.kg),reps=parseInt(s.reps);if(kg>0&&reps>0)total+=kg*reps}));return total}
+function allExerciseNames(){const labels=new Set();Object.values(program).forEach(p=>p.exercises.forEach(e=>labels.add(exerciseLabel(e[0],inferVariant(e[0])))));state.workouts.forEach(w=>(w.exercises||[]).forEach(e=>labels.add(exerciseLabel(e.name,e.variant))));state.real1rms.forEach(r=>labels.add(exerciseLabel(r.exercise,r.variant)));return [...labels].sort()}
+function allBaseExerciseNames(){const names=new Set();Object.values(program).forEach(p=>p.exercises.forEach(e=>names.add(e[0])));state.workouts.forEach(w=>(w.exercises||[]).forEach(e=>names.add(e.name)));state.real1rms.forEach(r=>names.add(r.exercise));return [...names].sort()}
 function athleteGoal(ath){return ath===state.settings.athlete1?state.settings.goal1:state.settings.goal2}
 function getPRs(ath){const out={};state.workouts.filter(w=>w.athlete===ath).forEach(w=>(w.exercises||[]).forEach(e=>(e.sets||[]).forEach(s=>{const kg=parseFloat(s.kg),reps=parseInt(s.reps);if(kg>0&&reps>0){const key=exerciseLabel(e.name,e.variant),e1rm=kg*(1+reps/30);if(!out[key]||e1rm>out[key].e1rm)out[key]={e1rm,kg,reps,date:w.date}}})));return out}
+function signedPct(v){if(v==null||!Number.isFinite(v))return 'N/A';return `${v>0?'+':''}${v.toFixed(1)} %`}
+function pctClass(v){return v==null?'neutral':v>0?'good':v<0?'bad':'neutral'}
+function bestE1RMInExercise(ex){let best=null;(ex.sets||[]).forEach(s=>{const kg=parseFloat(s.kg),reps=parseInt(s.reps);if(kg>0&&reps>0){const e1=kg*(1+reps/30);if(!best||e1>best.e1rm)best={e1rm:e1,kg,reps,rir:s.rir}}});return best}
+function exerciseSessionPoints(ath,label,workouts=state.workouts){const pts=[];workouts.filter(w=>w.athlete===ath).sort((a,b)=>a.date.localeCompare(b.date)).forEach(w=>{const ex=(w.exercises||[]).find(e=>exerciseLabel(e.name,e.variant)===label);if(!ex)return;const best=bestE1RMInExercise(ex);if(best)pts.push({date:w.date,...best,session:w.session})});return pts}
+function exerciseProgressRows(ath,workouts=state.workouts){const labels=new Set();workouts.filter(w=>w.athlete===ath).forEach(w=>(w.exercises||[]).forEach(e=>labels.add(exerciseLabel(e.name,e.variant))));return [...labels].map(label=>{const pts=exerciseSessionPoints(ath,label,workouts);if(!pts.length)return null;const first=pts[0],latest=pts[pts.length-1],best=pts.reduce((a,b)=>b.e1rm>a.e1rm?b:a,pts[0]);const actualPct=pts.length>=2?(latest.e1rm-first.e1rm)/first.e1rm*100:null,bestPct=pts.length>=2?(best.e1rm-first.e1rm)/first.e1rm*100:null;return{label,first,latest,best,actualPct,bestPct,count:pts.length}}).filter(Boolean).sort((a,b)=>(b.actualPct??-999)-(a.actualPct??-999))}
+function progressIndex(ath,workouts=state.workouts){const vals=exerciseProgressRows(ath,workouts).map(x=>x.actualPct).filter(x=>x!=null&&Number.isFinite(x));return vals.length?vals.reduce((a,b)=>a+b,0)/vals.length:null}
+function adherenceMetrics(ath,workouts=state.workouts){const ws=workouts.filter(w=>w.athlete===ath&&Number(w.week)>0);if(!ws.length)return{done:0,expected:0,pct:null};const unique=new Set(ws.map(w=>`${w.week}|${w.session}`)),weeks=new Set(ws.map(w=>Number(w.week)||1)),expected=Math.max(4,weeks.size*4);return{done:unique.size,expected,pct:unique.size/expected*100}}
+function goalProgressMetrics(ath,bodyweights=state.bodyweights){const bw=bodyweights.filter(x=>x.athlete===ath).sort((a,b)=>a.date.localeCompare(b.date)),goal=Number(athleteGoal(ath));if(!bw.length||!Number.isFinite(goal))return null;const start=Number(bw[0].weight),current=Number(bw[bw.length-1].weight),den=goal-start,pct=Math.abs(den)<1e-9?null:(current-start)/den*100;return{start,current,goal,pct,remaining:goal-current}}
+function nearestBodyweight(ath,date){const rows=state.bodyweights.filter(x=>x.athlete===ath&&Number(x.weight)>0);if(!rows.length)return null;const t=new Date(date+'T12:00:00').getTime();let best=null;rows.forEach(x=>{const d=Math.abs(new Date(x.date+'T12:00:00').getTime()-t);if(!best||d<best.dist)best={dist:d,weight:Number(x.weight),date:x.date}});return best}
+function realRMRelative(r){const bw=Number(r.bodyweightAtTest)||nearestBodyweight(r.athlete,r.date)?.weight;return bw>0?Number(r.weight)/bw:null}
+function rmUid(){return (crypto&&crypto.randomUUID)?crypto.randomUUID():`rm-${Date.now()}-${Math.random().toString(36).slice(2)}`}
+
 function drawLineChart(canvas,points,suffix=""){
-  const ctx=canvas.getContext("2d"),W=canvas.width,H=canvas.height,pad=34;
-  ctx.clearRect(0,0,W,H);ctx.strokeStyle="#263451";ctx.lineWidth=1;
-  ctx.beginPath();ctx.moveTo(pad,pad);ctx.lineTo(pad,H-pad);ctx.lineTo(W-pad,H-pad);ctx.stroke();
+  const ctx=canvas.getContext("2d"),W=canvas.width,H=canvas.height,pad=34;ctx.clearRect(0,0,W,H);ctx.strokeStyle="#263451";ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(pad,pad);ctx.lineTo(pad,H-pad);ctx.lineTo(W-pad,H-pad);ctx.stroke();
   if(!points.length){ctx.fillStyle="#9ba8bf";ctx.font="14px system-ui";ctx.fillText("Sin datos suficientes",pad+10,H/2);return}
-  const ys=points.map(p=>p.y);let ymin=Math.min(...ys),ymax=Math.max(...ys);if(ymin===ymax){ymin-=1;ymax+=1}
-  const step=points.length===1?0:(W-pad*2)/(points.length-1),yp=v=>H-pad-(v-ymin)/(ymax-ymin)*(H-pad*2);
-  ctx.strokeStyle="#72e6a3";ctx.lineWidth=3;ctx.beginPath();
-  points.forEach((p,i)=>{const x=pad+i*step,y=yp(p.y);i===0?ctx.moveTo(x,y):ctx.lineTo(x,y)});ctx.stroke();
-  ctx.fillStyle="#72e6a3";points.forEach((p,i)=>{const x=pad+i*step,y=yp(p.y);ctx.beginPath();ctx.arc(x,y,4,0,Math.PI*2);ctx.fill()});
-  ctx.fillStyle="#9ba8bf";ctx.font="11px system-ui";ctx.fillText(ymax.toFixed(1)+suffix,4,pad+3);ctx.fillText(ymin.toFixed(1)+suffix,4,H-pad+3);
-  [...new Set([0,Math.floor((points.length-1)/2),points.length-1])].forEach(i=>ctx.fillText(points[i].label,pad+i*step-18,H-8));
+  const ys=points.map(p=>p.y);let ymin=Math.min(...ys),ymax=Math.max(...ys);if(ymin===ymax){ymin-=1;ymax+=1}const step=points.length===1?0:(W-pad*2)/(points.length-1),yp=v=>H-pad-(v-ymin)/(ymax-ymin)*(H-pad*2);
+  ctx.strokeStyle="#72e6a3";ctx.lineWidth=3;ctx.beginPath();points.forEach((p,i)=>{const x=pad+i*step,y=yp(p.y);i===0?ctx.moveTo(x,y):ctx.lineTo(x,y)});ctx.stroke();ctx.fillStyle="#72e6a3";points.forEach((p,i)=>{const x=pad+i*step,y=yp(p.y);ctx.beginPath();ctx.arc(x,y,4,0,Math.PI*2);ctx.fill()});ctx.fillStyle="#9ba8bf";ctx.font="11px system-ui";ctx.fillText(ymax.toFixed(1)+suffix,4,pad+3);ctx.fillText(ymin.toFixed(1)+suffix,4,H-pad+3);[...new Set([0,Math.floor((points.length-1)/2),points.length-1])].forEach(i=>ctx.fillText(points[i].label,pad+i*step-18,H-8))
 }
+function drawStrengthCombined(canvas,estimated,real){
+  const ctx=canvas.getContext('2d'),W=canvas.width,H=canvas.height,pad=38;ctx.clearRect(0,0,W,H);ctx.strokeStyle='#263451';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(pad,pad);ctx.lineTo(pad,H-pad);ctx.lineTo(W-pad,H-pad);ctx.stroke();const all=[...estimated,...real];if(!all.length){ctx.fillStyle='#9ba8bf';ctx.font='14px system-ui';ctx.fillText('Sin datos suficientes',pad+10,H/2);return}
+  const times=all.map(p=>new Date(p.date+'T12:00:00').getTime()),ys=all.map(p=>p.y);let xmin=Math.min(...times),xmax=Math.max(...times),ymin=Math.min(...ys),ymax=Math.max(...ys);if(xmin===xmax){xmin-=86400000;xmax+=86400000}if(ymin===ymax){ymin-=1;ymax+=1}const xp=t=>pad+(t-xmin)/(xmax-xmin)*(W-pad*2),yp=v=>H-pad-(v-ymin)/(ymax-ymin)*(H-pad*2);
+  if(estimated.length){ctx.strokeStyle='#72e6a3';ctx.lineWidth=3;ctx.beginPath();estimated.forEach((p,i)=>{const x=xp(new Date(p.date+'T12:00:00').getTime()),y=yp(p.y);i?ctx.lineTo(x,y):ctx.moveTo(x,y)});ctx.stroke();ctx.fillStyle='#72e6a3';estimated.forEach(p=>{const x=xp(new Date(p.date+'T12:00:00').getTime()),y=yp(p.y);ctx.beginPath();ctx.arc(x,y,4,0,Math.PI*2);ctx.fill()})}
+  ctx.fillStyle='#5fb3ff';real.forEach(p=>{const x=xp(new Date(p.date+'T12:00:00').getTime()),y=yp(p.y);ctx.beginPath();ctx.arc(x,y,7,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#f4f7fb';ctx.lineWidth=1;ctx.stroke()});ctx.fillStyle='#9ba8bf';ctx.font='11px system-ui';ctx.fillText(ymax.toFixed(1)+' kg',4,pad+3);ctx.fillText(ymin.toFixed(1)+' kg',4,H-pad+3);const ds=[xmin,(xmin+xmax)/2,xmax];ds.forEach((t,i)=>ctx.fillText(new Date(t).toISOString().slice(5,10),pad+i*(W-pad*2)/2-18,H-8))
+}
+
+function renderRealRM(){
+  const ath=el('athlete').value;const athleteSel=el('rmAthlete');if(athleteSel){const current=athleteSel.value||ath;athleteSel.innerHTML=`<option>${state.settings.athlete1}</option><option>${state.settings.athlete2}</option>`;athleteSel.value=[state.settings.athlete1,state.settings.athlete2].includes(current)?current:ath}
+  const dl=el('rmExerciseOptions');if(dl)dl.innerHTML=allBaseExerciseNames().map(n=>`<option value="${n}"></option>`).join('');
+  const rows=state.real1rms.filter(r=>r.athlete===ath).sort((a,b)=>a.date.localeCompare(b.date));const grouped={};rows.forEach(r=>(grouped[exerciseLabel(r.exercise,r.variant)]??=[]).push(r));const bestRows=Object.entries(grouped).map(([label,rs])=>{const first=rs[0],best=rs.reduce((a,b)=>Number(b.weight)>Number(a.weight)?b:a,rs[0]),pct=rs.length>=2?(Number(best.weight)-Number(first.weight))/Number(first.weight)*100:null,rel=realRMRelative(best);return{label,first,best,pct,rel}}).sort((a,b)=>Number(b.best.weight)-Number(a.best.weight));
+  el('realRMBestTable').innerHTML=bestRows.length?bestRows.map(x=>`<tr><td>${x.label}</td><td>${Number(x.first.weight).toFixed(1)} kg</td><td><b>${Number(x.best.weight).toFixed(1)} kg</b></td><td class="${pctClass(x.pct)}">${signedPct(x.pct)}</td><td>${x.rel?x.rel.toFixed(2)+'× BW':'N/A'}</td></tr>`).join(''):'<tr><td colspan="5" class="small">Aún no hay 1RM reales registrados.</td></tr>';
+  el('realRMHistoryTable').innerHTML=rows.length?[...rows].reverse().map(r=>{const bw=Number(r.bodyweightAtTest)||nearestBodyweight(r.athlete,r.date)?.weight,rel=realRMRelative(r);return`<tr><td>${r.date}</td><td>${exerciseLabel(r.exercise,r.variant)}</td><td><b>${Number(r.weight).toFixed(1)} kg</b></td><td>${bw?Number(bw).toFixed(1)+' kg':'N/A'}</td><td>${rel?rel.toFixed(2)+'×':'N/A'}</td><td>${r.notes||'—'}</td></tr>`}).join(''):'<tr><td colspan="6" class="small">Aún no hay pruebas de 1RM real.</td></tr>'
+}
+
 function renderAnalytics(){
-  const ath=el("athlete").value,workouts=state.workouts.filter(w=>w.athlete===ath).sort((a,b)=>a.date.localeCompare(b.date)),prs=getPRs(ath);
-  el("kpiSessions").textContent=workouts.length;
-  el("kpiVolume").textContent=Math.round(workouts.reduce((s,w)=>s+workoutVolume(w),0)).toLocaleString("es-ES")+" kg";
-  el("kpiPRs").textContent=Object.keys(prs).length;
-  const goal=athleteGoal(ath);el("kpiGoal").textContent=goal?goal+" kg":"—";
-  const bw=state.bodyweights.filter(x=>x.athlete===ath).sort((a,b)=>a.date.localeCompare(b.date));
-  drawLineChart(el("weightChart"),bw.map(x=>({label:x.date.slice(5),y:+x.weight}))," kg");
-  const exSel=el("strengthExercise"),names=allExerciseNames(),prev=exSel.value;
-  exSel.innerHTML=names.map(n=>`<option>${n}</option>`).join("");if(names.includes(prev))exSel.value=prev;renderStrengthChart();
-  const rows=Object.entries(prs).sort((a,b)=>b[1].e1rm-a[1].e1rm);
-  el("prTable").innerHTML=rows.length?rows.map(([name,p])=>`<tr><td>${name}</td><td>${p.kg} × ${p.reps}</td><td>${p.e1rm.toFixed(1)} kg</td><td>${p.date}</td></tr>`).join(""):`<tr><td colspan="4" class="small">Aún no hay PRs registrados.</td></tr>`;
+  const ath=el('athlete').value,workouts=state.workouts.filter(w=>w.athlete===ath).sort((a,b)=>a.date.localeCompare(b.date)),prs=getPRs(ath),adh=adherenceMetrics(ath),idx=progressIndex(ath);
+  el('kpiSessions').textContent=workouts.length;el('kpiVolume').textContent=Math.round(workouts.reduce((s,w)=>s+workoutVolume(w),0)).toLocaleString('es-ES')+' kg';el('kpiAdherence').textContent=adh.pct==null?'N/A':adh.pct.toFixed(1)+' %';el('kpiProgressIndex').textContent=idx==null?'N/A':signedPct(idx);el('kpiProgressIndex').className=idx==null?'neutral':pctClass(idx);
+  const gp=goalProgressMetrics(ath);if(gp){el('goalStartWeight').textContent=gp.start.toFixed(1)+' kg';el('goalCurrentWeight').textContent=gp.current.toFixed(1)+' kg';el('goalTargetWeight').textContent=gp.goal.toFixed(1)+' kg';el('goalProgressText').textContent=`${signedPct(gp.pct)} del camino al objetivo`;el('goalProgressText').className=pctClass(gp.pct);el('goalRemainingText').textContent=Math.abs(gp.remaining)<0.05?'Objetivo alcanzado':`${Math.abs(gp.remaining).toFixed(1)} kg ${gp.remaining>0?'por subir':'por bajar'}`;el('goalProgressBar').style.width=`${Math.max(0,Math.min(100,gp.pct??0))}%`}else{['goalStartWeight','goalCurrentWeight','goalTargetWeight'].forEach(id=>el(id).textContent='—');el('goalProgressText').textContent='Sin datos suficientes';el('goalProgressText').className='neutral';el('goalRemainingText').textContent='';el('goalProgressBar').style.width='0%'}
+  const bw=state.bodyweights.filter(x=>x.athlete===ath).sort((a,b)=>a.date.localeCompare(b.date));drawLineChart(el('weightChart'),bw.map(x=>({label:x.date.slice(5),y:+x.weight})),' kg');const acts=state.activity.filter(x=>x.athlete===ath).sort((a,b)=>a.date.localeCompare(b.date));drawLineChart(el('stepsChart'),acts.map(x=>({label:x.date.slice(5),y:+x.steps})),'');
+  const exSel=el('strengthExercise'),names=allExerciseNames(),prev=exSel.value;exSel.innerHTML=names.map(n=>`<option>${n}</option>`).join('');if(names.includes(prev))exSel.value=prev;renderStrengthChart();
+  const prog=exerciseProgressRows(ath);el('strengthProgressTable').innerHTML=prog.length?prog.map(x=>`<tr><td>${x.label}</td><td>${x.first.e1rm.toFixed(1)} kg</td><td>${x.latest.e1rm.toFixed(1)} kg</td><td class="${pctClass(x.actualPct)}">${signedPct(x.actualPct)}</td><td>${x.best.e1rm.toFixed(1)} kg</td><td class="${pctClass(x.bestPct)}">${signedPct(x.bestPct)}</td></tr>`).join(''):'<tr><td colspan="6" class="small">Necesitamos sesiones válidas para calcular progreso.</td></tr>';
+  const prRows=Object.entries(prs).sort((a,b)=>b[1].e1rm-a[1].e1rm);el('prTable').innerHTML=prRows.length?prRows.map(([name,p])=>`<tr><td>${name}</td><td>${p.kg} × ${p.reps}</td><td>${p.e1rm.toFixed(1)} kg</td><td>${p.date}</td></tr>`).join(''):'<tr><td colspan="4" class="small">Aún no hay PRs registrados.</td></tr>';renderRealRM();renderReportsControls()
 }
-function renderStrengthChart(){const ath=el("athlete").value,label=el("strengthExercise").value;if(!label)return;const pts=[];state.workouts.filter(w=>w.athlete===ath).sort((a,b)=>a.date.localeCompare(b.date)).forEach(w=>{const ex=(w.exercises||[]).find(e=>exerciseLabel(e.name,e.variant)===label);if(!ex)return;let best=0;(ex.sets||[]).forEach(s=>{const kg=parseFloat(s.kg),reps=parseInt(s.reps);if(kg>0&&reps>0)best=Math.max(best,kg*(1+reps/30))});if(best>0)pts.push({label:w.date.slice(5),y:best})});drawLineChart(el("strengthChart"),pts," kg")}
-el("refreshAnalytics").addEventListener("click",renderAnalytics);
-el("strengthExercise").addEventListener("change",renderStrengthChart);
+function renderStrengthChart(){const ath=el('athlete').value,label=el('strengthExercise').value;if(!label)return;const est=exerciseSessionPoints(ath,label).map(p=>({date:p.date,y:p.e1rm})),real=state.real1rms.filter(r=>r.athlete===ath&&exerciseLabel(r.exercise,r.variant)===label).sort((a,b)=>a.date.localeCompare(b.date)).map(r=>({date:r.date,y:Number(r.weight)}));drawStrengthCombined(el('strengthChart'),est,real)}
+
+el('refreshAnalytics').addEventListener('click',renderAnalytics);el('strengthExercise').addEventListener('change',renderStrengthChart);
+el('saveRealRM').addEventListener('click',async()=>{const athlete=el('rmAthlete').value,exercise=el('rmExercise').value.trim(),variant=el('rmVariant').value,date=el('rmDate').value,weight=Number(el('rmWeight').value),notes=el('rmNotes').value.trim();if(!athlete||!exercise||!date||!(weight>0)){alert('Completa atleta, ejercicio, fecha y un 1RM válido.');return}const near=nearestBodyweight(athlete,date),rec={clientUid:rmUid(),athlete,exercise,variant,date,weight,bodyweightAtTest:near?.weight??null,notes};state.real1rms.push(rec);save();const ok=await saveRealRMToCloud(rec);el('rmWeight').value='';el('rmNotes').value='';renderAnalytics();alert(ok?'1RM real registrado y sincronizado.':'1RM real guardado localmente; pendiente de sincronizar.')});
+
+// -------- Informes --------
+function renderReportsControls(){const s=el('reportAthlete');if(!s)return;const prev=s.value||el('athlete')?.value||state.settings.athlete1;s.innerHTML=`<option>${state.settings.athlete1}</option><option>${state.settings.athlete2}</option><option value="__both__">Ambos</option>`;if([...s.options].some(o=>o.value===prev))s.value=prev;const target=s.value==='__both__'?'Guillem + Biel':s.value;el('reportPreview').innerHTML=`Informe para <b>${target}</b>. Incluye peso, pasos, fuerza, 1RM reales, fuerza relativa, volumen y adherencia.`}
+function reportRange(){const mode=el('reportPeriod').value;if(mode==='custom')return{start:el('reportStart').value||'0000-01-01',end:el('reportEnd').value||'9999-12-31',label:`${el('reportStart').value||'inicio'} → ${el('reportEnd').value||'hoy'}`};if(mode==='4w'){const end=todayISO(),d=new Date(end+'T12:00:00');d.setDate(d.getDate()-27);return{start:d.toISOString().slice(0,10),end,label:'Últimas 4 semanas'}}return{start:'0000-01-01',end:'9999-12-31',label:'Todo el bloque'} }
+function betweenDate(x,start,end){return x.date>=start&&x.date<=end}
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function reportSvg(points,suffix=''){if(!points.length)return '<div class="empty">Sin datos suficientes</div>';const W=720,H=190,p=35,ys=points.map(x=>Number(x.y)),mn=Math.min(...ys),mx=Math.max(...ys),lo=mn===mx?mn-1:mn,hi=mn===mx?mx+1:mx,step=points.length===1?0:(W-p*2)/(points.length-1),yp=v=>H-p-(v-lo)/(hi-lo)*(H-p*2),coords=points.map((x,i)=>`${p+i*step},${yp(x.y)}`).join(' '),circles=points.map((x,i)=>`<circle cx="${p+i*step}" cy="${yp(x.y)}" r="4" fill="#20b873"/>`).join('');return`<svg viewBox="0 0 ${W} ${H}" width="100%" height="190"><line x1="${p}" y1="${p}" x2="${p}" y2="${H-p}" stroke="#c8ced8"/><line x1="${p}" y1="${H-p}" x2="${W-p}" y2="${H-p}" stroke="#c8ced8"/><polyline points="${coords}" fill="none" stroke="#20b873" stroke-width="3"/>${circles}<text x="3" y="${p}" font-size="11" fill="#5f6978">${hi.toFixed(1)}${suffix}</text><text x="3" y="${H-p}" font-size="11" fill="#5f6978">${lo.toFixed(1)}${suffix}</text><text x="${p}" y="${H-7}" font-size="11" fill="#5f6978">${esc(points[0].label)}</text><text x="${W-p-50}" y="${H-7}" font-size="11" fill="#5f6978">${esc(points[points.length-1].label)}</text></svg>`}
+function reportMetrics(ath,start,end){const workouts=state.workouts.filter(w=>w.athlete===ath&&betweenDate(w,start,end)),bw=state.bodyweights.filter(x=>x.athlete===ath&&betweenDate(x,start,end)).sort((a,b)=>a.date.localeCompare(b.date)),activity=state.activity.filter(x=>x.athlete===ath&&betweenDate(x,start,end)).sort((a,b)=>a.date.localeCompare(b.date)),rms=state.real1rms.filter(x=>x.athlete===ath&&betweenDate(x,start,end)).sort((a,b)=>a.date.localeCompare(b.date)),prog=exerciseProgressRows(ath,workouts),adh=adherenceMetrics(ath,workouts),idx=progressIndex(ath,workouts),goal=goalProgressMetrics(ath,state.bodyweights);return{ath,workouts,bw,activity,rms,prog,adh,idx,goal,volume:workouts.reduce((s,w)=>s+workoutVolume(w),0)}}
+function reportAthleteHTML(m){const g=m.goal,steps=m.activity.map(x=>Number(x.steps)||0),avgSteps=steps.length?Math.round(steps.reduce((a,b)=>a+b,0)/steps.length):null,rmHist=m.rms.length?m.rms.map(r=>`<tr><td>${r.date}</td><td>${esc(exerciseLabel(r.exercise,r.variant))}</td><td>${Number(r.weight).toFixed(1)} kg</td><td>${realRMRelative(r)?realRMRelative(r).toFixed(2)+'× BW':'N/A'}</td></tr>`).join(''):'<tr><td colspan="4">Sin 1RM reales en el periodo</td></tr>',progRows=m.prog.length?m.prog.map(x=>`<tr><td>${esc(x.label)}</td><td>${x.first.e1rm.toFixed(1)}</td><td>${x.latest.e1rm.toFixed(1)}</td><td class="${pctClass(x.actualPct)}">${signedPct(x.actualPct)}</td><td>${x.best.e1rm.toFixed(1)}</td><td>${signedPct(x.bestPct)}</td></tr>`).join(''):'<tr><td colspan="6">Sin datos suficientes</td></tr>';return`<section class="athlete-page"><div class="brand">IRON BLOCK <span>Progress Report</span></div><h1>${esc(m.ath)}</h1><div class="metrics"><div><small>Sesiones</small><b>${m.workouts.length}</b></div><div><small>Volumen</small><b>${Math.round(m.volume).toLocaleString('es-ES')} kg</b></div><div><small>Adherencia</small><b>${m.adh.pct==null?'N/A':m.adh.pct.toFixed(1)+' %'}</b></div><div><small>Índice progreso</small><b>${signedPct(m.idx)}</b></div><div><small>Peso actual</small><b>${g?g.current.toFixed(1)+' kg':'N/A'}</b></div><div><small>Objetivo</small><b>${g?g.goal.toFixed(1)+' kg':'N/A'}</b></div><div><small>Objetivo completado</small><b>${g?signedPct(g.pct):'N/A'}</b></div><div><small>Pasos medios</small><b>${avgSteps==null?'N/A':avgSteps.toLocaleString('es-ES')}</b></div></div><h2>Peso corporal</h2>${reportSvg(m.bw.map(x=>({label:x.date.slice(5),y:Number(x.weight)})),' kg')}<h2>Pasos</h2>${reportSvg(m.activity.map(x=>({label:x.date.slice(5),y:Number(x.steps)})),'')}<h2>Progreso de fuerza</h2><table><thead><tr><th>Ejercicio</th><th>Inicio</th><th>Actual</th><th>Actual vs inicio</th><th>Mejor</th><th>Mejor vs inicio</th></tr></thead><tbody>${progRows}</tbody></table><h2>1RM reales testados</h2><table><thead><tr><th>Fecha</th><th>Ejercicio</th><th>1RM real</th><th>Fuerza relativa</th></tr></thead><tbody>${rmHist}</tbody></table></section>`}
+function generateProgressReport(){const win=window.open('','_blank');if(!win){alert('Chrome ha bloqueado la ventana del informe. Permite ventanas emergentes para IRON BLOCK y vuelve a intentarlo.');return}const range=reportRange(),selection=el('reportAthlete').value,aths=selection==='__both__'?[state.settings.athlete1,state.settings.athlete2]:[selection],metrics=aths.map(a=>reportMetrics(a,range.start,range.end));let comparison='';if(metrics.length===2){comparison=`<section class="cover"><div class="brand big">IRON BLOCK</div><h1>Progress Report</h1><p>${esc(range.label)}</p><h2>Resumen comparativo</h2><table><thead><tr><th>Atleta</th><th>Sesiones</th><th>Volumen</th><th>Adherencia</th><th>Índice progreso</th><th>Objetivo peso</th></tr></thead><tbody>${metrics.map(m=>`<tr><td><b>${esc(m.ath)}</b></td><td>${m.workouts.length}</td><td>${Math.round(m.volume).toLocaleString('es-ES')} kg</td><td>${m.adh.pct==null?'N/A':m.adh.pct.toFixed(1)+' %'}</td><td>${signedPct(m.idx)}</td><td>${m.goal?signedPct(m.goal.pct):'N/A'}</td></tr>`).join('')}</tbody></table></section>`}else{comparison=`<section class="cover"><div class="brand big">IRON BLOCK</div><h1>Progress Report</h1><p>${esc(metrics[0].ath)} · ${esc(range.label)}</p><div class="hero">Fuerza · hipertrofia · progreso medible</div></section>`}const doc=`<!doctype html><html><head><meta charset="utf-8"><title>IRON BLOCK Progress Report</title><style>@page{size:A4;margin:12mm}*{box-sizing:border-box}body{font-family:Arial,sans-serif;color:#101827;margin:0;-webkit-print-color-adjust:exact;print-color-adjust:exact}.cover{min-height:255mm;display:flex;flex-direction:column;justify-content:center}.brand{font-weight:900;letter-spacing:2px;color:#0c8050}.brand span{color:#4c6078}.brand.big{font-size:34px}.cover h1{font-size:42px;margin:8px 0}.cover p{font-size:18px;color:#637083}.hero{margin-top:30px;border-left:5px solid #20b873;padding:14px 18px;background:#eef9f4;font-weight:700}.athlete-page{page-break-before:always}.athlete-page:first-of-type{page-break-before:always}h1{font-size:30px;margin:8px 0 18px}h2{font-size:17px;margin:22px 0 8px;color:#22334b;border-bottom:2px solid #dfe6ee;padding-bottom:5px}.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.metrics div{border:1px solid #dfe6ee;border-radius:9px;padding:9px;background:#f8fafc}.metrics small{display:block;color:#6b7788;font-size:10px}.metrics b{display:block;font-size:16px;margin-top:3px}table{width:100%;border-collapse:collapse;font-size:10px}th,td{border-bottom:1px solid #e1e6ec;text-align:left;padding:6px}th{background:#f1f5f8}.good{color:#087849;font-weight:700}.bad{color:#c83e3e;font-weight:700}.neutral{color:#6b7788}.empty{padding:20px;background:#f6f8fa;color:#7a8594;border-radius:8px}.page-note{font-size:9px;color:#7b8491;margin-top:12px}@media print{button{display:none}}</style></head><body>${comparison}${metrics.map(reportAthleteHTML).join('')}<div class="page-note">Generado por IRON BLOCK V4.0 · ${new Date().toLocaleString('es-ES')}</div><script>setTimeout(()=>window.print(),500)<\/script></body></html>`;win.document.open();win.document.write(doc);win.document.close()}
+
+el('reportPeriod').addEventListener('change',()=>{const custom=el('reportPeriod').value==='custom';el('reportStartWrap').classList.toggle('hidden',!custom);el('reportEndWrap').classList.toggle('hidden',!custom)});el('reportAthlete').addEventListener('change',renderReportsControls);el('generateReportPDF').addEventListener('click',generateProgressReport);
 
 let timerSeconds=0,timerInterval=null;
 function formatTime(s){const m=Math.floor(s/60),sec=s%60;return `${String(m).padStart(2,"0")}:${String(sec).padStart(2,"0")}`}
@@ -1190,6 +1349,7 @@ function renderStorageDetail(extra=""){
     `Copia cargada al abrir: ${bootSource}<br>`+
     `Entrenamientos: ${state.workouts.length}<br>`+
     `Pesos corporales: ${state.bodyweights.length}<br>`+
+    `1RM reales: ${(state.real1rms||[]).length}<br>`+
     `Último guardado: ${formatSavedAt(state._savedAt)}`+
     (extra?`<br>${extra}`:"");
 }
