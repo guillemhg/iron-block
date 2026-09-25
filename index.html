@@ -136,12 +136,27 @@ canvas{width:100%;height:220px;display:block}
 .week-progress{font-size:12px;color:var(--muted);margin-top:4px}
 .pr-header{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;flex-wrap:wrap}
 
+
+.optional-launch{margin-top:10px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.optional-notice{margin-top:10px;border:1px solid #396785;background:#0b1b2c;border-radius:11px;padding:10px 12px;color:#cfe7ff;font-size:12px;line-height:1.5}
+.optional-notice b{color:#7ec8ff}
+.optional-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:12px}
+.optional-card{border:1px solid var(--border);background:#0c1426;border-radius:13px;padding:12px;text-align:left;color:var(--text);cursor:pointer}
+.optional-card:hover{border-color:var(--accent2)}
+.optional-card b{display:block;font-size:14px;margin-bottom:4px}
+.optional-card span{display:block;font-size:11px;color:var(--muted);line-height:1.4}
+.optional-card .tag{display:inline-block;margin-top:7px;border:1px solid var(--border);border-radius:999px;padding:3px 7px;font-size:10px;color:#c7d3e5}
+.optional-card.warn{border-color:#8c6b2a}
+.optional-badge{display:inline-flex;align-items:center;border:1px solid #3d6d94;color:#8fd0ff;background:#0b1b2c;border-radius:999px;padding:4px 8px;font-size:10px;font-weight:800;letter-spacing:.3px}
+.catalog-note{font-size:11px;color:var(--muted);margin-top:5px}
+@media(max-width:620px){.optional-grid{grid-template-columns:1fr}}
+
 </style>
 </head>
 <body>
 <div class="app">
 <header>
-  <h1>IRON BLOCK V4.1</h1>
+  <h1>IRON BLOCK V4.2</h1>
   <div class="sub">Programa de fuerza + hipertrofia · 4 días · 10 semanas · seguimiento avanzado</div>
   <div class="tabs">
     <button class="tab active" data-tab="today">Entreno</button>
@@ -162,7 +177,12 @@ canvas{width:100%;height:220px;display:block}
       <div><label>Sesión</label><select id="session"></select></div>
       <div><label>Fecha</label><input id="date" type="date"></div>
     </div>
+    <div class="optional-launch">
+      <button class="btn secondary" id="optionalWorkoutBtn">+ Entrenamiento opcional</button>
+      <span class="small">Plantilla o sesión libre · no cuenta para adherencia</span>
+    </div>
     <div id="weekNote" class="notice" style="margin-top:12px"></div>
+    <div id="optionalWorkoutNotice" class="optional-notice hidden"></div>
     <div id="deviceModeNotice" class="mode-readonly hidden"></div>
   </div>
 
@@ -422,7 +442,10 @@ canvas{width:100%;height:220px;display:block}
       <button class="btn secondary" id="refreshAnalytics">Actualizar</button>
     </div>
     <div class="metric-grid" style="margin-top:12px">
-      <div class="kpi"><span class="small">Sesiones</span><b id="kpiSessions">0</b></div>
+      <div class="kpi"><span class="small">Sesiones programadas</span><b id="kpiSessions">0</b></div>
+      <div class="kpi"><span class="small">Sesiones opcionales</span><b id="kpiOptionalSessions">0</b></div>
+      <div class="kpi"><span class="small">Volumen programado</span><b id="kpiVolumeProgrammed">0 kg</b></div>
+      <div class="kpi"><span class="small">Volumen opcional</span><b id="kpiVolumeOptional">0 kg</b></div>
       <div class="kpi"><span class="small">Volumen total</span><b id="kpiVolume">0 kg</b></div>
       <div class="kpi"><span class="small">Adherencia · semanas cerradas</span><b id="kpiAdherence">N/A</b><div class="week-progress" id="kpiAdherenceDetail">0 semanas cerradas</div></div>
       <div class="kpi"><span class="small">Semana actual</span><b id="kpiCurrentWeek">0 / 4</b><div class="week-progress" id="kpiCurrentWeekDetail">Sin sesiones todavía</div></div>
@@ -606,7 +629,7 @@ canvas{width:100%;height:220px;display:block}
   </div>
 </section>
 
-<div class="footer-note">IRON BLOCK V4.1 · Entrenad duro, progresad con cabeza y registrad todo.</div>
+<div class="footer-note">IRON BLOCK V4.2 · Entrenad duro, progresad con cabeza y registrad todo.</div>
 </div>
 
 <div class="timerbar">
@@ -628,8 +651,10 @@ canvas{width:100%;height:220px;display:block}
   </div>
 </div>
 <div class="modal-backdrop hidden" id="deviceModal"><div class="modal-card"><h2>¿Quién usa este dispositivo?</h2><p class="small">Esta elección solo se guarda en este móvil y define qué atleta aparece seleccionado al abrir la app. Podrás cambiar temporalmente al otro atleta y guardar sus datos con normalidad.</p><div class="device-choice" id="deviceModalChoices"></div></div></div>
+<div class="modal-backdrop hidden" id="optionalWorkoutModal"><div class="modal-card"><h2>Entrenamiento opcional</h2><p class="small">No sustituye a Upper A / Lower A / Upper B / Lower B y no cuenta para adherencia. Sí registra volumen, e1RM y PRs.</p><div class="optional-grid" id="optionalTemplateGrid"></div><div class="modal-actions"><button class="btn secondary" id="cancelOptionalWorkout">Cancelar</button></div></div></div>
 <div class="modal-backdrop hidden" id="exerciseModal"><div class="modal-card"><h2>Añadir ejercicio</h2><div class="grid2">
-<div><label>Nombre</label><input id="customExName" placeholder="Ej. Fondos en paralelas"></div>
+<div><label>Ejercicio del catálogo</label><select id="customExCatalog"></select><div class="catalog-note">Incluye rutina base, plantillas opcionales y ejercicios usados anteriormente.</div></div>
+<div id="customExNameWrap" class="hidden"><label>Nombre personalizado</label><input id="customExName" placeholder="Ej. Fondos en paralelas"></div>
 <div><label>Tipo</label><select id="customExVariant"><option>Barra</option><option>Mancuernas</option><option>Máquina</option><option>Polea</option><option>Peso corporal</option><option>Trap bar</option><option>Otro</option></select></div>
 <div><label>Series</label><input id="customExSets" type="number" min="1" max="10" value="3"></div>
 <div><label>Repeticiones objetivo</label><input id="customExReps" value="8-12"></div>
@@ -685,6 +710,91 @@ const program = {
       ["Extensión cuádriceps",2,"12-15","60-90 s"],
       ["Gemelos",3,"10-15","60-90 s"],
       ["Core",3,"10-20","60-90 s"]
+    ]
+  }
+};
+
+const optionalTemplates = {
+  free:{
+    name:"Libre", desc:"Sesión opcional desde cero. Añade los ejercicios que quieras del catálogo.", tag:"Desde cero", warning:false, exercises:[]
+  },
+  upperC:{
+    name:"Upper C · Pump", desc:"Torso de bombeo y fatiga moderada. Ideal cuando queréis entrenar sin comprometer un Lower cercano.", tag:"40-50 min · RIR 2-3", warning:false,
+    exercises:[
+      ["Press pecho máquina",3,"8-12","2 min","Máquina","2-3"],
+      ["Remo apoyado en pecho",3,"10-12","90-120 s","Máquina","2-3"],
+      ["Elevaciones laterales",3,"12-20","60-90 s","Mancuernas","2-3"],
+      ["Face pull / pájaro",3,"12-20","60-90 s","Polea","2-3"],
+      ["Curl bíceps",3,"10-15","60-90 s","Mancuernas","1-2"],
+      ["Extensión tríceps polea",3,"10-15","60-90 s","Polea","1-2"],
+      ["Core",2,"10-20","60 s","Peso corporal","2-3"]
+    ]
+  },
+  armsDelts:{
+    name:"Arms & Delts", desc:"Brazos y hombro con mucho estímulo local y poca fatiga sistémica.", tag:"35-45 min · RIR 1-3", warning:false,
+    exercises:[
+      ["Elevaciones laterales",4,"12-20","60 s","Mancuernas","1-2"],
+      ["Pájaros / deltoide posterior",3,"12-20","60-90 s","Máquina","2"],
+      ["Curl inclinado",3,"8-12","60-90 s","Mancuernas","1-2"],
+      ["Curl en polea",2,"12-15","60 s","Polea","1-2"],
+      ["Tríceps cuerda",3,"10-15","60-90 s","Polea","1-2"],
+      ["Extensión tríceps sobre cabeza",2,"10-15","60-90 s","Polea","1-2"]
+    ]
+  },
+  pushC:{
+    name:"Push C", desc:"Pecho, hombro y tríceps extra. Mejor cuando el torso está recuperado.", tag:"45-55 min · RIR 2-3", warning:false,
+    exercises:[
+      ["Press inclinado máquina",3,"8-12","2 min","Máquina","2-3"],
+      ["Press pecho convergente",3,"8-12","2 min","Máquina","2-3"],
+      ["Aperturas en polea",2,"12-15","90 s","Polea","2"],
+      ["Press hombro máquina",2,"8-12","2 min","Máquina","2-3"],
+      ["Elevaciones laterales",3,"15-20","60 s","Mancuernas","2"],
+      ["Extensión tríceps polea",3,"10-15","60-90 s","Polea","1-2"]
+    ]
+  },
+  pullC:{
+    name:"Pull C", desc:"Espalda y bíceps sin meter una bisagra pesada ni cargar la zona lumbar.", tag:"45-55 min · RIR 2-3", warning:false,
+    exercises:[
+      ["Remo apoyado en pecho",3,"8-12","2 min","Máquina","2-3"],
+      ["Jalón neutro",3,"8-12","90-120 s","Polea","2-3"],
+      ["Remo unilateral en polea",2,"10-15","90 s","Polea","2"],
+      ["Pullover en polea",2,"12-15","60-90 s","Polea","2"],
+      ["Pájaros / deltoide posterior",3,"15-20","60 s","Máquina","2"],
+      ["Curl bíceps",3,"10-15","60-90 s","Mancuernas","1-2"]
+    ]
+  },
+  legsC:{
+    name:"Legs C · Pump", desc:"Pierna ligera de bombeo. Úsala solo con piernas recuperadas y lejos de Lower A/B.", tag:"40-50 min · RIR 3", warning:true,
+    exercises:[
+      ["Prensa ligera",2,"12-15","2 min","Máquina","3"],
+      ["Extensión cuádriceps",3,"12-20","60-90 s","Máquina","2-3"],
+      ["Curl femoral",3,"12-20","90 s","Máquina","2-3"],
+      ["Aductor / abductor",2,"15-20","60-90 s","Máquina","2-3"],
+      ["Gemelos",3,"12-20","60-90 s","Máquina","2-3"],
+      ["Core",2,"10-20","60 s","Peso corporal","3"]
+    ]
+  },
+  fullBodyC:{
+    name:"Full Body C", desc:"Toca todo el cuerpo con poco volumen por ejercicio. No está pensado para reventarse.", tag:"45-55 min · RIR 3", warning:false,
+    exercises:[
+      ["Press pecho máquina",2,"10-12","90-120 s","Máquina","3"],
+      ["Jalón al pecho",2,"10-12","90-120 s","Polea","3"],
+      ["Prensa",2,"12-15","2 min","Máquina","3"],
+      ["Curl femoral",2,"12-15","90 s","Máquina","3"],
+      ["Remo apoyado en pecho",2,"10-12","90-120 s","Máquina","3"],
+      ["Elevaciones laterales",2,"15-20","60 s","Mancuernas","3"],
+      ["Curl bíceps",2,"12-15","60 s","Mancuernas","2-3"],
+      ["Extensión tríceps polea",2,"12-15","60 s","Polea","2-3"]
+    ]
+  },
+  recoveryCore:{
+    name:"Recovery / Core", desc:"Movimiento suave, hombro posterior y core. Para ir al gimnasio sin convertirlo en otro día duro.", tag:"30-45 min · muy fácil", warning:false,
+    exercises:[
+      ["Bici / cinta suave (minutos)",1,"15-25","0 s","Otro","4+"],
+      ["Face pull",2,"15-20","60 s","Polea","3-4"],
+      ["Plancha (segundos)",3,"30-60","60 s","Peso corporal","3-4"],
+      ["Dead bug",2,"8-12/lado","60 s","Peso corporal","3-4"],
+      ["Movilidad cadera / hombro",2,"8-12","30-60 s","Peso corporal","Muy cómodo"]
     ]
   }
 };
@@ -893,6 +1003,8 @@ async function cloudUpsertWorkout(w){
     session:w.session,
     notes:w.notes||"",
     exercises:w.exercises||[],
+    is_optional:isOptionalWorkout(w),
+    template_name:w.templateName||optionalTemplateNameFromSession(w.session)||null,
     updated_at:new Date().toISOString()
   };
   await cloudRequest("iron_block_workouts?on_conflict=athlete,workout_date,session",{
@@ -963,7 +1075,7 @@ async function seedLocalOnlyRecords(cloudWorkouts,cloudWeights,cloudActivity,clo
 async function pullCloudIntoState(){
   const [settingsRows,cloudWorkouts,cloudWeights,cloudActivity,cloudRms]=await Promise.all([
     cloudRequest("iron_block_settings?id=eq.shared&select=*"),
-    cloudRequest("iron_block_workouts?select=athlete,workout_date,week,session,notes,exercises,updated_at&order=workout_date.asc"),
+    cloudRequest("iron_block_workouts?select=athlete,workout_date,week,session,notes,exercises,is_optional,template_name,updated_at&order=workout_date.asc"),
     cloudRequest("iron_block_bodyweights?select=athlete,weight_date,weight,updated_at&order=weight_date.asc"),
     cloudRequest("iron_block_activity?select=athlete,activity_date,steps,notes,updated_at&order=activity_date.asc"),
     cloudRequest("iron_block_real_1rm?select=client_uid,athlete,exercise_name,variant,test_date,weight,bodyweight_at_test,notes,updated_at&order=test_date.asc")
@@ -971,7 +1083,7 @@ async function pullCloudIntoState(){
   await seedLocalOnlyRecords(cloudWorkouts||[],cloudWeights||[],cloudActivity||[],cloudRms||[]);
   const [freshSettings,freshWorkouts,freshWeights,freshActivity,freshRms]=await Promise.all([
     cloudRequest("iron_block_settings?id=eq.shared&select=*"),
-    cloudRequest("iron_block_workouts?select=athlete,workout_date,week,session,notes,exercises,updated_at&order=workout_date.asc"),
+    cloudRequest("iron_block_workouts?select=athlete,workout_date,week,session,notes,exercises,is_optional,template_name,updated_at&order=workout_date.asc"),
     cloudRequest("iron_block_bodyweights?select=athlete,weight_date,weight,updated_at&order=weight_date.asc"),
     cloudRequest("iron_block_activity?select=athlete,activity_date,steps,notes,updated_at&order=activity_date.asc"),
     cloudRequest("iron_block_real_1rm?select=client_uid,athlete,exercise_name,variant,test_date,weight,bodyweight_at_test,notes,updated_at&order=test_date.asc")
@@ -997,7 +1109,9 @@ async function pullCloudIntoState(){
     session:x.session,
     date:x.workout_date,
     notes:x.notes||"",
-    exercises:Array.isArray(x.exercises)?x.exercises:[]
+    exercises:Array.isArray(x.exercises)?x.exercises:[],
+    isOptional:!!x.is_optional || String(x.session||"").startsWith("Opcional ·"),
+    templateName:x.template_name||optionalTemplateNameFromSession(x.session)||null
   }));
 
   const mappedB=(freshWeights||[]).map(x=>({athlete:x.athlete,date:x.weight_date,weight:Number(x.weight)}));
@@ -1106,6 +1220,21 @@ function todayISO(){ return new Date().toISOString().slice(0,10); }
 
 const el=id=>document.getElementById(id);
 
+const scheduledSessions=Object.keys(program);
+function isOptionalSessionName(session){return String(session||"").startsWith("Opcional ·")}
+function optionalTemplateNameFromSession(session){return isOptionalSessionName(session)?String(session).replace(/^Opcional · /,""):null}
+function isOptionalWorkout(w){return !!w?.isOptional || isOptionalSessionName(w?.session)}
+function optionalSessionName(template){return `Opcional · ${template.name}`}
+function getOptionalTemplateBySession(session){const name=optionalTemplateNameFromSession(session);return Object.values(optionalTemplates).find(t=>t.name===name)||null}
+function getSessionDefinition(session){if(program[session])return {...program[session],optional:false};const t=getOptionalTemplateBySession(session);if(t)return {...t,optional:true};if(isOptionalSessionName(session))return {name:optionalTemplateNameFromSession(session)||"Libre",desc:"Entrenamiento opcional personalizado",exercises:[],optional:true};return null}
+function ensureSessionOption(session){const s=el("session");if(!s)return;if(![...s.options].some(o=>o.value===session)){const o=document.createElement("option");o.value=session;o.textContent=session;s.appendChild(o)}s.value=session}
+function catalogExerciseNames(){const set=new Set();Object.values(program).forEach(p=>p.exercises.forEach(e=>set.add(e[0])));Object.values(optionalTemplates).forEach(t=>(t.exercises||[]).forEach(e=>set.add(e[0])));state.workouts.forEach(w=>(w.exercises||[]).forEach(e=>set.add(e.name)));return [...set].filter(Boolean).sort((a,b)=>a.localeCompare(b,'es'))}
+function renderExerciseCatalog(){const s=el("customExCatalog");if(!s)return;const names=catalogExerciseNames();s.innerHTML=names.map(n=>`<option value="${String(n).replaceAll('"','&quot;')}">${n}</option>`).join("")+`<option value="__custom__">Otro / personalizado…</option>`;const wrap=el("customExNameWrap");if(wrap)wrap.classList.add("hidden");if(names.length){s.value=names[0];prefillExerciseFromCatalog(names[0])}}
+function prefillExerciseFromCatalog(name){if(!name||name==="__custom__")return;const v=inferVariant(name);if(el("customExVariant"))el("customExVariant").value=v}
+function optionalTemplateModels(key){const t=optionalTemplates[key];if(!t)return[];return (t.exercises||[]).map(e=>({name:e[0],baseSets:e[1],targetReps:e[2],rest:e[3],variant:e[4]||inferVariant(e[0]),rirTarget:`RIR ${e[5]||"2-3"}`,note:"",custom:true,sets:Array.from({length:e[1]},()=>({kg:"",reps:"",rir:""}))}))}
+function renderOptionalTemplateGrid(){const box=el("optionalTemplateGrid");if(!box)return;box.innerHTML=Object.entries(optionalTemplates).map(([key,t])=>`<button type="button" class="optional-card ${t.warning?'warn':''}" data-optional-template="${key}"><b>${t.name}</b><span>${t.desc}</span><span class="tag">${t.tag}</span></button>`).join("");box.querySelectorAll("[data-optional-template]").forEach(b=>b.addEventListener("click",()=>startOptionalWorkout(b.dataset.optionalTemplate)))}
+function startOptionalWorkout(key){const t=optionalTemplates[key];if(!t)return;const session=optionalSessionName(t);ensureSessionOption(session);const models=optionalTemplateModels(key);renderWorkout(models,{keepNotes:false});el("optionalWorkoutModal")?.classList.add("hidden");setWorkoutDockStatus(`Sesión opcional: ${t.name}. No cuenta para adherencia.`,"ok")}
+
 function initSelectors(){
   el("athlete").innerHTML = `<option>${state.settings.athlete1}</option><option>${state.settings.athlete2}</option>`;
   el("week").innerHTML = Array.from({length:10},(_,i)=>`<option value="${i+1}">Semana ${i+1}</option>`).join("");
@@ -1130,11 +1259,13 @@ function inferVariant(name){const n=(name||"").toLowerCase();if(n.includes("manc
 function exerciseLabel(name,variant){return `${name} · ${variant||inferVariant(name)}`}
 function bestEstimated1RM(athlete,exercise,variant){let best=null,target=exerciseLabel(exercise,variant);state.workouts.filter(x=>x.athlete===athlete).forEach(w=>(w.exercises||[]).forEach(e=>{if(exerciseLabel(e.name,e.variant)!==target)return;(e.sets||[]).forEach(s=>{const kg=parseFloat(s.kg),reps=parseInt(s.reps);if(kg>0&&reps>0){const e1rm=kg*(1+reps/30);if(!best||e1rm>best.e1rm)best={e1rm,kg,reps,date:w.date}}})}));return best}
 function lastExercisePerformance(athlete,session,exercise,variant){const target=exerciseLabel(exercise,variant),ws=state.workouts.filter(x=>x.athlete===athlete&&x.session===session).sort((a,b)=>b.date.localeCompare(a.date));for(const w of ws){const ex=(w.exercises||[]).find(e=>exerciseLabel(e.name,e.variant)===target);if(ex)return ex}return null}
-function progressionSuggestion(athlete,session,exercise,variant,repRange,week){if(week<=2)return "Prioridad: técnica y margen.";if(week===6)return "Descarga: peso cómodo y menos volumen.";const last=lastExercisePerformance(athlete,session,exercise,variant);if(!last)return "Primera referencia para esta variante.";const nums=String(repRange).match(/\d+/g)||[],maxRep=parseInt(nums[nums.length-1]||"0"),valid=(last.sets||[]).filter(s=>parseFloat(s.kg)>0&&parseInt(s.reps)>0);if(!valid.length)return "Sin datos suficientes.";const allTop=valid.every(s=>parseInt(s.reps)>=maxRep&&(s.rir===""||parseFloat(s.rir)<=1.5));if(allTop){const lower=/sentadilla|peso muerto|prensa|hack|búlgara|femoral|cuádriceps|gemelos/i.test(exercise);return `✓ Toca subir carga: +${lower?"2,5-5":"2-2,5"} kg aprox.`}return "Intenta mejorar 1-2 reps totales antes de subir peso."}
+function progressionSuggestion(athlete,session,exercise,variant,repRange,week){if(isOptionalSessionName(session))return "Sesión opcional: suma estímulo sin comprometer la recuperación.";if(week<=2)return "Prioridad: técnica y margen.";if(week===6)return "Descarga: peso cómodo y menos volumen.";const last=lastExercisePerformance(athlete,session,exercise,variant);if(!last)return "Primera referencia para esta variante.";const nums=String(repRange).match(/\d+/g)||[],maxRep=parseInt(nums[nums.length-1]||"0"),valid=(last.sets||[]).filter(s=>parseFloat(s.kg)>0&&parseInt(s.reps)>0);if(!valid.length)return "Sin datos suficientes.";const allTop=valid.every(s=>parseInt(s.reps)>=maxRep&&(s.rir===""||parseFloat(s.rir)<=1.5));if(allTop){const lower=/sentadilla|peso muerto|prensa|hack|búlgara|femoral|cuádriceps|gemelos/i.test(exercise);return `✓ Toca subir carga: +${lower?"2,5-5":"2-2,5"} kg aprox.`}return "Intenta mejorar 1-2 reps totales antes de subir peso."}
 
 function previousExerciseReference(athlete,exercise,variant,currentDate,currentSession){
   const target=exerciseLabel(exercise,variant);
-  const candidates=state.workouts.filter(w=>w.athlete===athlete&&w.date<=currentDate&&!(w.date===currentDate&&w.session===currentSession)).sort((a,b)=>b.date.localeCompare(a.date));
+  // La referencia anterior pertenece SIEMPRE al mismo tipo de sesión.
+  // Un Upper C opcional nunca sustituye la referencia de Upper A/B, y viceversa.
+  const candidates=state.workouts.filter(w=>w.athlete===athlete&&w.session===currentSession&&w.date<=currentDate&&!(w.date===currentDate&&w.session===currentSession)).sort((a,b)=>b.date.localeCompare(a.date));
   for(const w of candidates){
     const ex=(w.exercises||[]).find(e=>exerciseLabel(e.name,e.variant)===target);
     if(!ex)continue;
@@ -1159,12 +1290,12 @@ function updateExerciseReference(box){
   if(node)node.innerHTML=previousReferenceHTML(el('athlete').value,box.dataset.name,variant,el('date').value,el('session').value);
 }
 
-function templateModels(){const w=+el("week").value,s=el("session").value,p=program[s];return p.exercises.map(e=>({name:e[0],baseSets:getWeekSets(e[1],w),targetReps:e[2],rest:e[3],variant:inferVariant(e[0]),note:"",custom:false,sets:Array.from({length:getWeekSets(e[1],w)},()=>({kg:"",reps:"",rir:""}))}))}
+function templateModels(){const w=+el("week").value,s=el("session").value;if(isOptionalSessionName(s)){const t=getOptionalTemplateBySession(s);if(!t)return[];const key=Object.entries(optionalTemplates).find(([,x])=>x===t)?.[0];return key?optionalTemplateModels(key):[]}const p=program[s];return p.exercises.map(e=>({name:e[0],baseSets:getWeekSets(e[1],w),targetReps:e[2],rest:e[3],variant:inferVariant(e[0]),note:"",custom:false,sets:Array.from({length:getWeekSets(e[1],w)},()=>({kg:"",reps:"",rir:""}))}))}
 function makeSetRow(set={},idx=0){return `<div class="setrow"><button class="donebtn" type="button" data-done="${idx}" title="Serie completada">✓</button><input type="number" step="0.5" inputmode="decimal" placeholder="kg" data-field="kg" value="${set.kg??""}"><input type="text" inputmode="numeric" placeholder="reps" data-field="reps" value="${set.reps??""}"><input type="number" step="1" min="0" max="5" placeholder="RIR" data-field="rir" value="${set.rir??""}"></div>`}
 function bindExerciseButtons(box){box.querySelectorAll(".donebtn").forEach(btn=>{btn.onclick=()=>{btn.classList.toggle("done");if(btn.classList.contains("done"))startTimer(+box.dataset.restSec,box.dataset.name)}});const plus=box.querySelector(".add-set");if(plus)plus.onclick=()=>{const sets=box.querySelector(".sets");sets.insertAdjacentHTML("beforeend",makeSetRow({},sets.querySelectorAll(".setrow").length));bindExerciseButtons(box)};const minus=box.querySelector(".remove-set");if(minus)minus.onclick=()=>{const rows=box.querySelectorAll(".setrow");if(rows.length<=1){alert("El ejercicio debe tener al menos una serie.");return}rows[rows.length-1].remove()};const removeEx=box.querySelector(".remove-exercise");if(removeEx)removeEx.onclick=()=>{if(confirm(`¿Quitar ${box.dataset.name} de esta sesión?`))box.remove()};const variant=box.querySelector(".variant-select");if(variant)variant.onchange=()=>{const athlete=el("athlete").value,name=box.dataset.name,targetReps=box.dataset.targetReps,week=+el("week").value,best=bestEstimated1RM(athlete,name,variant.value);box.querySelector(".pr").textContent=best?`Mejor e1RM (Epley): ${best.e1rm.toFixed(1)} kg (${best.kg}×${best.reps})`:"Sin e1RM para esta variante";box.querySelector(".suggest").textContent=progressionSuggestion(athlete,el("session").value,name,variant.value,targetReps,week);updateExerciseReference(box)}}
-function renderWorkout(models=null,{keepNotes=false}={}){if(models&&!Array.isArray(models))models=null;const w=+el("week").value,s=el("session").value,p=program[s],athlete=el("athlete").value,wi=weekInfo[w];el("sessionTitle").textContent=s;el("sessionDesc").textContent=p.desc;el("rirBadge").textContent=wi[1];el("weekNote").innerHTML=`<b>Semana ${w} · ${wi[0]}</b><br>${wi[2]}`;const list=models||templateModels();el("exerciseList").innerHTML=list.map((m,idx)=>{const variant=m.variant||inferVariant(m.name),sets=(m.sets&&m.sets.length)?m.sets:Array.from({length:m.baseSets||3},()=>({kg:"",reps:"",rir:""})),best=bestEstimated1RM(athlete,m.name,variant),suggestion=progressionSuggestion(athlete,s,m.name,variant,m.targetReps||"8-12",w),restSec=parseRestSeconds(m.rest||"90 s");return `<div class="exercise ${m.custom?"custom-exercise":""}" data-ex="${idx}" data-name="${m.name.replaceAll('"','&quot;')}" data-target-reps="${m.targetReps||"8-12"}" data-rest-label="${m.rest||"90 s"}" data-rest-sec="${restSec}" data-custom="${m.custom?"1":"0"}"><div class="ex-head"><div><div class="ex-name">${m.name}</div><div class="ex-meta">${sets.length} series · ${m.targetReps||"8-12"} reps · descanso ${m.rest||"90 s"}</div><div class="pr">${best?`Mejor e1RM (Epley): ${best.e1rm.toFixed(1)} kg (${best.kg}×${best.reps})`:"Sin e1RM para esta variante"}</div><div class="suggest">${suggestion}</div><div class="prev-session">${previousReferenceHTML(athlete,m.name,variant,el("date").value,s)}</div></div><span class="badge">${m.rirTarget||wi[1]}</span></div><div class="variant-row"><div><label>Material / variante</label><select class="variant-select">${exerciseVariants.map(v=>`<option ${v===variant?"selected":""}>${v}</option>`).join("")}</select></div><div><label>Referencia</label><input value="${m.targetReps||"8-12"} reps · ${m.rest||"90 s"}" readonly></div></div><div class="sets">${sets.map((set,i)=>makeSetRow(set,i)).join("")}</div><div class="exercise-tools"><button class="btn secondary add-set" type="button">+ Serie</button><button class="btn secondary remove-set" type="button">− Serie</button>${m.custom?'<button class="btn danger remove-exercise" type="button">Quitar ejercicio</button>':""}</div><div class="exercise-note"><label>Nota de este ejercicio</label><input type="text" data-field="exnote" placeholder="Ajuste de máquina, sensaciones, agarre..." value="${(m.note||"").replaceAll('"','&quot;')}"></div></div>`}).join("");document.querySelectorAll(".exercise").forEach(bindExerciseButtons);if(!keepNotes)el("sessionNotes").value="";renderDeviceModeNotice()}
+function renderWorkout(models=null,{keepNotes=false}={}){if(models&&!Array.isArray(models))models=null;const w=+el("week").value,s=el("session").value,p=getSessionDefinition(s),athlete=el("athlete").value,wi=weekInfo[w],optional=isOptionalSessionName(s);if(!p){setWorkoutDockStatus("No se pudo cargar esta sesión.","bad");return}el("sessionTitle").textContent=s;el("sessionDesc").textContent=p.desc||"";el("rirBadge").textContent=optional?"OPCIONAL":wi[1];if(optional){el("weekNote").innerHTML=`<b>Semana ${w} · Sesión opcional</b><br>No sustituye a ninguna de las 4 sesiones programadas.`;const n=el("optionalWorkoutNotice");n.innerHTML=`<b>SESIÓN OPCIONAL</b> · No cuenta para adherencia. Sí cuenta para volumen, historial, e1RM y PRs. La referencia “Anterior” se mantiene separada de Upper/Lower A/B.`;n.classList.remove("hidden")}else{el("weekNote").innerHTML=`<b>Semana ${w} · ${wi[0]}</b><br>${wi[2]}`;el("optionalWorkoutNotice")?.classList.add("hidden")}const list=models||templateModels();el("exerciseList").innerHTML=list.map((m,idx)=>{const variant=m.variant||inferVariant(m.name),sets=(m.sets&&m.sets.length)?m.sets:Array.from({length:m.baseSets||3},()=>({kg:"",reps:"",rir:""})),best=bestEstimated1RM(athlete,m.name,variant),suggestion=progressionSuggestion(athlete,s,m.name,variant,m.targetReps||"8-12",w),restSec=parseRestSeconds(m.rest||"90 s");return `<div class="exercise ${m.custom?"custom-exercise":""}" data-ex="${idx}" data-name="${m.name.replaceAll('"','&quot;')}" data-target-reps="${m.targetReps||"8-12"}" data-rest-label="${m.rest||"90 s"}" data-rest-sec="${restSec}" data-custom="${m.custom?"1":"0"}"><div class="ex-head"><div><div class="ex-name">${m.name}</div><div class="ex-meta">${sets.length} series · ${m.targetReps||"8-12"} reps · descanso ${m.rest||"90 s"}</div><div class="pr">${best?`Mejor e1RM (Epley): ${best.e1rm.toFixed(1)} kg (${best.kg}×${best.reps})`:"Sin e1RM para esta variante"}</div><div class="suggest">${suggestion}</div><div class="prev-session">${previousReferenceHTML(athlete,m.name,variant,el("date").value,s)}</div></div><span class="badge">${m.rirTarget||wi[1]}</span></div><div class="variant-row"><div><label>Material / variante</label><select class="variant-select">${exerciseVariants.map(v=>`<option ${v===variant?"selected":""}>${v}</option>`).join("")}</select></div><div><label>Referencia</label><input value="${m.targetReps||"8-12"} reps · ${m.rest||"90 s"}" readonly></div></div><div class="sets">${sets.map((set,i)=>makeSetRow(set,i)).join("")}</div><div class="exercise-tools"><button class="btn secondary add-set" type="button">+ Serie</button><button class="btn secondary remove-set" type="button">− Serie</button>${m.custom?'<button class="btn danger remove-exercise" type="button">Quitar ejercicio</button>':""}</div><div class="exercise-note"><label>Nota de este ejercicio</label><input type="text" data-field="exnote" placeholder="Ajuste de máquina, sensaciones, agarre..." value="${(m.note||"").replaceAll('"','&quot;')}"></div></div>`}).join("");document.querySelectorAll(".exercise").forEach(bindExerciseButtons);if(!keepNotes)el("sessionNotes").value="";renderDeviceModeNotice()}
 
-function collectWorkout(){const s=el("session").value,exercises=[...document.querySelectorAll(".exercise")].map(box=>({name:box.dataset.name,variant:box.querySelector(".variant-select")?.value||inferVariant(box.dataset.name),targetReps:box.dataset.targetReps||"8-12",rest:box.dataset.restLabel||"90 s",note:box.querySelector('[data-field="exnote"]')?.value||"",custom:box.dataset.custom==="1",sets:[...box.querySelectorAll(".setrow")].map(row=>({kg:row.querySelector('[data-field="kg"]').value,reps:row.querySelector('[data-field="reps"]').value,rir:row.querySelector('[data-field="rir"]').value}))}));return{id:Date.now(),athlete:el("athlete").value,week:+el("week").value,session:s,date:el("date").value,notes:el("sessionNotes").value,exercises}}
+function collectWorkout(){const s=el("session").value,exercises=[...document.querySelectorAll(".exercise")].map(box=>({name:box.dataset.name,variant:box.querySelector(".variant-select")?.value||inferVariant(box.dataset.name),targetReps:box.dataset.targetReps||"8-12",rest:box.dataset.restLabel||"90 s",note:box.querySelector('[data-field="exnote"]')?.value||"",custom:box.dataset.custom==="1",sets:[...box.querySelectorAll(".setrow")].map(row=>({kg:row.querySelector('[data-field="kg"]').value,reps:row.querySelector('[data-field="reps"]').value,rir:row.querySelector('[data-field="rir"]').value}))}));return{id:Date.now(),athlete:el("athlete").value,week:+el("week").value,session:s,date:el("date").value,notes:el("sessionNotes").value,exercises,isOptional:isOptionalSessionName(s),templateName:optionalTemplateNameFromSession(s)} }
 
 function renderHistory(){
   const ath=el("athlete").value;
@@ -1202,7 +1333,8 @@ document.querySelectorAll(".tab").forEach(btn=>btn.addEventListener("click",()=>
   if(btn.dataset.tab==="progress")renderHistory();if(btn.dataset.tab==="analytics")renderAnalytics();if(btn.dataset.tab==="prs")renderPRs();if(btn.dataset.tab==="reports")renderReportsControls();
 }));
 
-["week","session"].forEach(id=>el(id).addEventListener("change",()=>renderWorkout()));
+el("week").addEventListener("change",()=>renderWorkout());
+el("session").addEventListener("change",()=>renderWorkout());
 el("date").addEventListener("change",()=>document.querySelectorAll(".exercise").forEach(updateExerciseReference));
 el("athlete").addEventListener("change",()=>{renderHistory();renderAnalytics();renderWorkout();renderDeviceModeNotice();renderReportsControls();});
 
@@ -1282,7 +1414,7 @@ el("resetData").addEventListener("click",()=>{
 
 
 function workoutVolume(w){let total=0;(w.exercises||[]).forEach(e=>(e.sets||[]).forEach(s=>{const kg=parseFloat(s.kg),reps=parseInt(s.reps);if(kg>0&&reps>0)total+=kg*reps}));return total}
-function allExerciseNames(){const labels=new Set();Object.values(program).forEach(p=>p.exercises.forEach(e=>labels.add(exerciseLabel(e[0],inferVariant(e[0])))));state.workouts.forEach(w=>(w.exercises||[]).forEach(e=>labels.add(exerciseLabel(e.name,e.variant))));state.real1rms.forEach(r=>labels.add(exerciseLabel(r.exercise,r.variant)));return [...labels].sort()}
+function allExerciseNames(){const labels=new Set();Object.values(program).forEach(p=>p.exercises.forEach(e=>labels.add(exerciseLabel(e[0],inferVariant(e[0])))));Object.values(optionalTemplates).forEach(t=>(t.exercises||[]).forEach(e=>labels.add(exerciseLabel(e[0],e[4]||inferVariant(e[0])))));state.workouts.forEach(w=>(w.exercises||[]).forEach(e=>labels.add(exerciseLabel(e.name,e.variant))));state.real1rms.forEach(r=>labels.add(exerciseLabel(r.exercise,r.variant)));return [...labels].sort()}
 function allBaseExerciseNames(){const names=new Set();Object.values(program).forEach(p=>p.exercises.forEach(e=>names.add(e[0])));state.workouts.forEach(w=>(w.exercises||[]).forEach(e=>names.add(e.name)));state.real1rms.forEach(r=>names.add(r.exercise));return [...names].sort()}
 function athleteGoal(ath){return ath===state.settings.athlete1?state.settings.goal1:state.settings.goal2}
 function getPRs(ath){const out={};state.workouts.filter(w=>w.athlete===ath).forEach(w=>(w.exercises||[]).forEach(e=>(e.sets||[]).forEach(s=>{const kg=parseFloat(s.kg),reps=parseInt(s.reps);if(kg>0&&reps>0){const key=exerciseLabel(e.name,e.variant),e1rm=kg*(1+reps/30);if(!out[key]||e1rm>out[key].e1rm)out[key]={e1rm,kg,reps,date:w.date}}})));return out}
@@ -1295,20 +1427,18 @@ function exerciseSessionRecords(ath,label,workouts=state.workouts){const rows=[]
 function exerciseSessionPoints(ath,label,workouts=state.workouts){return exerciseSessionRecords(ath,label,workouts).map(r=>({date:r.date,...r.best,session:r.session}))}
 function exerciseProgressRows(ath,workouts=state.workouts){const labels=new Set();workouts.filter(w=>w.athlete===ath).forEach(w=>(w.exercises||[]).forEach(e=>labels.add(exerciseLabel(e.name,e.variant))));return [...labels].map(label=>{const pts=exerciseSessionPoints(ath,label,workouts);if(!pts.length)return null;const first=pts[0],latest=pts[pts.length-1],best=pts.reduce((a,b)=>b.e1rm>a.e1rm?b:a,pts[0]);const actualPct=pts.length>=2?(latest.e1rm-first.e1rm)/first.e1rm*100:null,bestPct=pts.length>=2?(best.e1rm-first.e1rm)/first.e1rm*100:null;return{label,first,latest,best,actualPct,bestPct,count:pts.length}}).filter(Boolean).sort((a,b)=>(b.actualPct??-999)-(a.actualPct??-999))}
 function progressIndex(ath,workouts=state.workouts){const vals=exerciseProgressRows(ath,workouts).map(x=>x.actualPct).filter(x=>x!=null&&Number.isFinite(x));return vals.length?vals.reduce((a,b)=>a+b,0)/vals.length:null}
-function weekSessionCount(ath,week,workouts=state.workouts){const s=new Set(workouts.filter(w=>w.athlete===ath&&Number(w.week)===Number(week)).map(w=>w.session));return s.size}
+function weekSessionCount(ath,week,workouts=state.workouts){const s=new Set(workouts.filter(w=>w.athlete===ath&&Number(w.week)===Number(week)&&!isOptionalWorkout(w)&&scheduledSessions.includes(w.session)).map(w=>w.session));return s.size}
+function weekOptionalCount(ath,week,workouts=state.workouts){return workouts.filter(w=>w.athlete===ath&&Number(w.week)===Number(week)&&isOptionalWorkout(w)).length}
 function adherenceMetrics(ath,workouts=state.workouts){
-  const ws=workouts.filter(w=>w.athlete===ath&&Number(w.week)>0);
-  if(!ws.length)return{done:0,expected:0,pct:null,closedWeeks:0,currentWeek:null,currentDone:0,currentExpected:4,currentPct:0};
+  const ws=workouts.filter(w=>w.athlete===ath&&Number(w.week)>0&&!isOptionalWorkout(w)&&scheduledSessions.includes(w.session));
+  if(!ws.length)return{done:0,expected:0,pct:null,closedWeeks:0,currentWeek:null,currentDone:0,currentExpected:4,currentPct:0,currentExtras:0};
   const maxWeek=Math.max(...ws.map(w=>Number(w.week)||1));
-  const currentDone=weekSessionCount(ath,maxWeek,workouts);
-  // La semana con el número más alto se considera la semana en curso y no entra en adherencia.
-  // Solo al comenzar una semana posterior queda cerrada la anterior. La única excepción es la semana 10:
-  // si ya tiene las 4 sesiones, el bloque está terminado y sí puede cerrarse.
+  const currentDone=weekSessionCount(ath,maxWeek,workouts),currentExtras=weekOptionalCount(ath,maxWeek,workouts);
   const closedThrough=(maxWeek===10&&currentDone>=4)?10:maxWeek-1;
-  if(closedThrough<1)return{done:0,expected:0,pct:null,closedWeeks:0,currentWeek:maxWeek,currentDone,currentExpected:4,currentPct:Math.min(100,currentDone/4*100)};
+  if(closedThrough<1)return{done:0,expected:0,pct:null,closedWeeks:0,currentWeek:maxWeek,currentDone,currentExpected:4,currentPct:Math.min(100,currentDone/4*100),currentExtras};
   const unique=new Set(ws.filter(w=>Number(w.week)<=closedThrough).map(w=>`${Number(w.week)}|${w.session}`));
   const expected=closedThrough*4,done=unique.size;
-  return{done,expected,pct:expected?done/expected*100:null,closedWeeks:closedThrough,currentWeek:maxWeek,currentDone,currentExpected:4,currentPct:Math.min(100,currentDone/4*100)};
+  return{done,expected,pct:expected?done/expected*100:null,closedWeeks:closedThrough,currentWeek:maxWeek,currentDone,currentExpected:4,currentPct:Math.min(100,currentDone/4*100),currentExtras};
 }
 function goalProgressMetrics(ath,bodyweights=state.bodyweights){const bw=bodyweights.filter(x=>x.athlete===ath).sort((a,b)=>a.date.localeCompare(b.date)),goal=Number(athleteGoal(ath));if(!bw.length||!Number.isFinite(goal))return null;const start=Number(bw[0].weight),current=Number(bw[bw.length-1].weight),den=goal-start,pct=Math.abs(den)<1e-9?null:(current-start)/den*100;return{start,current,goal,pct,remaining:goal-current}}
 function nearestBodyweight(ath,date){const rows=state.bodyweights.filter(x=>x.athlete===ath&&Number(x.weight)>0);if(!rows.length)return null;const t=new Date(date+'T12:00:00').getTime();let best=null;rows.forEach(x=>{const d=Math.abs(new Date(x.date+'T12:00:00').getTime()-t);if(!best||d<best.dist)best={dist:d,weight:Number(x.weight),date:x.date}});return best}
@@ -1331,6 +1461,7 @@ function drawStrengthCombined(canvas,estimated,real){
 function knownVariantsForExercise(name){
   const known=new Set();
   Object.values(program).forEach(p=>p.exercises.forEach(e=>{if(e[0]===name)known.add(inferVariant(name))}));
+  Object.values(optionalTemplates).forEach(t=>(t.exercises||[]).forEach(e=>{if(e[0]===name)known.add(e[4]||inferVariant(name))}));
   state.workouts.forEach(w=>(w.exercises||[]).forEach(e=>{if(e.name===name)known.add(e.variant||inferVariant(e.name))}));
   state.real1rms.forEach(r=>{if(r.exercise===name)known.add(r.variant||inferVariant(r.exercise))});
   if(!known.size&&name)known.add(inferVariant(name));
@@ -1369,14 +1500,18 @@ function renderPRs(){
 }
 
 function renderAnalytics(){
-  const ath=el('athlete').value,workouts=state.workouts.filter(w=>w.athlete===ath).sort((a,b)=>a.date.localeCompare(b.date)),adh=adherenceMetrics(ath),idx=progressIndex(ath);
-  el('kpiSessions').textContent=workouts.length;
+  const ath=el('athlete').value,workouts=state.workouts.filter(w=>w.athlete===ath).sort((a,b)=>a.date.localeCompare(b.date)),scheduled=workouts.filter(w=>!isOptionalWorkout(w)),optional=workouts.filter(isOptionalWorkout),adh=adherenceMetrics(ath),idx=progressIndex(ath);
+  el('kpiSessions').textContent=scheduled.length;
+  el('kpiOptionalSessions').textContent=optional.length;
+  el('kpiVolumeProgrammed').textContent=Math.round(scheduled.reduce((s,w)=>s+workoutVolume(w),0)).toLocaleString('es-ES')+' kg';
+  el('kpiVolumeOptional').textContent=Math.round(optional.reduce((s,w)=>s+workoutVolume(w),0)).toLocaleString('es-ES')+' kg';
   el('kpiVolume').textContent=Math.round(workouts.reduce((s,w)=>s+workoutVolume(w),0)).toLocaleString('es-ES')+' kg';
   el('kpiAdherence').textContent=adh.pct==null?'N/A':adh.pct.toFixed(1)+' %';
   el('kpiAdherenceDetail').textContent=adh.closedWeeks?`${adh.done}/${adh.expected} sesiones · ${adh.closedWeeks} semana${adh.closedWeeks===1?'':'s'} cerrada${adh.closedWeeks===1?'':'s'}`:'La semana en curso no penaliza';
   const fallbackWeek=Number(el('week')?.value)||1,currentWeek=adh.currentWeek||fallbackWeek,currentDone=adh.currentWeek?adh.currentDone:weekSessionCount(ath,fallbackWeek);
-  el('kpiCurrentWeek').textContent=`${currentDone} / 4`;
-  el('kpiCurrentWeekDetail').textContent=`Semana ${currentWeek} · ${Math.min(100,currentDone/4*100).toFixed(0)} % completada`;
+  const currentExtras=adh.currentWeek?adh.currentExtras:weekOptionalCount(ath,fallbackWeek);
+  el('kpiCurrentWeek').textContent=`${currentDone} / 4${currentExtras?` · +${currentExtras} extra${currentExtras===1?'':'s'}`:''}`;
+  el('kpiCurrentWeekDetail').textContent=`Semana ${currentWeek} · ${Math.min(100,currentDone/4*100).toFixed(0)} % programado completado${currentExtras?` · ${currentExtras} opcional${currentExtras===1?'':'es'}`:''}`;
   el('kpiProgressIndex').textContent=idx==null?'N/A':signedPct(idx);el('kpiProgressIndex').className=idx==null?'neutral':pctClass(idx);
   const gp=goalProgressMetrics(ath);if(gp){el('goalStartWeight').textContent=gp.start.toFixed(1)+' kg';el('goalCurrentWeight').textContent=gp.current.toFixed(1)+' kg';el('goalTargetWeight').textContent=gp.goal.toFixed(1)+' kg';el('goalProgressText').textContent=`${signedPct(gp.pct)} del camino al objetivo`;el('goalProgressText').className=pctClass(gp.pct);el('goalRemainingText').textContent=Math.abs(gp.remaining)<0.05?'Objetivo alcanzado':`${Math.abs(gp.remaining).toFixed(1)} kg ${gp.remaining>0?'por subir':'por bajar'}`;el('goalProgressBar').style.width=`${Math.max(0,Math.min(100,gp.pct??0))}%`}else{['goalStartWeight','goalCurrentWeight','goalTargetWeight'].forEach(id=>el(id).textContent='—');el('goalProgressText').textContent='Sin datos suficientes';el('goalProgressText').className='neutral';el('goalRemainingText').textContent='';el('goalProgressBar').style.width='0%'}
   const bw=state.bodyweights.filter(x=>x.athlete===ath).sort((a,b)=>a.date.localeCompare(b.date));drawLineChart(el('weightChart'),bw.map(x=>({label:x.date.slice(5),y:+x.weight})),' kg');const acts=state.activity.filter(x=>x.athlete===ath).sort((a,b)=>a.date.localeCompare(b.date));drawLineChart(el('stepsChart'),acts.map(x=>({label:x.date.slice(5),y:+x.steps})),'');
@@ -1392,7 +1527,7 @@ el('rmAthlete').addEventListener('change',renderPRs);el('rmExercise').addEventLi
 el('saveRealRM').addEventListener('click',async()=>{const athlete=el('rmAthlete').value,exercise=el('rmExercise').value,variant=el('rmVariant').value,date=el('rmDate').value,weight=Number(el('rmWeight').value),notes=el('rmNotes').value.trim();if(!athlete||!exercise||!variant||!date||!(weight>0)){alert('Completa atleta, ejercicio, variante, fecha y un 1RM válido.');return}const near=nearestBodyweight(athlete,date),rec={clientUid:rmUid(),athlete,exercise,variant,date,weight,bodyweightAtTest:near?.weight??null,notes};state.real1rms.push(rec);save();const ok=await saveRealRMToCloud(rec);el('rmWeight').value='';el('rmNotes').value='';renderPRs();renderAnalytics();alert(ok?'1RM real registrado y sincronizado.':'1RM real guardado localmente; pendiente de sincronizar.')});
 
 // -------- Informes --------
-function renderReportsControls(){const s=el('reportAthlete');if(!s)return;const prev=s.value||el('athlete')?.value||state.settings.athlete1;s.innerHTML=`<option>${state.settings.athlete1}</option><option>${state.settings.athlete2}</option><option value="__both__">Ambos</option>`;if([...s.options].some(o=>o.value===prev))s.value=prev;const target=s.value==='__both__'?`${state.settings.athlete1} + ${state.settings.athlete2}`:s.value;el('reportPreview').innerHTML=`Informe para <b>${target}</b>. Incluye series reales iniciales/actuales, e1RM, gráficas por ejercicio, 1RM reales, peso, pasos, volumen y adherencia basada solo en semanas cerradas.`}
+function renderReportsControls(){const s=el('reportAthlete');if(!s)return;const prev=s.value||el('athlete')?.value||state.settings.athlete1;s.innerHTML=`<option>${state.settings.athlete1}</option><option>${state.settings.athlete2}</option><option value="__both__">Ambos</option>`;if([...s.options].some(o=>o.value===prev))s.value=prev;const target=s.value==='__both__'?`${state.settings.athlete1} + ${state.settings.athlete2}`:s.value;el('reportPreview').innerHTML=`Informe para <b>${target}</b>. Incluye series reales iniciales/actuales, e1RM, gráficas por ejercicio, 1RM reales, peso, pasos, volumen programado/opcional y adherencia basada solo en semanas cerradas.`}
 function reportRange(){const mode=el('reportPeriod').value;if(mode==='custom')return{start:el('reportStart').value||'0000-01-01',end:el('reportEnd').value||'9999-12-31',label:`${el('reportStart').value||'inicio'} → ${el('reportEnd').value||'hoy'}`};if(mode==='4w'){const end=todayISO(),d=new Date(end+'T12:00:00');d.setDate(d.getDate()-27);return{start:d.toISOString().slice(0,10),end,label:'Últimas 4 semanas'}}return{start:'0000-01-01',end:'9999-12-31',label:'Todo el bloque'} }
 function betweenDate(x,start,end){return x.date>=start&&x.date<=end}
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
@@ -1405,7 +1540,7 @@ function exerciseReportDetails(ath,workouts,rms){
   const labels=new Set();workouts.filter(w=>w.athlete===ath).forEach(w=>(w.exercises||[]).forEach(e=>labels.add(exerciseLabel(e.name,e.variant))));
   return [...labels].map(label=>{const sessions=exerciseSessionRecords(ath,label,workouts);if(!sessions.length)return null;const first=sessions[0],latest=sessions[sessions.length-1],best=sessions.reduce((a,b)=>b.best.e1rm>a.best.e1rm?b:a,sessions[0]),actualPct=sessions.length>=2?(latest.best.e1rm-first.best.e1rm)/first.best.e1rm*100:null,bestPct=sessions.length>=2?(best.best.e1rm-first.best.e1rm)/first.best.e1rm*100:null,realRows=rms.filter(r=>r.athlete===ath&&exerciseLabel(r.exercise,r.variant)===label).sort((a,b)=>a.date.localeCompare(b.date)),bestReal=realRows.length?realRows.reduce((a,b)=>Number(b.weight)>Number(a.weight)?b:a,realRows[0]):null;return{label,sessions,first,latest,best,actualPct,bestPct,realRows,bestReal}}).filter(Boolean).sort((a,b)=>a.label.localeCompare(b.label));
 }
-function reportMetrics(ath,start,end){const workouts=state.workouts.filter(w=>w.athlete===ath&&betweenDate(w,start,end)),bw=state.bodyweights.filter(x=>x.athlete===ath&&betweenDate(x,start,end)).sort((a,b)=>a.date.localeCompare(b.date)),activity=state.activity.filter(x=>x.athlete===ath&&betweenDate(x,start,end)).sort((a,b)=>a.date.localeCompare(b.date)),rms=state.real1rms.filter(x=>x.athlete===ath&&betweenDate(x,start,end)).sort((a,b)=>a.date.localeCompare(b.date)),prog=exerciseProgressRows(ath,workouts),adh=adherenceMetrics(ath,workouts),idx=progressIndex(ath,workouts),goal=goalProgressMetrics(ath,state.bodyweights),exerciseDetails=exerciseReportDetails(ath,workouts,rms);return{ath,workouts,bw,activity,rms,prog,adh,idx,goal,exerciseDetails,volume:workouts.reduce((s,w)=>s+workoutVolume(w),0)}}
+function reportMetrics(ath,start,end){const workouts=state.workouts.filter(w=>w.athlete===ath&&betweenDate(w,start,end)),scheduledWorkouts=workouts.filter(w=>!isOptionalWorkout(w)),optionalWorkouts=workouts.filter(isOptionalWorkout),bw=state.bodyweights.filter(x=>x.athlete===ath&&betweenDate(x,start,end)).sort((a,b)=>a.date.localeCompare(b.date)),activity=state.activity.filter(x=>x.athlete===ath&&betweenDate(x,start,end)).sort((a,b)=>a.date.localeCompare(b.date)),rms=state.real1rms.filter(x=>x.athlete===ath&&betweenDate(x,start,end)).sort((a,b)=>a.date.localeCompare(b.date)),prog=exerciseProgressRows(ath,workouts),adh=adherenceMetrics(ath,workouts),idx=progressIndex(ath,workouts),goal=goalProgressMetrics(ath,state.bodyweights),exerciseDetails=exerciseReportDetails(ath,workouts,rms),volumeProgrammed=scheduledWorkouts.reduce((s,w)=>s+workoutVolume(w),0),volumeOptional=optionalWorkouts.reduce((s,w)=>s+workoutVolume(w),0);return{ath,workouts,scheduledWorkouts,optionalWorkouts,bw,activity,rms,prog,adh,idx,goal,exerciseDetails,volumeProgrammed,volumeOptional,volume:volumeProgrammed+volumeOptional}}
 function reportExerciseHTML(x,ath){
   const est=x.sessions.map(s=>({date:s.date,y:s.best.e1rm})),real=x.realRows.map(r=>({date:r.date,y:Number(r.weight)}));
   const firstSets=compactExerciseSets(x.first.exercise),latestSets=compactExerciseSets(x.latest.exercise),bestSets=compactExerciseSets(x.best.exercise);
@@ -1418,13 +1553,13 @@ function reportAthleteHTML(m){
   const progRows=m.prog.length?m.prog.map(x=>{const real=bestRealRMForLabel(m.ath,x.label,m.rms);return`<tr><td>${esc(x.label)}</td><td>${x.first.e1rm.toFixed(1)} kg</td><td>${x.latest.e1rm.toFixed(1)} kg</td><td class="${pctClass(x.actualPct)}">${signedPct(x.actualPct)}</td><td>${x.best.e1rm.toFixed(1)} kg</td><td class="${pctClass(x.bestPct)}">${signedPct(x.bestPct)}</td><td>${real?Number(real.weight).toFixed(1)+' kg':'N/A'}</td></tr>`}).join(''):'<tr><td colspan="7">Sin datos suficientes</td></tr>';
   const currentWeek=m.adh.currentWeek?`Semana ${m.adh.currentWeek}: ${m.adh.currentDone}/4`:'Sin semana iniciada';
   const exerciseBlocks=m.exerciseDetails.length?m.exerciseDetails.map(x=>reportExerciseHTML(x,m.ath)).join(''):'<div class="empty">Sin ejercicios con datos en este periodo.</div>';
-  return`<section class="athlete-page"><div class="brand">IRON BLOCK <span>Progress Report</span></div><h1>${esc(m.ath)}</h1><div class="metrics"><div><small>Sesiones</small><b>${m.workouts.length}</b></div><div><small>Volumen</small><b>${Math.round(m.volume).toLocaleString('es-ES')} kg</b></div><div><small>Adherencia · semanas cerradas</small><b>${m.adh.pct==null?'N/A':m.adh.pct.toFixed(1)+' %'}</b><em>${m.adh.closedWeeks} semana${m.adh.closedWeeks===1?'':'s'} cerrada${m.adh.closedWeeks===1?'':'s'}</em></div><div><small>Semana actual</small><b>${currentWeek}</b></div><div><small>Índice progreso</small><b>${signedPct(m.idx)}</b></div><div><small>Peso actual</small><b>${g?g.current.toFixed(1)+' kg':'N/A'}</b></div><div><small>Objetivo</small><b>${g?g.goal.toFixed(1)+' kg':'N/A'}</b></div><div><small>Objetivo completado</small><b>${g?signedPct(g.pct):'N/A'}</b></div><div><small>Pasos medios</small><b>${avgSteps==null?'N/A':avgSteps.toLocaleString('es-ES')}</b></div></div><div class="method"><b>Cómo se calcula el e1RM:</b> IRON BLOCK usa la fórmula de Epley: <b>e1RM = peso × (1 + repeticiones / 30)</b>. Ejemplo: 100×6 → 120 kg de e1RM. Es una estimación para comparar rendimiento; no equivale a un 1RM real testado.</div><h2>Peso corporal</h2>${reportSvg(m.bw.map(x=>({label:x.date.slice(5),y:Number(x.weight)})),' kg')}<h2>Pasos</h2>${reportSvg(m.activity.map(x=>({label:x.date.slice(5),y:Number(x.steps)})),'')}<h2>Resumen de fuerza</h2><table><thead><tr><th>Ejercicio</th><th>e1RM inicial</th><th>e1RM actual</th><th>Actual vs inicio</th><th>Mejor e1RM</th><th>Mejor vs inicio</th><th>Mejor 1RM real</th></tr></thead><tbody>${progRows}</tbody></table><h2>Evolución por ejercicio</h2>${exerciseBlocks}<h2>1RM reales testados</h2><table><thead><tr><th>Fecha</th><th>Ejercicio</th><th>1RM real</th><th>Fuerza relativa</th></tr></thead><tbody>${rmHist}</tbody></table></section>`
+  return`<section class="athlete-page"><div class="brand">IRON BLOCK <span>Progress Report</span></div><h1>${esc(m.ath)}</h1><div class="metrics"><div><small>Sesiones programadas</small><b>${m.scheduledWorkouts.length}</b></div><div><small>Sesiones opcionales</small><b>+${m.optionalWorkouts.length}</b></div><div><small>Volumen programado</small><b>${Math.round(m.volumeProgrammed).toLocaleString('es-ES')} kg</b></div><div><small>Volumen opcional</small><b>${Math.round(m.volumeOptional).toLocaleString('es-ES')} kg</b></div><div><small>Adherencia · semanas cerradas</small><b>${m.adh.pct==null?'N/A':m.adh.pct.toFixed(1)+' %'}</b><em>${m.adh.closedWeeks} semana${m.adh.closedWeeks===1?'':'s'} cerrada${m.adh.closedWeeks===1?'':'s'}</em></div><div><small>Semana actual</small><b>${currentWeek}${m.adh.currentExtras?` · +${m.adh.currentExtras} extra${m.adh.currentExtras===1?'':'s'}`:''}</b></div><div><small>Índice progreso</small><b>${signedPct(m.idx)}</b></div><div><small>Peso actual</small><b>${g?g.current.toFixed(1)+' kg':'N/A'}</b></div><div><small>Objetivo</small><b>${g?g.goal.toFixed(1)+' kg':'N/A'}</b></div><div><small>Objetivo completado</small><b>${g?signedPct(g.pct):'N/A'}</b></div><div><small>Pasos medios</small><b>${avgSteps==null?'N/A':avgSteps.toLocaleString('es-ES')}</b></div></div><div class="method"><b>Cómo se calcula el e1RM:</b> IRON BLOCK usa la fórmula de Epley: <b>e1RM = peso × (1 + repeticiones / 30)</b>. Ejemplo: 100×6 → 120 kg de e1RM. Es una estimación para comparar rendimiento; no equivale a un 1RM real testado.</div><h2>Peso corporal</h2>${reportSvg(m.bw.map(x=>({label:x.date.slice(5),y:Number(x.weight)})),' kg')}<h2>Pasos</h2>${reportSvg(m.activity.map(x=>({label:x.date.slice(5),y:Number(x.steps)})),'')}<h2>Resumen de fuerza</h2><table><thead><tr><th>Ejercicio</th><th>e1RM inicial</th><th>e1RM actual</th><th>Actual vs inicio</th><th>Mejor e1RM</th><th>Mejor vs inicio</th><th>Mejor 1RM real</th></tr></thead><tbody>${progRows}</tbody></table><h2>Evolución por ejercicio</h2>${exerciseBlocks}<h2>1RM reales testados</h2><table><thead><tr><th>Fecha</th><th>Ejercicio</th><th>1RM real</th><th>Fuerza relativa</th></tr></thead><tbody>${rmHist}</tbody></table></section>`
 }
 function generateProgressReport(){
   const win=window.open('','_blank');if(!win){alert('Chrome ha bloqueado la ventana del informe. Permite ventanas emergentes para IRON BLOCK y vuelve a intentarlo.');return}
   const range=reportRange(),selection=el('reportAthlete').value,aths=selection==='__both__'?[state.settings.athlete1,state.settings.athlete2]:[selection],metrics=aths.map(a=>reportMetrics(a,range.start,range.end));
-  let comparison='';if(metrics.length===2){comparison=`<section class="cover"><div class="brand big">IRON BLOCK</div><h1>Progress Report</h1><p>${esc(range.label)}</p><h2>Resumen comparativo</h2><table><thead><tr><th>Atleta</th><th>Sesiones</th><th>Volumen</th><th>Adherencia cerrada</th><th>Semana actual</th><th>Índice progreso</th><th>Objetivo peso</th></tr></thead><tbody>${metrics.map(m=>`<tr><td><b>${esc(m.ath)}</b></td><td>${m.workouts.length}</td><td>${Math.round(m.volume).toLocaleString('es-ES')} kg</td><td>${m.adh.pct==null?'N/A':m.adh.pct.toFixed(1)+' %'}</td><td>${m.adh.currentWeek?`S${m.adh.currentWeek} · ${m.adh.currentDone}/4`:'N/A'}</td><td>${signedPct(m.idx)}</td><td>${m.goal?signedPct(m.goal.pct):'N/A'}</td></tr>`).join('')}</tbody></table></section>`}else{comparison=`<section class="cover"><div class="brand big">IRON BLOCK</div><h1>Progress Report</h1><p>${esc(metrics[0].ath)} · ${esc(range.label)}</p><div class="hero">Fuerza · hipertrofia · progreso medible</div></section>`}
-  const doc=`<!doctype html><html><head><meta charset="utf-8"><title>IRON BLOCK Progress Report</title><style>@page{size:A4;margin:11mm}*{box-sizing:border-box}body{font-family:Arial,sans-serif;color:#101827;margin:0;-webkit-print-color-adjust:exact;print-color-adjust:exact}.cover{min-height:260mm;display:flex;flex-direction:column;justify-content:center}.brand{font-weight:900;letter-spacing:2px;color:#0c8050}.brand span{color:#4c6078}.brand.big{font-size:34px}.cover h1{font-size:42px;margin:8px 0}.cover p{font-size:18px;color:#637083}.hero{margin-top:30px;border-left:5px solid #20b873;padding:14px 18px;background:#eef9f4;font-weight:700}.athlete-page{page-break-before:always}h1{font-size:30px;margin:8px 0 18px}h2{font-size:17px;margin:22px 0 8px;color:#22334b;border-bottom:2px solid #dfe6ee;padding-bottom:5px}h3{font-size:14px;margin:0 0 8px}.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.metrics div{border:1px solid #dfe6ee;border-radius:9px;padding:8px;background:#f8fafc}.metrics small{display:block;color:#6b7788;font-size:9px}.metrics b{display:block;font-size:14px;margin-top:3px}.metrics em{display:block;font-size:8px;color:#7b8491;font-style:normal;margin-top:2px}.method{margin:14px 0;padding:10px 12px;background:#eef6ff;border-left:4px solid #378ddd;border-radius:6px;font-size:10px;line-height:1.5}table{width:100%;border-collapse:collapse;font-size:9px}th,td{border-bottom:1px solid #e1e6ec;text-align:left;padding:5px;vertical-align:top}th{background:#f1f5f8}.good{color:#087849;font-weight:700}.bad{color:#c83e3e;font-weight:700}.neutral{color:#6b7788}.empty{padding:18px;background:#f6f8fa;color:#7a8594;border-radius:8px;font-size:10px}.exercise-report{border:1px solid #dfe6ee;border-radius:10px;padding:10px;margin:0 0 12px;break-inside:avoid-page;page-break-inside:avoid}.series-table{margin-top:5px}.exercise-summary{background:#f7f9fb;border-radius:6px;padding:7px;margin-top:7px;font-size:9px}.legendline{display:flex;gap:18px;font-size:8px;color:#657286;margin:2px 0 7px}.dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:4px}.dot.est{background:#20b873}.dot.real{background:#378ddd}.page-note{font-size:8px;color:#7b8491;margin-top:12px}@media print{button{display:none}}</style></head><body>${comparison}${metrics.map(reportAthleteHTML).join('')}<div class="page-note">Generado por IRON BLOCK V4.1 · ${new Date().toLocaleString('es-ES')} · e1RM calculado con fórmula de Epley.</div><script>setTimeout(()=>window.print(),700)<\/script></body></html>`;
+  let comparison='';if(metrics.length===2){comparison=`<section class="cover"><div class="brand big">IRON BLOCK</div><h1>Progress Report</h1><p>${esc(range.label)}</p><h2>Resumen comparativo</h2><table><thead><tr><th>Atleta</th><th>Programadas</th><th>Extras</th><th>Vol. programado</th><th>Vol. extra</th><th>Adherencia cerrada</th><th>Semana actual</th><th>Índice progreso</th><th>Objetivo peso</th></tr></thead><tbody>${metrics.map(m=>`<tr><td><b>${esc(m.ath)}</b></td><td>${m.scheduledWorkouts.length}</td><td>+${m.optionalWorkouts.length}</td><td>${Math.round(m.volumeProgrammed).toLocaleString('es-ES')} kg</td><td>${Math.round(m.volumeOptional).toLocaleString('es-ES')} kg</td><td>${m.adh.pct==null?'N/A':m.adh.pct.toFixed(1)+' %'}</td><td>${m.adh.currentWeek?`S${m.adh.currentWeek} · ${m.adh.currentDone}/4${m.adh.currentExtras?` · +${m.adh.currentExtras} extra${m.adh.currentExtras===1?'':'s'}`:''}`:'N/A'}</td><td>${signedPct(m.idx)}</td><td>${m.goal?signedPct(m.goal.pct):'N/A'}</td></tr>`).join('')}</tbody></table></section>`}else{comparison=`<section class="cover"><div class="brand big">IRON BLOCK</div><h1>Progress Report</h1><p>${esc(metrics[0].ath)} · ${esc(range.label)}</p><div class="hero">Fuerza · hipertrofia · progreso medible</div></section>`}
+  const doc=`<!doctype html><html><head><meta charset="utf-8"><title>IRON BLOCK Progress Report</title><style>@page{size:A4;margin:11mm}*{box-sizing:border-box}body{font-family:Arial,sans-serif;color:#101827;margin:0;-webkit-print-color-adjust:exact;print-color-adjust:exact}.cover{min-height:260mm;display:flex;flex-direction:column;justify-content:center}.brand{font-weight:900;letter-spacing:2px;color:#0c8050}.brand span{color:#4c6078}.brand.big{font-size:34px}.cover h1{font-size:42px;margin:8px 0}.cover p{font-size:18px;color:#637083}.hero{margin-top:30px;border-left:5px solid #20b873;padding:14px 18px;background:#eef9f4;font-weight:700}.athlete-page{page-break-before:always}h1{font-size:30px;margin:8px 0 18px}h2{font-size:17px;margin:22px 0 8px;color:#22334b;border-bottom:2px solid #dfe6ee;padding-bottom:5px}h3{font-size:14px;margin:0 0 8px}.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.metrics div{border:1px solid #dfe6ee;border-radius:9px;padding:8px;background:#f8fafc}.metrics small{display:block;color:#6b7788;font-size:9px}.metrics b{display:block;font-size:14px;margin-top:3px}.metrics em{display:block;font-size:8px;color:#7b8491;font-style:normal;margin-top:2px}.method{margin:14px 0;padding:10px 12px;background:#eef6ff;border-left:4px solid #378ddd;border-radius:6px;font-size:10px;line-height:1.5}table{width:100%;border-collapse:collapse;font-size:9px}th,td{border-bottom:1px solid #e1e6ec;text-align:left;padding:5px;vertical-align:top}th{background:#f1f5f8}.good{color:#087849;font-weight:700}.bad{color:#c83e3e;font-weight:700}.neutral{color:#6b7788}.empty{padding:18px;background:#f6f8fa;color:#7a8594;border-radius:8px;font-size:10px}.exercise-report{border:1px solid #dfe6ee;border-radius:10px;padding:10px;margin:0 0 12px;break-inside:avoid-page;page-break-inside:avoid}.series-table{margin-top:5px}.exercise-summary{background:#f7f9fb;border-radius:6px;padding:7px;margin-top:7px;font-size:9px}.legendline{display:flex;gap:18px;font-size:8px;color:#657286;margin:2px 0 7px}.dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:4px}.dot.est{background:#20b873}.dot.real{background:#378ddd}.page-note{font-size:8px;color:#7b8491;margin-top:12px}@media print{button{display:none}}</style></head><body>${comparison}${metrics.map(reportAthleteHTML).join('')}<div class="page-note">Generado por IRON BLOCK V4.2 · ${new Date().toLocaleString('es-ES')} · e1RM calculado con fórmula de Epley.</div><script>setTimeout(()=>window.print(),700)<\/script></body></html>`;
   win.document.open();win.document.write(doc);win.document.close();
 }
 
@@ -1548,9 +1683,12 @@ document.addEventListener("DOMContentLoaded",()=>{
   const syncBtn=el("syncCloudBtn");if(syncBtn)syncBtn.addEventListener("click",()=>syncCloud());
   el("dockSaveWorkout")?.addEventListener("click",()=>el("saveWorkout")?.click());
   el("dockSyncCloud")?.addEventListener("click",()=>syncCloud());
-  el("addExerciseBtn")?.addEventListener("click",()=>el("exerciseModal").classList.remove("hidden"));
+  el("optionalWorkoutBtn")?.addEventListener("click",()=>{renderOptionalTemplateGrid();el("optionalWorkoutModal").classList.remove("hidden")});
+  el("cancelOptionalWorkout")?.addEventListener("click",()=>el("optionalWorkoutModal").classList.add("hidden"));
+  el("addExerciseBtn")?.addEventListener("click",()=>{renderExerciseCatalog();el("exerciseModal").classList.remove("hidden")});
+  el("customExCatalog")?.addEventListener("change",()=>{const value=el("customExCatalog").value,wrap=el("customExNameWrap");if(value==="__custom__"){wrap.classList.remove("hidden");el("customExName").focus()}else{wrap.classList.add("hidden");el("customExName").value="";prefillExerciseFromCatalog(value)}});
   el("cancelCustomExercise")?.addEventListener("click",()=>el("exerciseModal").classList.add("hidden"));
-  el("confirmCustomExercise")?.addEventListener("click",()=>{const name=el("customExName").value.trim();if(!name){alert("Pon un nombre al ejercicio.");return}const model={name,variant:el("customExVariant").value,targetReps:el("customExReps").value.trim()||"8-12",rest:el("customExRest").value.trim()||"90 s",rirTarget:`RIR ${el("customExRir").value.trim()||"1-2"}`,custom:true,note:"",sets:Array.from({length:Math.max(1,parseInt(el("customExSets").value)||3)},()=>({kg:"",reps:"",rir:""}))},current=collectWorkout().exercises.map(e=>({...e})),general=el("sessionNotes").value;current.push(model);renderWorkout(current,{keepNotes:true});el("sessionNotes").value=general;el("exerciseModal").classList.add("hidden");el("customExName").value="";setWorkoutDockStatus(`Añadido: ${name}`,"ok")});
+  el("confirmCustomExercise")?.addEventListener("click",()=>{const catalog=el("customExCatalog").value,name=(catalog==="__custom__"?el("customExName").value.trim():catalog);if(!name){alert("Elige o escribe un ejercicio.");return}const model={name,variant:el("customExVariant").value,targetReps:el("customExReps").value.trim()||"8-12",rest:el("customExRest").value.trim()||"90 s",rirTarget:`RIR ${el("customExRir").value.trim()||"1-2"}`,custom:true,note:"",sets:Array.from({length:Math.max(1,parseInt(el("customExSets").value)||3)},()=>({kg:"",reps:"",rir:""}))},current=collectWorkout().exercises.map(e=>({...e})),general=el("sessionNotes").value;current.push(model);renderWorkout(current,{keepNotes:true});el("sessionNotes").value=general;el("exerciseModal").classList.add("hidden");el("customExName").value="";setWorkoutDockStatus(`Añadido: ${name}`,"ok")});
   el("saveDeviceAthlete")?.addEventListener("click",()=>{saveDeviceAthleteValue(el("deviceAthleteSelect").value);alert(`Este dispositivo queda asignado a ${deviceAthlete}.`)});
   bootPersistentState();renderCloudStatus();setTimeout(()=>{ensureDeviceAthlete();refreshAthleteSelectorPreserve();if(deviceAthlete&&el("athlete"))el("athlete").value=deviceAthlete;renderDeviceModeNotice();setWorkoutDockStatus(`Listo · perfil predeterminado: ${deviceAthlete||"sin elegir"}.`,"ok");syncCloud({quiet:true})},250);
 });
