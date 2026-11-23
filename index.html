@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <link rel="manifest" href="manifest.webmanifest" />
 <link rel="icon" href="icon-192.png" />
-<title>Iron Block V4.0 · Progress Intelligence</title>
+<title>Iron Block V5 · Blocks & Coach</title>
 <style>
 :root{
   --bg:#0b1020; --panel:#121a2e; --panel2:#18233c; --text:#f4f7fb;
@@ -160,24 +160,60 @@ canvas{width:100%;height:220px;display:block}
 .workoutdock-inner{flex-wrap:wrap}.workoutdock .finish-action{background:#12683f;border-color:#208e59}.workoutdock .finish-action:hover{filter:brightness(1.08)}
 @media(max-width:620px){.cal-day{min-height:65px;padding:4px}.cal-event{font-size:8px;padding:2px 3px}.calendar-month{min-width:120px;font-size:16px}.workoutdock-status{flex-basis:100%;order:4}}
 
+
+
+/* V5 · navegación móvil, bloques y coach */
+.app-header{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.header-brand h1{margin:0}.header-meta{display:flex;align-items:center;gap:8px;margin-top:4px;color:var(--muted);font-size:12px;flex-wrap:wrap}
+.cloud-dot{width:9px;height:9px;border-radius:50%;display:inline-block;background:var(--warn);box-shadow:0 0 0 3px rgba(255,209,102,.08)}
+.cloud-dot.online{background:var(--accent);box-shadow:0 0 0 3px rgba(114,230,163,.08)}
+.cloud-dot.offline{background:var(--danger);box-shadow:0 0 0 3px rgba(255,107,107,.08)}
+.menu-toggle{width:44px;height:44px;border-radius:12px;border:1px solid var(--border);background:var(--panel2);color:var(--text);font-size:24px;font-weight:900;line-height:1}
+.tabs{display:none!important}
+.menu-overlay{position:fixed;inset:0;background:rgba(0,0,0,.62);z-index:80}
+.side-menu{position:fixed;top:0;right:0;bottom:0;width:min(330px,88vw);z-index:90;background:#0c1323;border-left:1px solid var(--border);box-shadow:-18px 0 50px rgba(0,0,0,.35);padding:18px;overflow:auto;transform:translateX(105%);transition:transform .2s ease}
+.side-menu.open{transform:translateX(0)}
+.side-menu-head{display:flex;justify-content:space-between;align-items:center;gap:10px;padding-bottom:12px;border-bottom:1px solid var(--border);margin-bottom:10px}
+.side-menu-close{width:38px;height:38px;border-radius:10px;border:1px solid var(--border);background:var(--panel2);color:var(--text);font-size:21px}
+.menu-item{width:100%;display:flex;align-items:center;gap:11px;text-align:left;background:transparent;color:#dbe5f5;border:1px solid transparent;border-radius:11px;padding:12px;margin:4px 0;font-weight:800}
+.menu-item.active{background:var(--accent);color:#06130c}.menu-item:hover{border-color:var(--border)}
+.menu-divider{height:1px;background:var(--border);margin:10px 0}.page-title-mini{font-size:11px;color:var(--muted);font-weight:800;text-transform:uppercase;letter-spacing:.5px}
+.block-chip{display:inline-flex;border:1px solid #315069;background:#0d192b;border-radius:999px;padding:4px 8px;font-size:10px;font-weight:800;color:#cfe1f5}
+.week-close-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:10px}.missed-chip{display:inline-flex;border:1px solid #6b4e27;background:#251c0d;color:#f4d59b;border-radius:999px;padding:4px 7px;font-size:10px;font-weight:800}
+.setrow.not-done input{opacity:.68}.setrow.done-row{background:rgba(114,230,163,.045);border-radius:9px;padding:3px}.exercise-skipped{opacity:.72}.skip-label{display:inline-flex;background:#32270e;color:#f2d182;border:1px solid #6b5727;border-radius:999px;padding:3px 7px;font-size:9px;font-weight:900;margin-left:6px}
+.best-week{margin-top:7px;padding:8px 10px;border:1px solid #375171;border-radius:10px;background:#0b1728;font-size:11px;line-height:1.5;color:#cad9ec}.best-week b{color:#fff}
+.ai-chat{display:grid;gap:10px}.ai-bubble{border:1px solid var(--border);border-radius:13px;padding:12px;line-height:1.55;white-space:pre-wrap}.ai-bubble.user{background:#111e34}.ai-bubble.assistant{background:#0d241b;border-color:#285d45}.ai-status{font-size:11px;color:var(--muted)}
+.block-card{border:1px solid var(--border);background:#0d1627;border-radius:13px;padding:12px;margin-top:10px}.block-card.active{border-color:var(--accent)}
+@media(max-width:620px){header{padding-top:8px}.header-brand h1{font-size:20px}.app-header{align-items:flex-start}}
+
 </style>
 </head>
 <body>
 <div class="app">
 <header>
-  <h1>IRON BLOCK V4.3</h1>
-  <div class="sub">Programa de fuerza + hipertrofia · 4 días · 10 semanas · seguimiento avanzado</div>
-  <div class="tabs">
-    <button class="tab active" data-tab="today">Entreno</button>
-    <button class="tab" data-tab="plan">Plan</button>
-    <button class="tab" data-tab="progress">Progreso</button>
-    <button class="tab" data-tab="analytics">Analítica</button>
-    <button class="tab" data-tab="prs">PRs</button>
-    <button class="tab" data-tab="calendar">Calendario</button>
-    <button class="tab" data-tab="reports">Informes</button>
-    <button class="tab" data-tab="settings">Ajustes</button>
+  <div class="app-header">
+    <div class="header-brand">
+      <h1>IRON BLOCK V5</h1>
+      <div class="page-title-mini" id="currentSectionTitle">Entreno</div>
+      <div class="header-meta"><span id="headerBlockWeek">Bloque 1 · Semana 1/10</span><span class="cloud-dot" id="headerCloudDot"></span><span id="headerCloudText">Nube</span></div>
+    </div>
+    <button class="menu-toggle" id="menuToggle" aria-label="Abrir menú">☰</button>
   </div>
 </header>
+<div class="menu-overlay hidden" id="menuOverlay"></div>
+<nav class="side-menu" id="sideMenu" aria-label="Navegación principal">
+  <div class="side-menu-head"><div><b>IRON BLOCK</b><div class="small" id="menuBlockWeek">Bloque 1 · Semana 1</div></div><button class="side-menu-close" id="menuClose">×</button></div>
+  <button class="menu-item tab active" data-tab="today">🏋️ <span>Entreno</span></button>
+  <button class="menu-item tab" data-tab="calendar">📅 <span>Calendario</span></button>
+  <button class="menu-item tab" data-tab="plan">📋 <span>Plan / Bloques</span></button>
+  <button class="menu-item tab" data-tab="progress">📈 <span>Progreso</span></button>
+  <button class="menu-item tab" data-tab="analytics">📊 <span>Analítica</span></button>
+  <button class="menu-item tab" data-tab="prs">🏆 <span>PRs</span></button>
+  <button class="menu-item tab" data-tab="ai">🤖 <span>Coach IA</span></button>
+  <button class="menu-item tab" data-tab="reports">📄 <span>Informes</span></button>
+  <div class="menu-divider"></div>
+  <button class="menu-item tab" data-tab="settings">⚙️ <span>Ajustes</span></button>
+</nav>
 
 <section id="today" class="view">
   <div class="card">
@@ -185,11 +221,13 @@ canvas{width:100%;height:220px;display:block}
     <div id="historicalModeBar" class="historical-bar hidden"><div id="historicalModeText"></div><div class="row"><button class="btn secondary" id="editHistoricalWorkout">Editar entrenamiento</button><button class="btn secondary" id="exitHistoricalWorkout">Volver al entreno actual</button></div></div>
     <div class="grid2">
       <div><label>Atleta</label><select id="athlete"></select></div>
+      <div><label>Bloque</label><select id="block"></select></div>
       <div><label>Semana</label><select id="week"></select></div>
       <div><label>Sesión</label><select id="session"></select></div>
       <div><label>Fecha</label><input id="date" type="date"></div>
     </div>
     <div class="optional-launch">
+      <button class="btn secondary" id="loadPreviousTop">↶ Cargar última sesión</button>
       <button class="btn secondary" id="optionalWorkoutBtn">+ Entrenamiento opcional</button>
       <span class="small">Plantilla o sesión libre · no cuenta para adherencia</span>
     </div>
@@ -220,7 +258,7 @@ canvas{width:100%;height:220px;display:block}
 
 <section id="plan" class="view hidden">
   <div class="card">
-    <h2 class="section-title">Bloque de 10 semanas</h2>
+    <h2 class="section-title">Bloque activo · 10 semanas</h2><div id="blockManager"></div>
     <div class="week-grid" id="weekGrid"></div>
   </div>
 
@@ -589,13 +627,32 @@ canvas{width:100%;height:220px;display:block}
   </div>
 </section>
 
+
+<section id="ai" class="view hidden">
+  <div class="card">
+    <h2 class="section-title">Coach IA · IRON BLOCK</h2>
+    <div class="small">Pregunta exclusivamente sobre tus entrenamientos, progreso, volumen, fuerza y datos registrados. La conversación no se guarda.</div>
+    <div class="grid2" style="margin-top:12px">
+      <div><label>Atleta</label><select id="aiAthlete"></select></div>
+      <div><label>Contexto</label><select id="aiScope"><option value="recent">Últimas semanas + resumen histórico</option><option value="block">Bloque actual</option><option value="all">Historial completo resumido</option></select></div>
+    </div>
+    <div style="margin-top:12px"><label>Pregunta</label><textarea id="aiQuestion" placeholder="Ej.: ¿Estoy progresando en press banca? ¿Qué debería intentar en el próximo Upper A?"></textarea></div>
+    <div class="row" style="margin-top:10px"><button class="btn" id="askCoach">Preguntar al Coach</button><button class="btn secondary" id="clearCoach">Limpiar pantalla</button></div>
+    <div class="ai-status" id="aiStatus" style="margin-top:10px">Gemini se ejecuta mediante una función segura de Supabase. Falta configurar la clave para activarlo.</div>
+  </div>
+  <div class="card">
+    <h2 class="section-title">Conversación actual</h2>
+    <div class="ai-chat" id="aiChat"><div class="small">Las preguntas y respuestas solo viven en esta pantalla y no se guardan en la base de datos.</div></div>
+  </div>
+</section>
+
 <section id="reports" class="view hidden">
   <div class="card">
     <h2 class="section-title">Informes · IRON BLOCK Progress Report</h2>
     <div class="small">Genera un informe listo para PDF con peso corporal, pasos, series reales, gráficas de e1RM por ejercicio, 1RM reales, adherencia y progreso. El PDF no se guarda en Supabase.</div>
     <div class="grid2" style="margin-top:12px">
       <div><label>Atleta</label><select id="reportAthlete"></select></div>
-      <div><label>Periodo</label><select id="reportPeriod"><option value="all">Todo el bloque</option><option value="4w">Últimas 4 semanas</option><option value="custom">Personalizado</option></select></div>
+      <div><label>Periodo</label><select id="reportPeriod"><option value="all">Todo el historial</option><option value="4w">Últimas 4 semanas</option><option value="custom">Personalizado</option></select></div>
       <div id="reportStartWrap" class="hidden"><label>Desde</label><input id="reportStart" type="date"></div>
       <div id="reportEndWrap" class="hidden"><label>Hasta</label><input id="reportEnd" type="date"></div>
     </div>
@@ -613,10 +670,16 @@ canvas{width:100%;height:220px;display:block}
     <button class="btn" id="saveDeviceAthlete" style="margin-top:10px">Guardar perfil predeterminado</button>
   </div>
 
+  <div class="card">
+    <h2 class="section-title">Coach IA · acceso local</h2>
+    <p class="small">El PIN del Coach se guarda solo en este dispositivo y nunca en Supabase. Servirá para proteger la Edge Function cuando configuremos Gemini.</p>
+    <label>PIN del Coach IA</label><input id="coachPin" type="password" autocomplete="off" placeholder="Configurar cuando activemos Gemini">
+    <button class="btn secondary" id="saveCoachPin" style="margin-top:10px">Guardar PIN en este dispositivo</button>
+  </div>
 
   <div class="card">
     <h2 class="section-title">Entrenamientos guardados pendientes</h2>
-    <div class="small">Guardar protege tus datos, pero una sesión solo cuenta para el 4/4 cuando pulsas <b>Finalizar entreno</b>. Los registros anteriores a V4.3 se migran automáticamente como finalizados.</div>
+    <div class="small">Guardar protege tus datos, pero una sesión solo cuenta para el 4/4 cuando pulsas <b>Finalizar entreno</b>. Los registros históricos con series válidas se conservan como finalizados. Los entrenamientos antiguos vacíos quedan anulados y no cuentan para el 4/4.</div>
     <div id="pendingFinalizeSummary" class="persist-detail small" style="margin-top:10px">Comprobando…</div>
     <button class="btn secondary" id="finalizeAllSaved" style="margin-top:10px">Finalizar todos los guardados pendientes</button>
   </div>
@@ -643,7 +706,7 @@ canvas{width:100%;height:220px;display:block}
     </div>
     <div id="storageDetail" class="persist-detail small">Esperando carga inicial...</div>
     <p class="small" style="margin-top:10px">
-      Para que los datos sobrevivan de forma fiable entre cierres, abre esta V4.3 desde una URL HTTPS estable o instálala como PWA.
+      Para que los datos sobrevivan de forma fiable entre cierres, abre IRON BLOCK V5 desde una URL HTTPS estable o instálala como PWA.
       Si la abres directamente desde Descargas como <code>file://</code> o <code>content://</code>, Android/Chrome puede aislar el almacenamiento entre aperturas.
     </p>
   </div>
@@ -672,7 +735,7 @@ canvas{width:100%;height:220px;display:block}
   </div>
 </section>
 
-<div class="footer-note">IRON BLOCK V4.3 · Entrenad duro, progresad con cabeza y registrad todo.</div>
+<div class="footer-note">IRON BLOCK V5 · Entrenad duro, progresad con cabeza y registrad todo.</div>
 </div>
 
 <div class="timerbar">
@@ -864,7 +927,8 @@ const key="ironBlockV1";
 const backupKey="ironBlockV1_backup";
 const defaultState={
   settings:{athlete1:"Guillem",athlete2:"Biel",goal1:"95",goal2:"80"},
-  workouts:[], bodyweights:[], activity:[], real1rms:[], weekProgress:{}, _savedAt:0
+  blocks:[{number:1,name:"Bloque 1",weeks:10,createdAt:null,closedAt:null}],
+  workouts:[], bodyweights:[], activity:[], real1rms:[], weekProgress:{}, weekClosures:[], _savedAt:0
 };
 
 let state=structuredClone(defaultState);
@@ -920,20 +984,40 @@ function chooseStoredState(){
 function migrateState(s){
   if(!s || typeof s!=="object")s=structuredClone(defaultState);
   if(!s.settings)s.settings=structuredClone(defaultState.settings);
+  if(!Array.isArray(s.blocks)||!s.blocks.length)s.blocks=[{number:1,name:"Bloque 1",weeks:10,createdAt:null,closedAt:null}];
+  s.blocks=s.blocks.map((b,i)=>({number:Number(b.number)||i+1,name:b.name||`Bloque ${Number(b.number)||i+1}`,weeks:10,createdAt:b.createdAt||null,closedAt:b.closedAt||null})).sort((a,b)=>a.number-b.number);
   if(!Array.isArray(s.workouts))s.workouts=[];
   if(!Array.isArray(s.bodyweights))s.bodyweights=[];
   if(!Array.isArray(s.activity))s.activity=[];
   if(!Array.isArray(s.real1rms))s.real1rms=[];
+  if(!Array.isArray(s.weekClosures))s.weekClosures=[];
   if(!s.weekProgress || typeof s.weekProgress!=="object" || Array.isArray(s.weekProgress))s.weekProgress={};
-  // V4.3: antes no existía el concepto de finalizar. Todo registro histórico previo se considera finalizado.
+  // V5: todo el historial previo pertenece al Bloque 1. Las series con datos históricos se consideran realizadas.
   s.workouts.forEach(w=>{
+    w.block=Number(w.block)||1;
+    if(!w.clientUid)w.clientUid=`legacy|${w.athlete||'ath'}|${w.date||'date'}|${w.session||'session'}`;
     if(typeof w.finalized!=="boolean")w.finalized=true;
     if(w.finalized&&!w.finalizedAt)w.finalizedAt=w.date?`${w.date}T23:59:00.000Z`:new Date().toISOString();
-  });
+    (w.exercises||[]).forEach(e=>{
+      (e.sets||[]).forEach(set=>{
+        if(typeof set.done!=="boolean")set.done=Number(set.reps)>0;
+      });
+      if(!e.status)e.status=(e.sets||[]).some(x=>x.done&&Number(x.reps)>0)?"performed":"skipped";
+    });
+    const hasReps=(w.exercises||[]).some(e=>(e.sets||[]).some(set=>Number(set.reps)>0));
+    if(!w.isOptional&&!isOptionalSessionName(w.session)&&w.finalized&&!hasReps){w.void=true;w.finalized=false;w.finalizedAt=null;}
+    else w.void=!!w.void;
 
+  });
+  for(const [ath,p] of Object.entries(s.weekProgress)){
+    if(!p||typeof p!=="object")s.weekProgress[ath]={currentBlock:1,currentWeek:1};
+    else{p.currentBlock=Number(p.currentBlock)||1;p.currentWeek=Math.max(1,Math.min(10,Number(p.currentWeek)||1));}
+  }
   if(s.settings.athlete2==="Amigo"){
     s.workouts.forEach(x=>{if(x.athlete==="Amigo")x.athlete="Biel"});
     s.bodyweights.forEach(x=>{if(x.athlete==="Amigo")x.athlete="Biel"});
+    s.weekClosures.forEach(x=>{if(x.athlete==="Amigo")x.athlete="Biel"});
+    if(s.weekProgress.Amigo&&!s.weekProgress.Biel){s.weekProgress.Biel=s.weekProgress.Amigo;delete s.weekProgress.Amigo}
     s.settings.athlete2="Biel";
   }
   if(!s.settings.athlete1)s.settings.athlete1="Guillem";
@@ -943,7 +1027,6 @@ function migrateState(s){
   if(!Number.isFinite(Number(s._savedAt)))s._savedAt=0;
   return s;
 }
-
 function save(){
   if(!bootComplete)return false;
   state._savedAt=Date.now();
@@ -970,316 +1053,119 @@ function formatSavedAt(ts){
 
 const SUPABASE_URL="https://vsielxtpyetaohwniqvn.supabase.co";
 const SUPABASE_KEY="sb_publishable_zfCsnI0uQFSCNMEwHHS32g_v5M79TZB";
-let cloudOnline=false;
-let cloudSyncing=false;
-let lastCloudSync=0;
-
-async function cloudRequest(path,{method="GET",body=null,prefer=null}={}){
-  const headers={
-    "apikey":SUPABASE_KEY,
-    "Content-Type":"application/json"
-  };
-  if(prefer)headers["Prefer"]=prefer;
-
-  const response=await fetch(`${SUPABASE_URL}/rest/v1/${path}`,{
-    method,
-    headers,
-    body:body===null?undefined:JSON.stringify(body),
-    cache:"no-store"
-  });
-
-  if(!response.ok){
-    const msg=await response.text().catch(()=>response.statusText);
-    throw new Error(`Cloud ${response.status}: ${msg}`);
-  }
-
-  const txt=await response.text();
-  return txt?JSON.parse(txt):null;
+let cloudOnline=false,cloudPartial=false,cloudSyncing=false,lastCloudSync=0,lastCloudErrors=[];
+async function cloudRequest(path,{method="GET",body=null,prefer=null,headers:extraHeaders={}}={}){
+  const headers={"apikey":SUPABASE_KEY,"Content-Type":"application/json",...extraHeaders};if(prefer)headers["Prefer"]=prefer;
+  const response=await fetch(`${SUPABASE_URL}/rest/v1/${path}`,{method,headers,body:body===null?undefined:JSON.stringify(body),cache:"no-store"});
+  if(!response.ok){const msg=await response.text().catch(()=>response.statusText);throw new Error(`Cloud ${response.status}: ${msg}`)}const txt=await response.text();return txt?JSON.parse(txt):null;
 }
-
-function workoutCloudKey(w){
-  return `${w.athlete}|||${w.date}|||${w.session}`;
-}
-function weightCloudKey(w){
-  return `${w.athlete}|||${w.date}`;
-}
-
+function workoutCloudKey(w){return w?.clientUid?`uid|||${w.clientUid}`:`legacy|||${w.athlete}|||${w.date}|||${w.session}`}
+function weightCloudKey(w){return `${w.athlete}|||${w.date}`}
 function renderCloudStatus(extra=""){
-  const status=el("cloudStatus");
-  const detail=el("cloudDetail");
-  if(!status||!detail)return;
-
-  if(cloudSyncing){
-    status.innerHTML='<span class="storage-warn">↻ Sincronizando...</span>';
-  }else if(cloudOnline){
-    status.innerHTML='<span class="storage-ok">✓ Nube conectada.</span> Datos compartidos activos.';
-  }else{
-    status.innerHTML='<span class="storage-warn">⚠ Sin conexión con la nube.</span> La copia local sigue funcionando.';
-  }
-
-  const pendingW=(state.workouts||[]).filter(x=>x._cloudDirty).length;
-  const pendingB=(state.bodyweights||[]).filter(x=>x._cloudDirty).length;
-  const pendingS=state.settings?._cloudDirty?1:0;
-  const pendingA=(state.activity||[]).filter(x=>x._cloudDirty).length;
-  const pendingR=(state.real1rms||[]).filter(x=>x._cloudDirty).length;
-  const pendingP=Object.values(state.weekProgress||{}).filter(x=>x&&x._cloudDirty).length;
-  detail.innerHTML=
-    `<b>Estado cloud</b><br>`+
-    `Última sincronización: ${lastCloudSync?new Date(lastCloudSync).toLocaleString("es-ES"):"todavía no"}<br>`+
-    `Entrenamientos locales: ${(state.workouts||[]).length}<br>`+
-    `Pesos locales: ${(state.bodyweights||[]).length}<br>`+
-    `Días con pasos: ${(state.activity||[]).length}<br>`+
-    `1RM reales: ${(state.real1rms||[]).length}<br>`+
-    `Pendientes de subir: ${pendingW+pendingB+pendingS+pendingA+pendingR+pendingP}`+
-    (extra?`<br>${extra}`:"");
+  const status=el("cloudStatus"),detail=el("cloudDetail");if(!status||!detail){renderHeaderStatus();return}
+  if(cloudSyncing)status.innerHTML='<span class="storage-warn">↻ Sincronizando...</span>';
+  else if(cloudOnline&&!cloudPartial)status.innerHTML='<span class="storage-ok">✓ Nube conectada.</span> Todos los módulos sincronizados.';
+  else if(cloudPartial)status.innerHTML='<span class="storage-warn">⚠ Sincronización parcial.</span> La copia local sigue protegida.';
+  else status.innerHTML='<span class="storage-warn">⚠ Nube no disponible.</span> La copia local sigue funcionando.';
+  const pendingW=(state.workouts||[]).filter(x=>x._cloudDirty).length,pendingB=(state.bodyweights||[]).filter(x=>x._cloudDirty).length,pendingS=state.settings?._cloudDirty?1:0,pendingA=(state.activity||[]).filter(x=>x._cloudDirty).length,pendingR=(state.real1rms||[]).filter(x=>x._cloudDirty).length,pendingP=Object.values(state.weekProgress||{}).filter(x=>x&&x._cloudDirty).length,pendingC=(state.weekClosures||[]).filter(x=>x._cloudDirty).length,pendingBlocks=(state.blocks||[]).filter(x=>x._cloudDirty).length;
+  detail.innerHTML=`<b>Estado cloud</b><br>Última sincronización: ${lastCloudSync?new Date(lastCloudSync).toLocaleString("es-ES"):"todavía no"}<br>Entrenamientos locales: ${(state.workouts||[]).length}<br>Pesos locales: ${(state.bodyweights||[]).length}<br>Días con pasos: ${(state.activity||[]).length}<br>1RM reales: ${(state.real1rms||[]).length}<br>Pendientes de subir: ${pendingW+pendingB+pendingS+pendingA+pendingR+pendingP+pendingC+pendingBlocks}${lastCloudErrors.length?`<br><b>Avisos:</b> ${lastCloudErrors.slice(0,3).map(esc).join(' · ')}`:''}${extra?`<br>${extra}`:""}`;renderHeaderStatus();
 }
-
-async function cloudUpsertSettings(){
-  const payload={
-    id:"shared",
-    athlete1:state.settings.athlete1,
-    athlete2:state.settings.athlete2,
-    goal1:state.settings.goal1===""?null:Number(state.settings.goal1),
-    goal2:state.settings.goal2===""?null:Number(state.settings.goal2),
-    updated_at:new Date().toISOString()
-  };
-  await cloudRequest("iron_block_settings?on_conflict=id",{
-    method:"POST",
-    body:payload,
-    prefer:"resolution=merge-duplicates,return=minimal"
-  });
+async function cloudUpsertSettings(){await cloudRequest("iron_block_settings?on_conflict=id",{method:"POST",body:{id:"shared",athlete1:state.settings.athlete1,athlete2:state.settings.athlete2,goal1:state.settings.goal1===""?null:Number(state.settings.goal1),goal2:state.settings.goal2===""?null:Number(state.settings.goal2),updated_at:new Date().toISOString()},prefer:"resolution=merge-duplicates,return=minimal"})}
+async function cloudUpsertWorkout(w){if(!w.clientUid)w.clientUid=(crypto&&crypto.randomUUID)?crypto.randomUUID():`workout-${Date.now()}-${Math.random().toString(36).slice(2)}`;await cloudRequest("iron_block_workouts?on_conflict=client_uid",{method:"POST",body:{client_uid:w.clientUid,athlete:w.athlete,workout_date:w.date,block_number:blockNumber(w),week:Number(w.week),session:w.session,notes:w.notes||"",exercises:w.exercises||[],is_optional:isOptionalWorkout(w),template_name:w.templateName||optionalTemplateNameFromSession(w.session)||null,is_finalized:isWorkoutFinalized(w),is_void:isWorkoutVoid(w),finalized_at:isWorkoutFinalized(w)?(w.finalizedAt||new Date().toISOString()):null,updated_at:new Date().toISOString()},prefer:"resolution=merge-duplicates,return=minimal"})}
+async function cloudUpsertBodyweight(w){await cloudRequest("iron_block_bodyweights?on_conflict=athlete,weight_date",{method:"POST",body:{athlete:w.athlete,weight_date:w.date,weight:Number(w.weight),updated_at:new Date().toISOString()},prefer:"resolution=merge-duplicates,return=minimal"})}
+async function cloudUpsertActivity(a){await cloudRequest("iron_block_activity?on_conflict=athlete,activity_date",{method:"POST",body:{athlete:a.athlete,activity_date:a.date,steps:Number(a.steps)||0,notes:a.notes||"",updated_at:new Date().toISOString()},prefer:"resolution=merge-duplicates,return=minimal"})}
+async function cloudUpsertRealRM(r){await cloudRequest("iron_block_real_1rm?on_conflict=client_uid",{method:"POST",body:{client_uid:r.clientUid,athlete:r.athlete,exercise_name:r.exercise,variant:r.variant,test_date:r.date,weight:Number(r.weight),bodyweight_at_test:r.bodyweightAtTest==null?null:Number(r.bodyweightAtTest),notes:r.notes||"",updated_at:new Date().toISOString()},prefer:"resolution=merge-duplicates,return=minimal"})}
+async function cloudUpsertWeekProgress(athlete){const p=state.weekProgress?.[athlete];if(!p)return;await cloudRequest("iron_block_week_progress?on_conflict=athlete",{method:"POST",body:{athlete,current_block:Number(p.currentBlock)||1,current_week:Number(p.currentWeek)||1,updated_at:new Date().toISOString()},prefer:"resolution=merge-duplicates,return=minimal"})}
+async function cloudUpsertWeekClosure(c){if(!c)return;await cloudRequest("iron_block_week_closures?on_conflict=athlete,block_number,week",{method:"POST",body:{athlete:c.athlete,block_number:Number(c.block)||1,week:Number(c.week),missed_sessions:c.missedSessions||[],closed_at:c.closedAt||new Date().toISOString(),updated_at:new Date().toISOString()},prefer:"resolution=merge-duplicates,return=minimal"})}
+async function cloudUpsertBlock(b){await cloudRequest("iron_block_blocks?on_conflict=block_number",{method:"POST",body:{block_number:Number(b.number),name:b.name||`Bloque ${b.number}`,weeks:Number(b.weeks)||10,created_at:b.createdAt||new Date().toISOString(),closed_at:b.closedAt||null,updated_at:new Date().toISOString()},prefer:"resolution=merge-duplicates,return=minimal"})}
+async function saveActivityToCloud(rec){rec._cloudDirty=true;save();try{await cloudUpsertActivity(rec);delete rec._cloudDirty;cloudOnline=true;save();renderCloudStatus("Actividad subida.");return true}catch(err){cloudOnline=false;renderCloudStatus("Actividad guardada localmente; pendiente de subir.");return false}}
+async function saveRealRMToCloud(rec){rec._cloudDirty=true;save();try{await cloudUpsertRealRM(rec);delete rec._cloudDirty;cloudOnline=true;save();renderCloudStatus("1RM real subido.");return true}catch(err){cloudOnline=false;renderCloudStatus("1RM real guardado localmente; pendiente de subir.");return false}}
+async function saveWeekProgressToCloud(athlete){const p=state.weekProgress?.[athlete];if(!p)return false;p._cloudDirty=true;save();try{await cloudUpsertWeekProgress(athlete);delete p._cloudDirty;save();return true}catch(e){renderCloudStatus('Progreso semanal pendiente de nube.');return false}}
+async function saveWeekClosureToCloud(c){if(!c)return true;c._cloudDirty=true;save();try{await cloudUpsertWeekClosure(c);delete c._cloudDirty;save();return true}catch(e){renderCloudStatus('Cierre semanal pendiente de nube.');return false}}
+async function saveBlocksToCloud(){let ok=true;for(const b of state.blocks||[]){if(!b._cloudDirty)continue;try{await cloudUpsertBlock(b);delete b._cloudDirty}catch(e){ok=false}}save();return ok}
+async function saveWorkoutToCloud(w,originalKey=null){w._cloudDirty=true;save();try{await cloudUpsertWorkout(w);delete w._cloudDirty;cloudOnline=true;lastCloudSync=Date.now();save();renderCloudStatus("Entrenamiento subido.");return true}catch(err){cloudOnline=false;renderCloudStatus("Entrenamiento guardado localmente; pendiente de subir.");return false}}
+async function saveBodyweightToCloud(rec){rec._cloudDirty=true;save();try{await cloudUpsertBodyweight(rec);delete rec._cloudDirty;cloudOnline=true;lastCloudSync=Date.now();save();renderCloudStatus("Peso subido.");return true}catch(err){cloudOnline=false;renderCloudStatus("Peso guardado localmente; pendiente de subir.");return false}}
+async function saveSettingsToCloud(){state.settings._cloudDirty=true;save();try{await cloudUpsertSettings();delete state.settings._cloudDirty;cloudOnline=true;lastCloudSync=Date.now();save();renderCloudStatus("Ajustes compartidos actualizados.");return true}catch(err){cloudOnline=false;renderCloudStatus("Ajustes guardados localmente; pendientes de subir.");return false}}
+async function tryCloud(label,fn,errors){try{return {ok:true,data:await fn()}}catch(e){errors.push(`${label}: ${String(e.message||e).slice(0,100)}`);return {ok:false,data:null}}}
+async function pushPendingToCloud(errors=[]){
+  if(state.settings?._cloudDirty){const r=await tryCloud('Ajustes',cloudUpsertSettings,errors);if(r.ok){delete state.settings._cloudDirty;save()}}
+  for(const w of (state.workouts||[]).filter(x=>x._cloudDirty)){const r=await tryCloud('Entreno',()=>cloudUpsertWorkout(w),errors);if(r.ok){delete w._cloudDirty;save()}}
+  for(const b of (state.bodyweights||[]).filter(x=>x._cloudDirty)){const r=await tryCloud('Peso',()=>cloudUpsertBodyweight(b),errors);if(r.ok){delete b._cloudDirty;save()}}
+  for(const a of (state.activity||[]).filter(x=>x._cloudDirty)){const r=await tryCloud('Pasos',()=>cloudUpsertActivity(a),errors);if(r.ok){delete a._cloudDirty;save()}}
+  for(const rm of (state.real1rms||[]).filter(x=>x._cloudDirty)){const r=await tryCloud('PR',()=>cloudUpsertRealRM(rm),errors);if(r.ok){delete rm._cloudDirty;save()}}
+  for(const [ath,p] of Object.entries(state.weekProgress||{})){if(p?._cloudDirty){const r=await tryCloud('Progreso',()=>cloudUpsertWeekProgress(ath),errors);if(r.ok){delete p._cloudDirty;save()}}}
+  for(const c of (state.weekClosures||[]).filter(x=>x._cloudDirty)){const r=await tryCloud('Cierre semana',()=>cloudUpsertWeekClosure(c),errors);if(r.ok){delete c._cloudDirty;save()}}
+  for(const b of (state.blocks||[]).filter(x=>x._cloudDirty)){const r=await tryCloud('Bloque',()=>cloudUpsertBlock(b),errors);if(r.ok){delete b._cloudDirty;save()}}
 }
-
-async function cloudUpsertWorkout(w){
-  const payload={
-    athlete:w.athlete,
-    workout_date:w.date,
-    week:Number(w.week),
-    session:w.session,
-    notes:w.notes||"",
-    exercises:w.exercises||[],
-    is_optional:isOptionalWorkout(w),
-    template_name:w.templateName||optionalTemplateNameFromSession(w.session)||null,
-    is_finalized:isWorkoutFinalized(w),
-    finalized_at:isWorkoutFinalized(w)?(w.finalizedAt||new Date().toISOString()):null,
-    updated_at:new Date().toISOString()
-  };
-  await cloudRequest("iron_block_workouts?on_conflict=athlete,workout_date,session",{
-    method:"POST",
-    body:payload,
-    prefer:"resolution=merge-duplicates,return=minimal"
-  });
-}
-
-async function cloudUpsertBodyweight(w){
-  const payload={
-    athlete:w.athlete,
-    weight_date:w.date,
-    weight:Number(w.weight),
-    updated_at:new Date().toISOString()
-  };
-  await cloudRequest("iron_block_bodyweights?on_conflict=athlete,weight_date",{
-    method:"POST",
-    body:payload,
-    prefer:"resolution=merge-duplicates,return=minimal"
-  });
-}
-
-async function cloudUpsertActivity(a){const payload={athlete:a.athlete,activity_date:a.date,steps:Number(a.steps)||0,notes:a.notes||"",updated_at:new Date().toISOString()};await cloudRequest("iron_block_activity?on_conflict=athlete,activity_date",{method:"POST",body:payload,prefer:"resolution=merge-duplicates,return=minimal"})}
-async function saveActivityToCloud(rec){rec._cloudDirty=true;save();try{await cloudUpsertActivity(rec);delete rec._cloudDirty;cloudOnline=true;lastCloudSync=Date.now();save();renderCloudStatus("Actividad subida.");return true}catch(err){cloudOnline=false;renderCloudStatus("Actividad guardada localmente; pendiente de subir.");return false}}
-
-async function cloudUpsertRealRM(r){
-  const payload={client_uid:r.clientUid,athlete:r.athlete,exercise_name:r.exercise,variant:r.variant,test_date:r.date,weight:Number(r.weight),bodyweight_at_test:r.bodyweightAtTest==null?null:Number(r.bodyweightAtTest),notes:r.notes||"",updated_at:new Date().toISOString()};
-  await cloudRequest("iron_block_real_1rm?on_conflict=client_uid",{method:"POST",body:payload,prefer:"resolution=merge-duplicates,return=minimal"});
-}
-async function saveRealRMToCloud(rec){rec._cloudDirty=true;save();try{await cloudUpsertRealRM(rec);delete rec._cloudDirty;cloudOnline=true;lastCloudSync=Date.now();save();renderCloudStatus("1RM real subido.");return true}catch(err){cloudOnline=false;renderCloudStatus("1RM real guardado localmente; pendiente de subir.");return false}}
-
-async function cloudUpsertWeekProgress(athlete){
-  const p=state.weekProgress?.[athlete];if(!p)return;
-  await cloudRequest("iron_block_week_progress?on_conflict=athlete",{method:"POST",body:{athlete,current_week:Number(p.currentWeek)||1,updated_at:new Date().toISOString()},prefer:"resolution=merge-duplicates,return=minimal"});
-}
-async function saveWeekProgressToCloud(athlete){
-  const p=state.weekProgress?.[athlete];if(!p)return false;p._cloudDirty=true;save();
-  try{await cloudUpsertWeekProgress(athlete);delete p._cloudDirty;save();return true}catch(e){return false}
-}
-
-
-async function pushPendingToCloud(){
-  if(state.settings?._cloudDirty){
-    await cloudUpsertSettings();
-    delete state.settings._cloudDirty;
-    save();
-  }
-
-  for(const w of (state.workouts||[]).filter(x=>x._cloudDirty)){
-    await cloudUpsertWorkout(w);
-    delete w._cloudDirty;
-    save();
-  }
-
-  for(const b of (state.bodyweights||[]).filter(x=>x._cloudDirty)){await cloudUpsertBodyweight(b);delete b._cloudDirty;save()}
-  for(const a of (state.activity||[]).filter(x=>x._cloudDirty)){await cloudUpsertActivity(a);delete a._cloudDirty;save()}
-  for(const r of (state.real1rms||[]).filter(x=>x._cloudDirty)){await cloudUpsertRealRM(r);delete r._cloudDirty;save()}
-  for(const [ath,p] of Object.entries(state.weekProgress||{})){if(p?._cloudDirty){await cloudUpsertWeekProgress(ath);delete p._cloudDirty;save()}}
-}
-
-async function seedLocalOnlyRecords(cloudWorkouts,cloudWeights,cloudActivity,cloudRms){
-  const cw=new Set(cloudWorkouts.map(x=>`${x.athlete}|||${x.workout_date}|||${x.session}`));
-  const cb=new Set(cloudWeights.map(x=>`${x.athlete}|||${x.weight_date}`));
-  const ca=new Set((cloudActivity||[]).map(x=>`${x.athlete}|||${x.activity_date}`));
-  const cr=new Set((cloudRms||[]).map(x=>x.client_uid));
-
-  for(const w of state.workouts||[]){
-    if(!cw.has(workoutCloudKey(w))){
-      try{await cloudUpsertWorkout(w)}catch(e){w._cloudDirty=true}
-    }
-  }
-  for(const b of state.bodyweights||[]){if(!cb.has(weightCloudKey(b))){try{await cloudUpsertBodyweight(b)}catch(e){b._cloudDirty=true}}}
-  for(const a of state.activity||[]){const k=`${a.athlete}|||${a.date}`;if(!ca.has(k)){try{await cloudUpsertActivity(a)}catch(e){a._cloudDirty=true}}}
-  for(const r of state.real1rms||[]){if(r.clientUid&&!cr.has(r.clientUid)){try{await cloudUpsertRealRM(r)}catch(e){r._cloudDirty=true}}}
-}
-
-async function pullCloudIntoState(){
-  const [settingsRows,cloudWorkouts,cloudWeights,cloudActivity,cloudRms,cloudProgress]=await Promise.all([
-    cloudRequest("iron_block_settings?id=eq.shared&select=*"),
-    cloudRequest("iron_block_workouts?select=athlete,workout_date,week,session,notes,exercises,is_optional,template_name,is_finalized,finalized_at,updated_at&order=workout_date.asc"),
-    cloudRequest("iron_block_bodyweights?select=athlete,weight_date,weight,updated_at&order=weight_date.asc"),
-    cloudRequest("iron_block_activity?select=athlete,activity_date,steps,notes,updated_at&order=activity_date.asc"),
-    cloudRequest("iron_block_real_1rm?select=client_uid,athlete,exercise_name,variant,test_date,weight,bodyweight_at_test,notes,updated_at&order=test_date.asc"),
-    cloudRequest("iron_block_week_progress?select=athlete,current_week,updated_at")
-  ]);
-  await seedLocalOnlyRecords(cloudWorkouts||[],cloudWeights||[],cloudActivity||[],cloudRms||[]);
-  const [freshSettings,freshWorkouts,freshWeights,freshActivity,freshRms,freshProgress]=await Promise.all([
-    cloudRequest("iron_block_settings?id=eq.shared&select=*"),
-    cloudRequest("iron_block_workouts?select=athlete,workout_date,week,session,notes,exercises,is_optional,template_name,is_finalized,finalized_at,updated_at&order=workout_date.asc"),
-    cloudRequest("iron_block_bodyweights?select=athlete,weight_date,weight,updated_at&order=weight_date.asc"),
-    cloudRequest("iron_block_activity?select=athlete,activity_date,steps,notes,updated_at&order=activity_date.asc"),
-    cloudRequest("iron_block_real_1rm?select=client_uid,athlete,exercise_name,variant,test_date,weight,bodyweight_at_test,notes,updated_at&order=test_date.asc"),
-    cloudRequest("iron_block_week_progress?select=athlete,current_week,updated_at")
-  ]);
-
-  if(freshSettings?.[0] && !state.settings?._cloudDirty){
-    const s=freshSettings[0];state.settings={athlete1:s.athlete1||"Guillem",athlete2:s.athlete2||"Biel",goal1:s.goal1??"95",goal2:s.goal2??"80"};
-  }
-  const stillDirtyW=(state.workouts||[]).filter(x=>x._cloudDirty),stillDirtyB=(state.bodyweights||[]).filter(x=>x._cloudDirty);
-  const mappedW=(freshWorkouts||[]).map(x=>({
-    id:`cloud-${x.athlete}-${x.workout_date}-${x.session}`,athlete:x.athlete,week:Number(x.week),session:x.session,date:x.workout_date,notes:x.notes||"",exercises:Array.isArray(x.exercises)?x.exercises:[],isOptional:!!x.is_optional||String(x.session||"").startsWith("Opcional ·"),templateName:x.template_name||optionalTemplateNameFromSession(x.session)||null,finalized:x.is_finalized!==false,finalizedAt:x.finalized_at||null
-  }));
-  const mappedB=(freshWeights||[]).map(x=>({athlete:x.athlete,date:x.weight_date,weight:Number(x.weight)}));
-  const mappedA=(freshActivity||[]).map(x=>({athlete:x.athlete,date:x.activity_date,steps:Number(x.steps)||0,notes:x.notes||""}));
-  const mappedR=(freshRms||[]).map(x=>({clientUid:x.client_uid,athlete:x.athlete,exercise:x.exercise_name,variant:x.variant,date:x.test_date,weight:Number(x.weight),bodyweightAtTest:x.bodyweight_at_test==null?null:Number(x.bodyweight_at_test),notes:x.notes||""}));
-  const wk=new Set(mappedW.map(workoutCloudKey));stillDirtyW.forEach(x=>{if(!wk.has(workoutCloudKey(x)))mappedW.push(x)});
-  const bk=new Set(mappedB.map(weightCloudKey));stillDirtyB.forEach(x=>{if(!bk.has(weightCloudKey(x)))mappedB.push(x)});
-  const stillDirtyA=(state.activity||[]).filter(x=>x._cloudDirty),ak=new Set(mappedA.map(x=>`${x.athlete}|||${x.date}`));stillDirtyA.forEach(x=>{if(!ak.has(`${x.athlete}|||${x.date}`))mappedA.push(x)});
-  const stillDirtyR=(state.real1rms||[]).filter(x=>x._cloudDirty),rk=new Set(mappedR.map(x=>x.clientUid));stillDirtyR.forEach(x=>{if(!rk.has(x.clientUid))mappedR.push(x)});
-  state.workouts=mappedW;state.bodyweights=mappedB;state.activity=mappedA;state.real1rms=mappedR;
-
-  const localProgress=state.weekProgress||{};state.weekProgress={};
-  (freshProgress||[]).forEach(x=>state.weekProgress[x.athlete]={currentWeek:Number(x.current_week)||1});
-  [state.settings.athlete1,state.settings.athlete2].forEach(ath=>{
-    if(!state.weekProgress[ath]){
-      const local=localProgress[ath];state.weekProgress[ath]={currentWeek:Number(local?.currentWeek)||deriveCurrentWeekFromData(ath),_cloudDirty:true};
-    }
-  });
-  save();
-  for(const [ath,p] of Object.entries(state.weekProgress)){if(p?._cloudDirty){try{await cloudUpsertWeekProgress(ath);delete p._cloudDirty}catch(e){}}}
+async function seedMissingFromLocal(cloud,errors){
+  if(cloud.workouts.ok){const ids=new Set((cloud.workouts.data||[]).map(x=>x.client_uid));for(const w of state.workouts||[]){if(!ids.has(w.clientUid)){const r=await tryCloud('Sembrar entreno',()=>cloudUpsertWorkout(w),errors);if(!r.ok)w._cloudDirty=true}}}
+  if(cloud.weights.ok){const ids=new Set((cloud.weights.data||[]).map(x=>`${x.athlete}|||${x.weight_date}`));for(const b of state.bodyweights||[]){if(!ids.has(weightCloudKey(b))){const r=await tryCloud('Sembrar peso',()=>cloudUpsertBodyweight(b),errors);if(!r.ok)b._cloudDirty=true}}}
+  if(cloud.activity.ok){const ids=new Set((cloud.activity.data||[]).map(x=>`${x.athlete}|||${x.activity_date}`));for(const a of state.activity||[]){if(!ids.has(`${a.athlete}|||${a.date}`)){const r=await tryCloud('Sembrar pasos',()=>cloudUpsertActivity(a),errors);if(!r.ok)a._cloudDirty=true}}}
+  if(cloud.rms.ok){const ids=new Set((cloud.rms.data||[]).map(x=>x.client_uid));for(const rm of state.real1rms||[]){if(rm.clientUid&&!ids.has(rm.clientUid)){const r=await tryCloud('Sembrar PR',()=>cloudUpsertRealRM(rm),errors);if(!r.ok)rm._cloudDirty=true}}}
+  if(cloud.closures.ok){const ids=new Set((cloud.closures.data||[]).map(x=>`${x.athlete}|${x.block_number}|${x.week}`));for(const c of state.weekClosures||[]){if(!ids.has(`${c.athlete}|${c.block}|${c.week}`)){const r=await tryCloud('Sembrar cierre',()=>cloudUpsertWeekClosure(c),errors);if(!r.ok)c._cloudDirty=true}}}
+  if(cloud.blocks.ok){const ids=new Set((cloud.blocks.data||[]).map(x=>Number(x.block_number)));for(const b of state.blocks||[]){if(!ids.has(Number(b.number))){const r=await tryCloud('Sembrar bloque',()=>cloudUpsertBlock(b),errors);if(!r.ok)b._cloudDirty=true}}}
   save();
 }
-
-
-function refreshAthleteSelectorPreserve(){const s=el("athlete");if(!s)return;const previous=s.value||deviceAthlete||state.settings.athlete1;s.innerHTML=`<option>${state.settings.athlete1}</option><option>${state.settings.athlete2}</option>`;if([...s.options].some(o=>o.value===previous))s.value=previous;else if(deviceAthlete&&[...s.options].some(o=>o.value===deviceAthlete))s.value=deviceAthlete;renderDeviceControls();renderDeviceModeNotice()}
+async function fetchCloudModules(errors){return {
+  settings:await tryCloud('Ajustes',()=>cloudRequest('iron_block_settings?id=eq.shared&select=*'),errors),
+  workouts:await tryCloud('Entrenamientos',()=>cloudRequest('iron_block_workouts?select=client_uid,athlete,workout_date,block_number,week,session,notes,exercises,is_optional,template_name,is_finalized,is_void,finalized_at,updated_at&order=workout_date.asc'),errors),
+  weights:await tryCloud('Pesos',()=>cloudRequest('iron_block_bodyweights?select=athlete,weight_date,weight,updated_at&order=weight_date.asc'),errors),
+  activity:await tryCloud('Pasos',()=>cloudRequest('iron_block_activity?select=athlete,activity_date,steps,notes,updated_at&order=activity_date.asc'),errors),
+  rms:await tryCloud('PRs',()=>cloudRequest('iron_block_real_1rm?select=client_uid,athlete,exercise_name,variant,test_date,weight,bodyweight_at_test,notes,updated_at&order=test_date.asc'),errors),
+  progress:await tryCloud('Progreso semanal',()=>cloudRequest('iron_block_week_progress?select=athlete,current_block,current_week,updated_at'),errors),
+  closures:await tryCloud('Cierres semanales',()=>cloudRequest('iron_block_week_closures?select=athlete,block_number,week,missed_sessions,closed_at,updated_at'),errors),
+  blocks:await tryCloud('Bloques',()=>cloudRequest('iron_block_blocks?select=block_number,name,weeks,created_at,closed_at,updated_at&order=block_number.asc'),errors)
+}}
+function mergeCloudIntoState(cloud){
+  if(cloud.settings.ok&&cloud.settings.data?.[0]&&!state.settings?._cloudDirty){const x=cloud.settings.data[0];state.settings={athlete1:x.athlete1||'Guillem',athlete2:x.athlete2||'Biel',goal1:x.goal1??'95',goal2:x.goal2??'80'}}
+  if(cloud.workouts.ok){const dirty=(state.workouts||[]).filter(x=>x._cloudDirty),mapped=(cloud.workouts.data||[]).map(x=>({id:`cloud-${x.client_uid}`,clientUid:x.client_uid,athlete:x.athlete,block:Number(x.block_number)||1,week:Number(x.week),session:x.session,date:x.workout_date,notes:x.notes||'',exercises:Array.isArray(x.exercises)?x.exercises:[],isOptional:!!x.is_optional||String(x.session||'').startsWith('Opcional ·'),templateName:x.template_name||optionalTemplateNameFromSession(x.session)||null,finalized:x.is_finalized!==false,void:!!x.is_void,finalizedAt:x.finalized_at||null}));const ids=new Set(mapped.map(workoutCloudKey));dirty.forEach(x=>{if(!ids.has(workoutCloudKey(x)))mapped.push(x)});state.workouts=mapped}
+  if(cloud.weights.ok){const dirty=(state.bodyweights||[]).filter(x=>x._cloudDirty),mapped=(cloud.weights.data||[]).map(x=>({athlete:x.athlete,date:x.weight_date,weight:Number(x.weight)})),ids=new Set(mapped.map(weightCloudKey));dirty.forEach(x=>{if(!ids.has(weightCloudKey(x)))mapped.push(x)});state.bodyweights=mapped}
+  if(cloud.activity.ok){const dirty=(state.activity||[]).filter(x=>x._cloudDirty),mapped=(cloud.activity.data||[]).map(x=>({athlete:x.athlete,date:x.activity_date,steps:Number(x.steps)||0,notes:x.notes||''})),ids=new Set(mapped.map(x=>`${x.athlete}|${x.date}`));dirty.forEach(x=>{if(!ids.has(`${x.athlete}|${x.date}`))mapped.push(x)});state.activity=mapped}
+  if(cloud.rms.ok){const dirty=(state.real1rms||[]).filter(x=>x._cloudDirty),mapped=(cloud.rms.data||[]).map(x=>({clientUid:x.client_uid,athlete:x.athlete,exercise:x.exercise_name,variant:x.variant,date:x.test_date,weight:Number(x.weight),bodyweightAtTest:x.bodyweight_at_test==null?null:Number(x.bodyweight_at_test),notes:x.notes||''})),ids=new Set(mapped.map(x=>x.clientUid));dirty.forEach(x=>{if(!ids.has(x.clientUid))mapped.push(x)});state.real1rms=mapped}
+  if(cloud.blocks.ok&&cloud.blocks.data?.length){const dirty=(state.blocks||[]).filter(x=>x._cloudDirty),mapped=cloud.blocks.data.map(x=>({number:Number(x.block_number),name:x.name||`Bloque ${x.block_number}`,weeks:Number(x.weeks)||10,createdAt:x.created_at||null,closedAt:x.closed_at||null})),ids=new Set(mapped.map(x=>x.number));dirty.forEach(x=>{if(!ids.has(Number(x.number)))mapped.push(x)});state.blocks=mapped.sort((a,b)=>a.number-b.number)}
+  if(cloud.closures.ok){const dirty=(state.weekClosures||[]).filter(x=>x._cloudDirty),mapped=(cloud.closures.data||[]).map(x=>({athlete:x.athlete,block:Number(x.block_number)||1,week:Number(x.week),missedSessions:Array.isArray(x.missed_sessions)?x.missed_sessions:[],closedAt:x.closed_at||null})),ids=new Set(mapped.map(x=>`${x.athlete}|${x.block}|${x.week}`));dirty.forEach(x=>{if(!ids.has(`${x.athlete}|${x.block}|${x.week}`))mapped.push(x)});state.weekClosures=mapped}
+  if(cloud.progress.ok){
+    const local=state.weekProgress||{},cloudRows=new Map((cloud.progress.data||[]).map(x=>[x.athlete,{block:Number(x.current_block)||1,week:Number(x.current_week)||1}]));state.weekProgress={};
+    [state.settings.athlete1,state.settings.athlete2].forEach(ath=>{
+      const c=cloudRows.get(ath)||{block:1,week:1},l={block:Number(local[ath]?.currentBlock)||1,week:Number(local[ath]?.currentWeek)||1},d=deriveCurrentPositionFromData(ath);
+      let best=c;for(const candidate of [l,d])if(positionCompare(candidate.block,candidate.week,best.block,best.week)>0)best=candidate;
+      const differs=best.block!==c.block||best.week!==c.week;state.weekProgress[ath]={currentBlock:best.block,currentWeek:best.week,...(differs?{_cloudDirty:true}:{})};
+    });
+  }
+  state=migrateState(state);save();
+}
 async function syncCloud({quiet=false}={}){
-  if(cloudSyncing)return;
-  cloudSyncing=true;
-  renderCloudStatus();
-
-  try{
-    await pushPendingToCloud();
-    await pullCloudIntoState();
-    cloudOnline=true;
-    lastCloudSync=Date.now();
-
-    refreshAthleteSelectorPreserve();
-    if(!firstCloudWeekApplied){programmaticWorkoutLoad=true;el("week").value=String(currentWeekFor(el("athlete").value));if(!isOptionalSessionName(el("session").value))renderWorkout();programmaticWorkoutLoad=false;firstCloudWeekApplied=true}
-    renderHistory();
-    renderAnalytics();
-    renderWeekStatus();
-    renderPendingFinalize();
-    renderCalendar();
-    renderCloudStatus("Sincronización completada.");
-    setWorkoutDockStatus("✓ Nube sincronizada.","ok");
-    if(!quiet)alert("Cloud Sync completado.");
-  }catch(err){
-    console.error("Cloud sync error",err);
-    cloudOnline=false;
-    renderCloudStatus(`Último error: ${String(err.message||err).slice(0,180)}`);
-    if(!quiet)alert("No se pudo sincronizar con la nube. Los datos locales siguen guardados.");
-  }finally{
-    cloudSyncing=false;
-    renderCloudStatus();
-  }
+  if(cloudSyncing)return;cloudSyncing=true;lastCloudErrors=[];renderCloudStatus();const errors=[];
+  await pushPendingToCloud(errors);let cloud=await fetchCloudModules(errors);await seedMissingFromLocal(cloud,errors);cloud=await fetchCloudModules(errors);mergeCloudIntoState(cloud);
+  cloudPartial=errors.length>0;cloudOnline=cloud.workouts.ok||cloud.settings.ok;lastCloudErrors=[...new Set(errors)];lastCloudSync=Date.now();
+  refreshAthleteSelectorPreserve();updateBlockSelector();if(!firstCloudWeekApplied){programmaticWorkoutLoad=true;const ath=el('athlete').value;el('block').value=String(currentBlockFor(ath));el('week').value=String(currentWeekFor(ath));if(!isOptionalSessionName(el('session').value))renderWorkout();programmaticWorkoutLoad=false;firstCloudWeekApplied=true}
+  renderHistory();renderAnalytics();renderWeekStatus();renderPendingFinalize();renderCalendar();renderBlocksManager();renderAIControls();cloudSyncing=false;renderCloudStatus(errors.length?'Sincronizado con algunos avisos.':'Sincronización completada.');setWorkoutDockStatus(errors.length?'⚠ Nube parcial · datos locales protegidos.':'✓ Nube sincronizada.',errors.length?'warn':'ok');if(!quiet)alert(errors.length?`Cloud Sync completado con ${errors.length} aviso${errors.length===1?'':'s'}. Los datos locales siguen protegidos.`:'Cloud Sync completado.');
 }
-
-function encodeFilter(v){return encodeURIComponent(String(v))}
-async function cloudPatchWorkout(originalKey,w){
-  const [ath,date,session]=String(originalKey).split('|||');
-  const payload={athlete:w.athlete,workout_date:w.date,week:Number(w.week),session:w.session,notes:w.notes||"",exercises:w.exercises||[],is_optional:isOptionalWorkout(w),template_name:w.templateName||optionalTemplateNameFromSession(w.session)||null,is_finalized:isWorkoutFinalized(w),finalized_at:isWorkoutFinalized(w)?(w.finalizedAt||new Date().toISOString()):null,updated_at:new Date().toISOString()};
-  await cloudRequest(`iron_block_workouts?athlete=eq.${encodeFilter(ath)}&workout_date=eq.${encodeFilter(date)}&session=eq.${encodeFilter(session)}`,{method:"PATCH",body:payload,prefer:"return=minimal"});
-}
-async function saveWorkoutToCloud(w,originalKey=null){
-  w._cloudDirty=true;save();
-  try{
-    if(originalKey&&originalKey!==workoutCloudKey(w))await cloudPatchWorkout(originalKey,w);else await cloudUpsertWorkout(w);
-    delete w._cloudDirty;cloudOnline=true;lastCloudSync=Date.now();save();renderCloudStatus("Entrenamiento subido.");return true;
-  }catch(err){cloudOnline=false;renderCloudStatus("Entrenamiento guardado localmente; pendiente de subir.");return false}
-}
-
-
-async function saveBodyweightToCloud(rec){
-  rec._cloudDirty=true;
-  save();
-  try{
-    await cloudUpsertBodyweight(rec);
-    delete rec._cloudDirty;
-    cloudOnline=true;
-    lastCloudSync=Date.now();
-    save();
-    renderCloudStatus("Peso subido.");
-    return true;
-  }catch(err){
-    cloudOnline=false;
-    renderCloudStatus("Peso guardado localmente; pendiente de subir.");
-    return false;
-  }
-}
-
-async function saveSettingsToCloud(){
-  state.settings._cloudDirty=true;
-  save();
-  try{
-    await cloudUpsertSettings();
-    delete state.settings._cloudDirty;
-    cloudOnline=true;
-    lastCloudSync=Date.now();
-    save();
-    renderCloudStatus("Ajustes compartidos actualizados.");
-    return true;
-  }catch(err){
-    cloudOnline=false;
-    renderCloudStatus("Ajustes guardados localmente; pendientes de subir.");
-    return false;
-  }
-}
-
 
 const deviceAthleteKey="ironBlockDeviceAthlete";
 let deviceAthlete=localStorage.getItem(deviceAthleteKey)||"";
 function setWorkoutDockStatus(message,type="normal"){const node=el("workoutDockStatus");if(!node)return;node.textContent=message;node.style.color=type==="ok"?"var(--accent)":type==="warn"?"var(--warn)":type==="bad"?"var(--danger)":"var(--muted)"}
-function saveDeviceAthleteValue(name){deviceAthlete=name;localStorage.setItem(deviceAthleteKey,name);renderDeviceControls();renderDeviceModeNotice();const s=el("athlete");if(s&&[...s.options].some(o=>o.value===name)){s.value=name;renderWorkout();renderHistory();renderAnalytics()}}
+function saveDeviceAthleteValue(name){
+  deviceAthlete=name;localStorage.setItem(deviceAthleteKey,name);renderDeviceControls();renderDeviceModeNotice();const s=el('athlete');
+  if(s&&[...s.options].some(o=>o.value===name)){
+    s.value=name;programmaticWorkoutLoad=true;updateBlockSelector();el('block').value=String(currentBlockFor(name));el('week').value=String(currentWeekFor(name));renderWorkout();programmaticWorkoutLoad=false;
+    renderHistory();renderAnalytics();renderWeekStatus();renderCalendarControls();renderHeaderStatus();
+  }
+}
+function refreshAthleteSelectorPreserve(){
+  const s=el('athlete');if(!s)return;const previous=s.value||deviceAthlete||state.settings.athlete1;
+  s.innerHTML=`<option>${state.settings.athlete1}</option><option>${state.settings.athlete2}</option>`;
+  if([...s.options].some(o=>o.value===previous))s.value=previous;else if(deviceAthlete&&[...s.options].some(o=>o.value===deviceAthlete))s.value=deviceAthlete;else s.value=state.settings.athlete1;
+  renderDeviceControls();renderDeviceModeNotice();updateBlockSelector();renderHeaderStatus();
+}
 function renderDeviceControls(){const s=el("deviceAthleteSelect");if(!s)return;const current=deviceAthlete;s.innerHTML=`<option>${state.settings.athlete1}</option><option>${state.settings.athlete2}</option>`;if([...s.options].some(o=>o.value===current))s.value=current}
 function ensureDeviceAthlete(){const valid=[state.settings.athlete1,state.settings.athlete2];if(deviceAthlete&&valid.includes(deviceAthlete))return true;deviceAthlete="";const modal=el("deviceModal"),choices=el("deviceModalChoices");if(modal&&choices){choices.innerHTML=valid.map(n=>`<button class="btn" type="button" data-device-choice="${n}">${n}</button>`).join("");choices.querySelectorAll("[data-device-choice]").forEach(b=>b.addEventListener("click",()=>{saveDeviceAthleteValue(b.dataset.deviceChoice);modal.classList.add("hidden")}));modal.classList.remove("hidden")}return false}
 function renderDeviceModeNotice(){const n=el("deviceModeNotice");if(!n)return;const selected=el("athlete")?.value;if(!deviceAthlete){n.textContent="Aún no has elegido el perfil predeterminado de este dispositivo.";n.classList.remove("hidden");return}if(selected&&selected!==deviceAthlete){n.innerHTML=`<b>Este dispositivo: ${deviceAthlete}</b> · Perfil activo: <b>${selected}</b>. Puedes editarlo y guardar normalmente. Al volver a abrir la app se seleccionará ${deviceAthlete}.`;n.classList.remove("hidden")}else{n.innerHTML=`<b>Este dispositivo: ${deviceAthlete}</b> · Perfil activo: ${deviceAthlete}.`;n.classList.remove("hidden")}}
-function todayISO(){ return new Date().toISOString().slice(0,10); }
+function todayISO(){
+  const d=new Date();
+  const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),day=String(d.getDate()).padStart(2,'0');
+  return `${y}-${m}-${day}`;
+}
 
 const el=id=>document.getElementById(id);
 
@@ -1308,117 +1194,172 @@ let conflictResolver=null;
 let calendarCursor=new Date();
 let calendarSelectedDate=todayISO();
 
-function isWorkoutFinalized(w){return w?.finalized!==false}
-function finalizedScheduledWorkouts(ath,week=null){return state.workouts.filter(w=>w.athlete===ath&&!isOptionalWorkout(w)&&scheduledSessions.includes(w.session)&&isWorkoutFinalized(w)&&(week==null||Number(w.week)===Number(week)))}
-function weekFinalizedSessionSet(ath,week){return new Set(finalizedScheduledWorkouts(ath,week).map(w=>w.session))}
-function weekFinalizedCount(ath,week){return weekFinalizedSessionSet(ath,week).size}
-function weekFinalizedExtras(ath,week){return state.workouts.filter(w=>w.athlete===ath&&Number(w.week)===Number(week)&&isOptionalWorkout(w)&&isWorkoutFinalized(w)).length}
-function deriveCurrentWeekFromData(ath){
-  const ws=finalizedScheduledWorkouts(ath);if(!ws.length)return 1;
-  const maxWeek=Math.max(...ws.map(w=>Number(w.week)||1));
-  if(maxWeek<10&&weekFinalizedCount(ath,maxWeek)>=4)return maxWeek+1;
-  return Math.max(1,Math.min(10,maxWeek));
+const BLOCK_WEEKS=10;
+function isWorkoutVoid(w){return !!w?.void}
+function isWorkoutFinalized(w){return w?.finalized!==false&&!isWorkoutVoid(w)}
+function blockNumber(w){return Math.max(1,Number(w?.block)||1)}
+function globalWeekNumber(block,week){return (Math.max(1,Number(block))-1)*BLOCK_WEEKS+Math.max(1,Number(week)||1)}
+function ensureBlocks(){if(!Array.isArray(state.blocks)||!state.blocks.length)state.blocks=[{number:1,name:"Bloque 1",weeks:10,createdAt:null,closedAt:null}];state.blocks.sort((a,b)=>a.number-b.number)}
+function blockMeta(num){ensureBlocks();return state.blocks.find(b=>Number(b.number)===Number(num))||{number:Number(num)||1,name:`Bloque ${Number(num)||1}`,weeks:10}}
+function positionKey(block,week){return `${Number(block)||1}|||${Number(week)||1}`}
+function positionCompare(aBlock,aWeek,bBlock,bWeek){return globalWeekNumber(aBlock,aWeek)-globalWeekNumber(bBlock,bWeek)}
+function finalizedScheduledWorkouts(ath,block=null,week=null){return state.workouts.filter(w=>w.athlete===ath&&!isOptionalWorkout(w)&&scheduledSessions.includes(w.session)&&isWorkoutFinalized(w)&&(block==null||blockNumber(w)===Number(block))&&(week==null||Number(w.week)===Number(week)))}
+function weekFinalizedSessionSet(ath,block,week){return new Set(finalizedScheduledWorkouts(ath,block,week).map(w=>w.session))}
+function weekFinalizedCount(ath,block,week){return weekFinalizedSessionSet(ath,block,week).size}
+function weekFinalizedExtras(ath,block,week){return state.workouts.filter(w=>w.athlete===ath&&blockNumber(w)===Number(block)&&Number(w.week)===Number(week)&&isOptionalWorkout(w)&&isWorkoutFinalized(w)).length}
+function weekClosureFor(ath,block,week){return (state.weekClosures||[]).find(x=>x.athlete===ath&&Number(x.block)===Number(block)&&Number(x.week)===Number(week))||null}
+function isWeekClosed(ath,block,week){return weekFinalizedCount(ath,block,week)>=4||!!weekClosureFor(ath,block,week)}
+function missedSessionsForWeek(ath,block,week){const done=weekFinalizedSessionSet(ath,block,week);return scheduledSessions.filter(s=>!done.has(s))}
+function closeWeekLocal(ath,block,week){
+  if(weekFinalizedCount(ath,block,week)>=4)return null;
+  let row=weekClosureFor(ath,block,week);const missed=missedSessionsForWeek(ath,block,week),now=new Date().toISOString();
+  if(!row){row={athlete:ath,block:Number(block),week:Number(week),missedSessions:missed,closedAt:now,_cloudDirty:true};state.weekClosures.push(row)}
+  else{row.missedSessions=missed;row.closedAt=row.closedAt||now;row._cloudDirty=true}
+  save();return row;
+}
+function deriveCurrentPositionFromData(ath){
+  const positions=[];
+  finalizedScheduledWorkouts(ath).forEach(w=>positions.push({block:blockNumber(w),week:Number(w.week)||1}));
+  (state.weekClosures||[]).filter(x=>x.athlete===ath).forEach(x=>positions.push({block:Number(x.block)||1,week:Number(x.week)||1}));
+  if(!positions.length)return {block:1,week:1};
+  positions.sort((a,b)=>positionCompare(a.block,a.week,b.block,b.week));let p=positions[positions.length-1];
+  if(isWeekClosed(ath,p.block,p.week)){
+    if(p.week<BLOCK_WEEKS)return {block:p.block,week:p.week+1};
+    const next=state.blocks?.find(b=>Number(b.number)===p.block+1);if(next)return {block:p.block+1,week:1};
+  }
+  return p;
 }
 function ensureWeekProgressState(){
-  if(!state.weekProgress||typeof state.weekProgress!=="object")state.weekProgress={};
-  [state.settings.athlete1,state.settings.athlete2].forEach(ath=>{if(!state.weekProgress[ath])state.weekProgress[ath]={currentWeek:deriveCurrentWeekFromData(ath),_cloudDirty:true}});
+  if(!state.weekProgress||typeof state.weekProgress!=="object")state.weekProgress={};ensureBlocks();
+  [state.settings.athlete1,state.settings.athlete2].forEach(ath=>{if(!state.weekProgress[ath]){const p=deriveCurrentPositionFromData(ath);state.weekProgress[ath]={currentBlock:p.block,currentWeek:p.week,_cloudDirty:true}}else{state.weekProgress[ath].currentBlock=Number(state.weekProgress[ath].currentBlock)||1;state.weekProgress[ath].currentWeek=Math.max(1,Math.min(BLOCK_WEEKS,Number(state.weekProgress[ath].currentWeek)||1))}})
 }
-function currentWeekFor(ath){ensureWeekProgressState();return Math.max(1,Math.min(10,Number(state.weekProgress[ath]?.currentWeek)||deriveCurrentWeekFromData(ath)))}
-function setCurrentWeekFor(ath,week,{dirty=true}={}){ensureWeekProgressState();state.weekProgress[ath].currentWeek=Math.max(1,Math.min(10,Number(week)||1));if(dirty)state.weekProgress[ath]._cloudDirty=true;save();renderWeekStatus()}
-function mainWorkoutFor(ath,week,session){return state.workouts.filter(w=>w.athlete===ath&&Number(w.week)===Number(week)&&w.session===session&&!isOptionalWorkout(w)).sort((a,b)=>String(b.finalizedAt||b.date).localeCompare(String(a.finalizedAt||a.date)))[0]||null}
+function currentBlockFor(ath){ensureWeekProgressState();return Math.max(1,Number(state.weekProgress[ath]?.currentBlock)||1)}
+function currentWeekFor(ath){ensureWeekProgressState();return Math.max(1,Math.min(BLOCK_WEEKS,Number(state.weekProgress[ath]?.currentWeek)||1))}
+function setCurrentPositionFor(ath,block,week,{dirty=true}={}){ensureWeekProgressState();state.weekProgress[ath].currentBlock=Math.max(1,Number(block)||1);state.weekProgress[ath].currentWeek=Math.max(1,Math.min(BLOCK_WEEKS,Number(week)||1));if(dirty)state.weekProgress[ath]._cloudDirty=true;save();renderWeekStatus();renderHeaderStatus()}
+function setCurrentWeekFor(ath,week,{dirty=true}={}){setCurrentPositionFor(ath,currentBlockFor(ath),week,{dirty})}
+function mainWorkoutFor(ath,block,week,session){return state.workouts.filter(w=>w.athlete===ath&&blockNumber(w)===Number(block)&&Number(w.week)===Number(week)&&w.session===session&&!isOptionalWorkout(w)).sort((a,b)=>String(b.finalizedAt||b.date).localeCompare(String(a.finalizedAt||a.date)))[0]||null}
 function exactWorkoutFor(w){return state.workouts.find(x=>workoutCloudKey(x)===workoutCloudKey(w))||null}
-function pendingSavedWorkouts(){return state.workouts.filter(w=>!isWorkoutFinalized(w))}
-
+function pendingSavedWorkouts(){return state.workouts.filter(w=>!isWorkoutFinalized(w)&&!isWorkoutVoid(w)&&workoutPerformedSetCount(w)>0)}
+function updateBlockSelector(){const s=el('block');if(!s)return;ensureBlocks();const old=Number(s.value)||currentBlockFor(el('athlete')?.value||state.settings.athlete1);s.innerHTML=state.blocks.map(b=>`<option value="${b.number}">${esc(b.name||`Bloque ${b.number}`)}</option>`).join('');s.value=String(state.blocks.some(b=>Number(b.number)===old)?old:currentBlockFor(el('athlete')?.value||state.settings.athlete1))}
+function renderHeaderStatus(){
+  const ath=el('athlete')?.value||deviceAthlete||state.settings.athlete1,b=currentBlockFor(ath),w=currentWeekFor(ath),txt=`Bloque ${b} · Semana ${w}/${BLOCK_WEEKS} · Global ${globalWeekNumber(b,w)}`;
+  if(el('headerBlockWeek'))el('headerBlockWeek').textContent=txt;if(el('menuBlockWeek'))el('menuBlockWeek').textContent=txt;
+  const dot=el('headerCloudDot'),ct=el('headerCloudText'),pending=(state.workouts||[]).filter(x=>x._cloudDirty).length+(state.bodyweights||[]).filter(x=>x._cloudDirty).length+(state.activity||[]).filter(x=>x._cloudDirty).length+(state.real1rms||[]).filter(x=>x._cloudDirty).length+(state.weekClosures||[]).filter(x=>x._cloudDirty).length+(state.blocks||[]).filter(x=>x._cloudDirty).length+Object.values(state.weekProgress||{}).filter(x=>x?._cloudDirty).length+(state.settings?._cloudDirty?1:0);
+  if(dot){dot.className='cloud-dot'+(cloudSyncing||cloudPartial||pending?'':cloudOnline?' online':' offline')}
+  if(ct)ct.textContent=cloudSyncing?'Sincronizando':cloudPartial||pending?`${pending||'!'} pendiente${pending===1?'':'s'}`:cloudOnline?'Nube OK':'Local';
+}
 function renderWeekStatus(){
   const box=el("weekStatusCard");if(!box||!el("athlete"))return;
-  const ath=el("athlete").value,current=currentWeekFor(ath),doneSet=weekFinalizedSessionSet(ath,current),done=doneSet.size,extras=weekFinalizedExtras(ath,current),complete=done>=4;
-  const pct=Math.min(100,done/4*100),selected=Number(el("week")?.value)||current;
-  box.innerHTML=`<div class="week-status-top"><div><div class="week-status-title">SEMANA ${current} / 10</div><div class="week-status-count">${complete&&current===10?'Bloque completado':`${done} / 4 entrenamientos finalizados${extras?` · +${extras} extra${extras===1?'':'s'}`:''}`}${selected!==current?` · Viendo semana ${selected}`:''}</div></div><div class="badge ${complete?'green':''}">${complete?'4/4':'EN CURSO'}</div></div><div class="week-progress-track"><div class="week-progress-fill" style="width:${pct}%"></div></div><div class="session-chip-row">${scheduledSessions.map(s=>`<button class="session-chip ${doneSet.has(s)?'done':''}" data-week-session="${s}">${s} ${doneSet.has(s)?'✓':'○'}</button>`).join('')}</div>`;
-  box.querySelectorAll('[data-week-session]').forEach(b=>b.addEventListener('click',()=>{
-    const ses=b.dataset.weekSession,existing=mainWorkoutFor(ath,current,ses);
-    if(existing&&isWorkoutFinalized(existing))openStoredWorkout(existing,false);else{clearHistoricalMode();programmaticWorkoutLoad=true;el('week').value=String(current);ensureSessionOption(ses);renderWorkout();programmaticWorkoutLoad=false}
-  }));
+  const ath=el("athlete").value,b=currentBlockFor(ath),current=currentWeekFor(ath),doneSet=weekFinalizedSessionSet(ath,b,current),done=doneSet.size,extras=weekFinalizedExtras(ath,b,current),closed=weekClosureFor(ath,b,current),complete=done>=4;
+  const pct=Math.min(100,done/4*100),selected=Number(el("week")?.value)||current,selectedBlock=Number(el('block')?.value)||b,missed=closed?.missedSessions||[];
+  box.innerHTML=`<div class="week-status-top"><div><div class="week-status-title">BLOQUE ${b} · SEMANA ${current} / ${BLOCK_WEEKS}</div><div class="week-status-count">Semana global ${globalWeekNumber(b,current)} · ${done} / 4 finalizados${extras?` · +${extras} extra${extras===1?'':'s'}`:''}${selected!==current||selectedBlock!==b?` · Viendo B${selectedBlock} S${selected}`:''}</div></div><div class="badge ${complete?'green':''}">${complete?'4/4':closed?'CERRADA':'EN CURSO'}</div></div><div class="week-progress-track"><div class="week-progress-fill" style="width:${pct}%"></div></div><div class="session-chip-row">${scheduledSessions.map(s=>`<button class="session-chip ${doneSet.has(s)?'done':''}" data-week-session="${s}">${s} ${doneSet.has(s)?'✓':missed.includes(s)?'—':'○'}</button>`).join('')}</div>${missed.length?`<div class="week-close-row"><span class="small">No realizados:</span>${missed.map(x=>`<span class="missed-chip">${x}</span>`).join('')}</div>`:''}${!complete&&!closed?`<div class="week-close-row"><button class="btn secondary" id="closeIncompleteWeek">Cerrar semana ${current} y continuar</button><span class="small">Los entrenos pendientes quedarán como NO REALIZADOS, sin crear sesiones vacías.</span></div>`:''}${(complete||closed)&&current===10?`<div class="week-close-row"><button class="btn" id="createNextBlock">Crear siguiente bloque</button></div>`:''}`;
+  box.querySelectorAll('[data-week-session]').forEach(btn=>btn.addEventListener('click',()=>{const ses=btn.dataset.weekSession,existing=mainWorkoutFor(ath,b,current,ses);if(existing&&isWorkoutFinalized(existing))openStoredWorkout(existing,false);else{clearHistoricalMode();programmaticWorkoutLoad=true;el('block').value=String(b);el('week').value=String(current);ensureSessionOption(ses);renderWorkout();programmaticWorkoutLoad=false}}));
+  el('closeIncompleteWeek')?.addEventListener('click',()=>closeCurrentWeekAndAdvance(ath));el('createNextBlock')?.addEventListener('click',()=>createNextBlock());renderHeaderStatus();
 }
+async function closeCurrentWeekAndAdvance(ath){
+  const b=currentBlockFor(ath),w=currentWeekFor(ath),missing=missedSessionsForWeek(ath,b,w);if(!missing.length)return;
+  if(!confirm(`Cerrar Bloque ${b} · Semana ${w} con ${weekFinalizedCount(ath,b,w)}/4?
 
-function applyCurrentWeekToUI({force=false}={}){
-  if(!el('athlete')||!el('week'))return;const ath=el('athlete').value,w=currentWeekFor(ath);
-  if(force||!el('week').value){programmaticWorkoutLoad=true;el('week').value=String(w);if(!isOptionalSessionName(el('session').value))renderWorkout();programmaticWorkoutLoad=false}
-  renderWeekStatus();
+No realizados: ${missing.join(', ')}
+
+No se crearán entrenamientos vacíos.`))return;
+  const row=closeWeekLocal(ath,b,w);await saveWeekClosureToCloud(row);
+  if(w<BLOCK_WEEKS){setCurrentPositionFor(ath,b,w+1);await saveWeekProgressToCloud(ath);programmaticWorkoutLoad=true;el('block').value=String(b);el('week').value=String(w+1);ensureSessionOption('Upper A');renderWorkout();programmaticWorkoutLoad=false;showCompletion('SEMANA CERRADA',`Bloque ${b} · Semana ${w}: <b>${weekFinalizedCount(ath,b,w)}/4</b>.<br>${missing.join(', ')} queda${missing.length===1?'':'n'} como NO REALIZADO${missing.length===1?'':'S'}.`,'→')}
+  else{showCompletion('BLOQUE CERRADO',`Bloque ${b} finalizado con la semana 10 incompleta.<br>Puedes crear el siguiente bloque sin fabricar entrenamientos vacíos.`,'🏁')}
+  renderWeekStatus();renderAnalytics();renderCalendar();
 }
+async function createNextBlock(){
+  const ath=el('athlete')?.value||state.settings.athlete1,b=currentBlockFor(ath),w=currentWeekFor(ath);if(w!==10||!isWeekClosed(ath,b,10)){alert('Primero completa o cierra la semana 10.');return false}
+  const next=b+1;ensureBlocks();if(!state.blocks.some(x=>Number(x.number)===next))state.blocks.push({number:next,name:`Bloque ${next}`,weeks:10,createdAt:new Date().toISOString(),closedAt:null,_cloudDirty:true});
+  setCurrentPositionFor(ath,next,1);
+  const meta=state.blocks.find(x=>Number(x.number)===b),allPast=[state.settings.athlete1,state.settings.athlete2].every(a=>currentBlockFor(a)>b);if(meta&&allPast&&!meta.closedAt){meta.closedAt=new Date().toISOString();meta._cloudDirty=true}
+  updateBlockSelector();el('block').value=String(next);el('week').value='1';ensureSessionOption('Upper A');renderWorkout();renderBlocksManager();await saveBlocksToCloud();await saveWeekProgressToCloud(ath);showCompletion(`BLOQUE ${next} CREADO`,`Empieza <b>Bloque ${next} · Semana 1/10</b> · Semana global ${globalWeekNumber(next,1)}.<br>El historial anterior queda intacto.`,'🚀');return true
+}
+function exportBlockBackup(block){
+  const n=Number(block)||1,workouts=state.workouts.filter(w=>blockNumber(w)===n),closures=(state.weekClosures||[]).filter(c=>Number(c.block)===n),dates=workouts.map(w=>w.date).filter(Boolean).sort(),start=dates[0]||null,end=dates[dates.length-1]||null;
+  const payload={format:'IRON_BLOCK_V5_BLOCK_BACKUP',exportedAt:new Date().toISOString(),block:blockMeta(n),workouts,weekClosures:closures,bodyweights:start?state.bodyweights.filter(x=>x.date>=start&&x.date<=end):[],activity:start?state.activity.filter(x=>x.date>=start&&x.date<=end):[],real1rms:start?state.real1rms.filter(x=>x.date>=start&&x.date<=end):[]};
+  const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`iron-block-bloque-${n}-backup.json`;a.click();URL.revokeObjectURL(a.href);
+}
+function renderBlocksManager(){
+  const box=el('blockManager');if(!box)return;ensureBlocks();const ath=el('athlete')?.value||state.settings.athlete1,active=currentBlockFor(ath);
+  box.innerHTML=state.blocks.map(b=>`<div class="block-card ${Number(b.number)===active?'active':''}"><div class="row" style="justify-content:space-between"><div><b>${esc(b.name||`Bloque ${b.number}`)}</b><div class="small">Semanas globales ${(b.number-1)*10+1}-${b.number*10}${b.closedAt?' · cerrado':''}</div></div><span class="block-chip">${Number(b.number)===active?'ACTIVO':'HISTÓRICO'}</span></div><div class="row" style="margin-top:9px"><button class="btn secondary" data-export-block="${b.number}">Exportar backup del bloque</button></div></div>`).join('');
+  box.querySelectorAll('[data-export-block]').forEach(btn=>btn.addEventListener('click',()=>exportBlockBackup(Number(btn.dataset.exportBlock))));
+}
+async function ensureAdvanceAllowed(ath,targetBlock,targetWeek){
+  const cb=currentBlockFor(ath),cw=currentWeekFor(ath);if(positionCompare(targetBlock,targetWeek,cb,cw)<=0)return true;
+  if(Number(targetBlock)!==cb){alert('Para avanzar a otro bloque usa “Crear siguiente bloque” al cerrar la semana 10.');return false}
+  const incom=[];for(let w=cw;w<targetWeek;w++){if(!isWeekClosed(ath,cb,w))incom.push({week:w,done:weekFinalizedCount(ath,cb,w),missing:missedSessionsForWeek(ath,cb,w)})}
+  if(incom.length){const txt=incom.map(x=>`Semana ${x.week}: ${x.done}/4 · falta ${x.missing.join(', ')}`).join('\n');if(!confirm(`Vas a avanzar dejando semanas incompletas:
 
+${txt}
+
+Se cerrarán como NO REALIZADAS las sesiones pendientes. ¿Continuar?`)){return false}for(const x of incom){const row=closeWeekLocal(ath,cb,x.week);if(row)await saveWeekClosureToCloud(row)}}
+  setCurrentPositionFor(ath,cb,targetWeek);await saveWeekProgressToCloud(ath);return true;
+}
+function applyCurrentWeekToUI({force=false}={}){if(!el('athlete')||!el('week'))return;const ath=el('athlete').value,b=currentBlockFor(ath),w=currentWeekFor(ath);updateBlockSelector();if(force||!el('week').value){programmaticWorkoutLoad=true;el('block').value=String(b);el('week').value=String(w);if(!isOptionalSessionName(el('session').value))renderWorkout();programmaticWorkoutLoad=false}renderWeekStatus();renderBlocksManager()}
 function clearHistoricalMode(){
   loadedWorkoutOriginalKey=null;loadedWorkoutObject=null;historicalReadOnly=false;
   el('historicalModeBar')?.classList.add('hidden');el('today')?.classList.remove('readonly-workout');
   setWorkoutFormDisabled(false);
 }
 function setWorkoutFormDisabled(disabled){
-  ['athlete','week','session','date','sessionNotes','addExerciseBtn','loadPrevious','saveWorkout','finishWorkout'].forEach(id=>{const n=el(id);if(n)n.disabled=disabled});
+  ['athlete','block','week','session','date','sessionNotes','addExerciseBtn','loadPrevious','loadPreviousTop','saveWorkout','finishWorkout'].forEach(id=>{const n=el(id);if(n)n.disabled=disabled});
   document.querySelectorAll('#exerciseList input,#exerciseList select,#exerciseList button').forEach(n=>n.disabled=disabled);
   if(el('dockSaveWorkout'))el('dockSaveWorkout').disabled=disabled;if(el('dockFinishWorkout'))el('dockFinishWorkout').disabled=disabled;
 }
 function setHistoricalMode(w,readonly=true){
   loadedWorkoutOriginalKey=workoutCloudKey(w);loadedWorkoutObject=w;historicalReadOnly=readonly;
-  const bar=el('historicalModeBar');if(bar){bar.classList.remove('hidden');el('historicalModeText').innerHTML=`<b>${w.session}</b> · Semana ${w.week} · ${w.date} · ${isWorkoutFinalized(w)?'Finalizado':'Guardado pendiente'}`}
+  const bar=el('historicalModeBar');if(bar){bar.classList.remove('hidden');el('historicalModeText').innerHTML=`<b>${w.session}</b> · Bloque ${blockNumber(w)} · Semana ${w.week} · ${w.date} · ${isWorkoutFinalized(w)?'Finalizado':'Guardado pendiente'}`}
   el('today')?.classList.toggle('readonly-workout',readonly);setWorkoutFormDisabled(readonly);
   if(!readonly&&isWorkoutFinalized(w)){if(el('finishWorkout')){el('finishWorkout').disabled=true;el('finishWorkout').textContent='✓ Ya finalizado'}if(el('dockFinishWorkout'))el('dockFinishWorkout').disabled=true}else{if(el('finishWorkout'))el('finishWorkout').textContent='✓ Finalizar entreno'}
 }
-function activateTab(name){document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x.dataset.tab===name));document.querySelectorAll('.view').forEach(x=>x.classList.toggle('hidden',x.id!==name));el('workoutDock')?.classList.toggle('hidden',name!=='today')}
-function workoutModelsFromStored(w){return (w.exercises||[]).map(e=>({name:e.name,variant:e.variant||inferVariant(e.name),targetReps:e.targetReps||'8-12',rest:e.rest||'90 s',note:e.note||'',custom:!!e.custom,sets:(e.sets||[]).map(s=>({...s}))}))}
+const sectionTitles={today:'Entreno',calendar:'Calendario',plan:'Plan / Bloques',progress:'Progreso',analytics:'Analítica',prs:'PRs',ai:'Coach IA',reports:'Informes',settings:'Ajustes'};
+function closeMenu(){el('sideMenu')?.classList.remove('open');el('menuOverlay')?.classList.add('hidden')}
+function openMenu(){el('sideMenu')?.classList.add('open');el('menuOverlay')?.classList.remove('hidden')}
+function activateTab(name){document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x.dataset.tab===name));document.querySelectorAll('.view').forEach(x=>x.classList.toggle('hidden',x.id!==name));el('workoutDock')?.classList.toggle('hidden',name!=='today');if(el('currentSectionTitle'))el('currentSectionTitle').textContent=sectionTitles[name]||name;closeMenu();if(name==='ai')renderAIControls();if(name==='plan')renderBlocksManager()}
+function workoutModelsFromStored(w){return (w.exercises||[]).map(e=>({name:e.name,variant:e.variant||inferVariant(e.name),targetReps:e.targetReps||'8-12',rest:e.rest||'90 s',note:e.note||'',custom:!!e.custom,status:e.status||'performed',sets:(e.sets||[]).map(s=>({...s}))}))}
 function openStoredWorkout(w,editable=false){
   if(!w)return;activateTab('today');programmaticWorkoutLoad=true;
-  if([...el('athlete').options].some(o=>o.value===w.athlete))el('athlete').value=w.athlete;el('week').value=String(w.week);ensureSessionOption(w.session);el('date').value=w.date;renderWorkout(workoutModelsFromStored(w),{keepNotes:true});el('sessionNotes').value=w.notes||'';programmaticWorkoutLoad=false;setHistoricalMode(w,!editable);renderWeekStatus();
+  if([...el('athlete').options].some(o=>o.value===w.athlete))el('athlete').value=w.athlete;updateBlockSelector();el('block').value=String(blockNumber(w));el('week').value=String(w.week);ensureSessionOption(w.session);el('date').value=w.date;renderWorkout(workoutModelsFromStored(w),{keepNotes:true});el('sessionNotes').value=w.notes||'';programmaticWorkoutLoad=false;setHistoricalMode(w,!editable);renderWeekStatus();
 }
 
-function showConflictModal(existing){return new Promise(resolve=>{conflictResolver=resolve;const m=el('workoutConflictModal');el('workoutConflictText').innerHTML=`<b>${existing.athlete} · Semana ${existing.week} · ${existing.session}</b><br>Ya existe un registro del ${existing.date}${isWorkoutFinalized(existing)?' y está finalizado':' guardado como pendiente'}. Nunca se sobrescribirá sin confirmación.`;m.classList.remove('hidden')})}
+function showConflictModal(existing){return new Promise(resolve=>{conflictResolver=resolve;const m=el('workoutConflictModal');el('workoutConflictText').innerHTML=`<b>${existing.athlete} · Bloque ${blockNumber(existing)} · Semana ${existing.week} · ${existing.session}</b><br>Ya existe un registro del ${existing.date}${isWorkoutFinalized(existing)?' y está finalizado':' guardado como pendiente'}. Nunca se sobrescribirá sin confirmación.`;m.classList.remove('hidden')})}
 function resolveConflict(action){el('workoutConflictModal')?.classList.add('hidden');if(conflictResolver){const r=conflictResolver;conflictResolver=null;r(action)}}
 function showCompletion(title,text,icon='✓'){el('completionIcon').textContent=icon;el('completionTitle').textContent=title;el('completionText').innerHTML=text;el('completionModal').classList.remove('hidden')}
 
-async function ensureAdvanceAllowed(ath,targetWeek){
-  const current=currentWeekFor(ath);if(targetWeek<=current)return true;
-  const incomplete=[];
-  for(let w=current;w<targetWeek;w++){
-    const done=weekFinalizedCount(ath,w);
-    if(done<4){const missing=scheduledSessions.filter(s=>!weekFinalizedSessionSet(ath,w).has(s));incomplete.push({week:w,done,missing})}
-  }
-  if(incomplete.length){
-    const summary=incomplete.map(x=>`Semana ${x.week}: ${x.done}/4 · falta ${x.missing.join(', ')}`).join('\n');
-    const ok=confirm(`Vas a avanzar hasta la semana ${targetWeek} dejando semanas incompletas:\n\n${summary}\n\nLo pendiente contará como no realizado para la adherencia.\n\n¿Continuar?`);
-    if(!ok){programmaticWorkoutLoad=true;el('week').value=String(current);renderWorkout();programmaticWorkoutLoad=false;return false}
-  }
-  setCurrentWeekFor(ath,targetWeek);await saveWeekProgressToCloud(ath);return true;
+function setHasMeaningfulData(set){return String(set?.kg??'').trim()!==''||String(set?.reps??'').trim()!==''||String(set?.rir??'').trim()!==''}
+function setPerformed(set){return !!set?.done && Number(set?.reps)>0}
+function workoutPerformedSetCount(w){let n=0;(w.exercises||[]).forEach(e=>(e.sets||[]).forEach(st=>{if(setPerformed(st))n++}));return n}
+function prepareWorkoutForFinalization(w){
+  let skipped=0,performed=0;
+  (w.exercises||[]).forEach(e=>{
+    (e.sets||[]).forEach(st=>{if(setHasMeaningfulData(st)&&Number(st.reps)>0)st.done=true;else st.done=false;if(st.done)performed++});
+    e.status=(e.sets||[]).some(setPerformed)?'performed':'skipped';if(e.status==='skipped')skipped++;
+  });
+  return {performed,skipped};
 }
-
 function replaceLocalWorkout(existing,w){const idx=existing?state.workouts.indexOf(existing):-1;if(idx>=0)state.workouts[idx]=w;else state.workouts.push(w)}
 async function persistWorkout(w,{finalize=false}={}){
-  const main=!isOptionalWorkout(w);let existing=null,originalKey=loadedWorkoutOriginalKey;
+  const main=!isOptionalWorkout(w),b=blockNumber(w);let existing=null,originalKey=loadedWorkoutOriginalKey;
   if(loadedWorkoutObject)existing=loadedWorkoutObject;
-  if(!existing&&main)existing=mainWorkoutFor(w.athlete,w.week,w.session);
+  if(!existing&&main)existing=mainWorkoutFor(w.athlete,b,w.week,w.session);
   if(!existing&&!main)existing=exactWorkoutFor(w);
-
-  if(main&&existing&&!loadedWorkoutOriginalKey){
-    const action=await showConflictModal(existing);
-    if(action==='cancel'||!action)return false;
-    if(action==='view'){openStoredWorkout(existing,false);return false}
-    originalKey=workoutCloudKey(existing);
-  }
-  if(finalize&&main){const allowed=await ensureAdvanceAllowed(w.athlete,Number(w.week));if(!allowed)return false}
-
-  if(finalize){w.finalized=true;w.finalizedAt=new Date().toISOString()}
-  else if(existing){w.finalized=isWorkoutFinalized(existing);w.finalizedAt=existing.finalizedAt||null}
-  else{w.finalized=false;w.finalizedAt=null}
-
-  replaceLocalWorkout(existing,w);loadedWorkoutObject=w;loadedWorkoutOriginalKey=originalKey||workoutCloudKey(w);save();renderHistory();renderAnalytics();renderPendingFinalize();renderCalendar();renderWeekStatus();
-  setWorkoutDockStatus(finalize?'Finalizando y sincronizando…':'Guardado local. Subiendo a la nube…','warn');
-  const uploaded=await saveWorkoutToCloud(w,originalKey);
-  setWorkoutDockStatus(uploaded?(finalize?'✓ Entreno finalizado y sincronizado.':'✓ Guardado y sincronizado.'):(finalize?'✓ Finalizado local · pendiente de nube':'✓ Guardado local · pendiente de nube'),uploaded?'ok':'warn');
-
+  if(main&&existing&&!loadedWorkoutOriginalKey){const action=await showConflictModal(existing);if(action==='cancel'||!action)return false;if(action==='view'){openStoredWorkout(existing,false);return false}originalKey=workoutCloudKey(existing)}
+  if(finalize&&main){const allowed=await ensureAdvanceAllowed(w.athlete,b,Number(w.week));if(!allowed)return false}
   if(finalize){
-    const ath=w.athlete,week=Number(w.week),optional=isOptionalWorkout(w),done=weekFinalizedCount(ath,week),extras=weekFinalizedExtras(ath,week);
-    if(!optional&&week===currentWeekFor(ath)&&done>=4){
-      if(week<10){setCurrentWeekFor(ath,week+1);await saveWeekProgressToCloud(ath);showCompletion('SEMANA COMPLETADA · 4/4',`Semana ${week} finalizada.<br>Próxima: <b>Semana ${week+1} / 10</b>`,'🏆');programmaticWorkoutLoad=true;el('week').value=String(week+1);ensureSessionOption('Upper A');renderWorkout();programmaticWorkoutLoad=false;clearHistoricalMode()}
-      else{showCompletion('BLOQUE COMPLETADO · 10/10',`Semana 10 completada · 4/4.<br><b>IRON BLOCK terminado.</b>`,'🏆');setHistoricalMode(w,true)}
-    }else if(optional){showCompletion('ENTRENO EXTRA FINALIZADO',`${w.session}<br>Programa principal: <b>${weekFinalizedCount(ath,week)}/4</b> · Extras esta semana: <b>+${extras}</b>`,'✓');setHistoricalMode(w,true)}
-    else{const remaining=Math.max(0,4-done);showCompletion('ENTRENO FINALIZADO',`Semana ${week} · ${w.session}<br><b>${done}/4 completados</b> · ${remaining===1?'Queda 1 entrenamiento':`Quedan ${remaining} entrenamientos`} esta semana.`,'✓');setHistoricalMode(w,true)}
+    const q=prepareWorkoutForFinalization(w);if(q.performed===0){alert('No se puede finalizar un entrenamiento vacío. Si esta sesión no se ha realizado, cierra la semana y quedará marcada como NO REALIZADA.');return false}
+    if(q.skipped>0&&!confirm(`Hay ${q.skipped} ejercicio${q.skipped===1?'':'s'} sin ninguna serie realizada.\n\nSi continúas se guardará${q.skipped===1?'':'n'} como NO REALIZADO${q.skipped===1?'':'S'} y no contará${q.skipped===1?'':'n'} como 0 kg / 0 reps.\n\n¿Finalizar igualmente?`))return false;
+    w.finalized=true;w.finalizedAt=new Date().toISOString();
+  }else if(existing){w.finalized=isWorkoutFinalized(existing);w.finalizedAt=existing.finalizedAt||null}else{w.finalized=false;w.finalizedAt=null}
+  replaceLocalWorkout(existing,w);loadedWorkoutObject=w;loadedWorkoutOriginalKey=originalKey||workoutCloudKey(w);save();renderHistory();renderAnalytics();renderPendingFinalize();renderCalendar();renderWeekStatus();
+  setWorkoutDockStatus(finalize?'Finalizando y sincronizando…':'Guardado local. Subiendo a la nube…','warn');const uploaded=await saveWorkoutToCloud(w,originalKey);setWorkoutDockStatus(uploaded?(finalize?'✓ Entreno finalizado y sincronizado.':'✓ Guardado y sincronizado.'):(finalize?'✓ Finalizado local · pendiente de nube':'✓ Guardado local · pendiente de nube'),uploaded?'ok':'warn');
+  if(finalize){
+    const ath=w.athlete,week=Number(w.week),optional=isOptionalWorkout(w),done=weekFinalizedCount(ath,b,week),extras=weekFinalizedExtras(ath,b,week);
+    if(!optional&&b===currentBlockFor(ath)&&week===currentWeekFor(ath)&&done>=4){
+      if(week<BLOCK_WEEKS){setCurrentPositionFor(ath,b,week+1);await saveWeekProgressToCloud(ath);showCompletion('SEMANA COMPLETADA · 4/4',`Bloque ${b} · Semana ${week} finalizada.<br>Próxima: <b>Bloque ${b} · Semana ${week+1}/10</b> · Global ${globalWeekNumber(b,week+1)}`,'🏆');programmaticWorkoutLoad=true;el('block').value=String(b);el('week').value=String(week+1);ensureSessionOption('Upper A');renderWorkout();programmaticWorkoutLoad=false;clearHistoricalMode()}
+      else{showCompletion(`BLOQUE ${b} COMPLETADO · 10/10`,`Semana 10 completada · 4/4.<br>Ya puedes crear el <b>Bloque ${b+1}</b> desde la pantalla principal o Plan / Bloques.`,'🏆');setHistoricalMode(w,true)}
+    }else if(optional){showCompletion('ENTRENO EXTRA FINALIZADO',`${w.session}<br>Bloque ${b} · Semana ${week} · Programa principal: <b>${weekFinalizedCount(ath,b,week)}/4</b> · Extras: <b>+${extras}</b>`,'✓');setHistoricalMode(w,true)}
+    else{const remaining=Math.max(0,4-done);showCompletion('ENTRENO FINALIZADO',`Bloque ${b} · Semana ${week} · ${w.session}<br><b>${done}/4 completados</b> · ${remaining===1?'Queda 1 entrenamiento':`Quedan ${remaining} entrenamientos`} esta semana.`,'✓');setHistoricalMode(w,true)}
     renderWeekStatus();renderAnalytics();renderCalendar();renderPendingFinalize();
   }
   return true;
@@ -1427,13 +1368,12 @@ async function handleSaveWorkout(){const w=collectWorkout();await persistWorkout
 async function handleFinishWorkout(){const w=collectWorkout();await persistWorkout(w,{finalize:true})}
 
 function renderPendingFinalize(){const n=el('pendingFinalizeSummary'),btn=el('finalizeAllSaved');if(!n||!btn)return;const rows=pendingSavedWorkouts();n.innerHTML=rows.length?`Hay <b>${rows.length}</b> entrenamiento${rows.length===1?'':'s'} guardado${rows.length===1?'':'s'} sin finalizar.`:'✓ No hay entrenamientos guardados pendientes de finalizar.';btn.disabled=!rows.length}
-function openBulkFinalize(){const rows=pendingSavedWorkouts();if(!rows.length){alert('No hay entrenamientos pendientes.');return}el('bulkFinalizeList').innerHTML=rows.sort((a,b)=>a.date.localeCompare(b.date)).map(w=>`<div class="pending-item"><b>${w.athlete}</b> · Semana ${w.week} · ${w.session}<br><span class="small">${w.date}${isOptionalWorkout(w)?' · Extra':''}</span></div>`).join('');el('bulkFinalizeModal').classList.remove('hidden')}
+function openBulkFinalize(){const rows=pendingSavedWorkouts();if(!rows.length){alert('No hay entrenamientos pendientes.');return}el('bulkFinalizeList').innerHTML=rows.sort((a,b)=>a.date.localeCompare(b.date)).map(w=>`<div class="pending-item"><b>${w.athlete}</b> · B${blockNumber(w)} S${w.week} · ${w.session}<br><span class="small">${w.date}${isOptionalWorkout(w)?' · Extra':''} · ${workoutPerformedSetCount(w)} series realizadas</span></div>`).join('');el('bulkFinalizeModal').classList.remove('hidden')}
 async function finalizeAllPending(){
-  const rows=[...pendingSavedWorkouts()];el('bulkFinalizeModal').classList.add('hidden');if(!rows.length)return;
-  const now=new Date().toISOString();for(const w of rows){w.finalized=true;w.finalizedAt=now;w._cloudDirty=true}save();
-  let uploaded=0;for(const w of rows){if(await saveWorkoutToCloud(w))uploaded++}
-  [state.settings.athlete1,state.settings.athlete2].forEach(ath=>{const derived=deriveCurrentWeekFromData(ath),cur=currentWeekFor(ath);if(derived>cur)setCurrentWeekFor(ath,derived)});for(const ath of [state.settings.athlete1,state.settings.athlete2])await saveWeekProgressToCloud(ath);
-  renderPendingFinalize();renderWeekStatus();renderAnalytics();renderCalendar();showCompletion(`${rows.length} ENTRENOS FINALIZADOS`,`Se han marcado como completados ${rows.length} registros.<br>${uploaded}/${rows.length} sincronizados ahora mismo.`,'✓');
+  const rows=[...pendingSavedWorkouts()];el('bulkFinalizeModal').classList.add('hidden');if(!rows.length)return;let uploaded=0,doneRows=0,emptyRows=0;
+  for(const w of rows){const q=prepareWorkoutForFinalization(w);if(q.performed===0){emptyRows++;continue}w.finalized=true;w.finalizedAt=new Date().toISOString();w._cloudDirty=true;doneRows++;if(await saveWorkoutToCloud(w))uploaded++}
+  save();for(const ath of [state.settings.athlete1,state.settings.athlete2]){const pos=deriveCurrentPositionFromData(ath),cb=currentBlockFor(ath),cw=currentWeekFor(ath);if(positionCompare(pos.block,pos.week,cb,cw)>0)setCurrentPositionFor(ath,pos.block,pos.week);await saveWeekProgressToCloud(ath)}
+  renderPendingFinalize();renderWeekStatus();renderAnalytics();renderCalendar();showCompletion(`${doneRows} ENTRENOS FINALIZADOS`,`Se han finalizado ${doneRows} registros válidos · ${uploaded}/${doneRows} sincronizados.${emptyRows?`<br><b>${emptyRows} entrenamiento${emptyRows===1?'':'s'} vacío${emptyRows===1?'':'s'} NO se ha${emptyRows===1?'':'n'} finalizado.</b>`:''}`,'✓');
 }
 
 function monthKey(d){return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`}
@@ -1442,10 +1382,10 @@ function renderCalendarControls(){const s=el('calendarAthlete');if(!s)return;con
 function renderCalendar(){
   const grid=el('calendarGrid');if(!grid)return;renderCalendarControls();const ath=el('calendarAthlete').value,y=calendarCursor.getFullYear(),m=calendarCursor.getMonth();el('calendarMonthLabel').textContent=new Intl.DateTimeFormat('es-ES',{month:'long',year:'numeric'}).format(new Date(y,m,1));
   const first=new Date(y,m,1),start=(first.getDay()+6)%7,days=new Date(y,m+1,0).getDate(),prevDays=new Date(y,m,0).getDate();let cells='';
-  for(let i=0;i<42;i++){let cy=y,cm=m,day=i-start+1,out=false;if(day<1){cm=m-1;if(cm<0){cm=11;cy--}day=prevDays+day;out=true}else if(day>days){day-=days;cm=m+1;if(cm>11){cm=0;cy++}out=true}const iso=localISO(cy,cm,day),events=state.workouts.filter(w=>w.athlete===ath&&w.date===iso).sort((a,b)=>Number(isOptionalWorkout(a))-Number(isOptionalWorkout(b)));cells+=`<button class="cal-day ${out?'outside':''} ${iso===todayISO()?'today':''} ${iso===calendarSelectedDate?'selected':''}" data-cal-date="${iso}"><div class="cal-num">${day}</div>${events.map(w=>`<span class="cal-event ${isOptionalWorkout(w)?'extra':'main'} ${isWorkoutFinalized(w)?'':'draft'}">${isOptionalWorkout(w)?'EXTRA · ':''}${esc(w.session)}</span>`).join('')}</button>`}
+  for(let i=0;i<42;i++){let cy=y,cm=m,day=i-start+1,out=false;if(day<1){cm=m-1;if(cm<0){cm=11;cy--}day=prevDays+day;out=true}else if(day>days){day-=days;cm=m+1;if(cm>11){cm=0;cy++}out=true}const iso=localISO(cy,cm,day),events=state.workouts.filter(w=>w.athlete===ath&&w.date===iso&&!isWorkoutVoid(w)).sort((a,b)=>Number(isOptionalWorkout(a))-Number(isOptionalWorkout(b)));cells+=`<button class="cal-day ${out?'outside':''} ${iso===todayISO()?'today':''} ${iso===calendarSelectedDate?'selected':''}" data-cal-date="${iso}"><div class="cal-num">${day}</div>${events.map(w=>`<span class="cal-event ${isOptionalWorkout(w)?'extra':'main'} ${isWorkoutFinalized(w)?'':'draft'}">${isOptionalWorkout(w)?'EXTRA · ':''}${esc(w.session)}</span>`).join('')}</button>`}
   grid.innerHTML=cells;grid.querySelectorAll('[data-cal-date]').forEach(b=>b.addEventListener('click',()=>{calendarSelectedDate=b.dataset.calDate;const d=new Date(calendarSelectedDate+'T12:00:00');calendarCursor=new Date(d.getFullYear(),d.getMonth(),1);renderCalendar();renderCalendarDay()}));renderCalendarDay();
 }
-function renderCalendarDay(){const box=el('calendarDayDetail');if(!box||!el('calendarAthlete'))return;const ath=el('calendarAthlete').value,rows=state.workouts.filter(w=>w.athlete===ath&&w.date===calendarSelectedDate).sort((a,b)=>Number(isOptionalWorkout(a))-Number(isOptionalWorkout(b)));el('calendarSelectedTitle').textContent=new Intl.DateTimeFormat('es-ES',{weekday:'long',day:'numeric',month:'long',year:'numeric'}).format(new Date(calendarSelectedDate+'T12:00:00'));if(!rows.length){box.innerHTML='No hay entrenamientos guardados este día.';return}box.innerHTML=rows.map(w=>{const idx=state.workouts.indexOf(w);return`<div class="calendar-session-card ${isOptionalWorkout(w)?'extra':''}"><div class="row" style="justify-content:space-between"><div><b>${esc(w.session)}</b> · Semana ${w.week}</div><span class="status-pill ${isWorkoutFinalized(w)?'final':'draft'}">${isWorkoutFinalized(w)?'FINALIZADO':'GUARDADO'}</span></div><div style="margin-top:7px">${(w.exercises||[]).map(e=>`<div class="cal-ex"><b>${esc(exerciseLabel(e.name,e.variant))}</b> · ${esc(compactExerciseSets(e))}</div>`).join('')||'<div class="small">Sin ejercicios registrados.</div>'}</div>${w.notes?`<div class="small" style="margin-top:7px"><b>Notas:</b> ${esc(w.notes)}</div>`:''}<button class="btn secondary" style="margin-top:8px" data-open-workout="${idx}">${isWorkoutFinalized(w)?'Ver entrenamiento':'Continuar / editar'}</button></div>`}).join('');box.querySelectorAll('[data-open-workout]').forEach(b=>b.addEventListener('click',()=>{const w=state.workouts[Number(b.dataset.openWorkout)];openStoredWorkout(w,!isWorkoutFinalized(w))}))}
+function renderCalendarDay(){const box=el('calendarDayDetail');if(!box||!el('calendarAthlete'))return;const ath=el('calendarAthlete').value,rows=state.workouts.filter(w=>w.athlete===ath&&w.date===calendarSelectedDate&&!isWorkoutVoid(w)).sort((a,b)=>Number(isOptionalWorkout(a))-Number(isOptionalWorkout(b)));el('calendarSelectedTitle').textContent=new Intl.DateTimeFormat('es-ES',{weekday:'long',day:'numeric',month:'long',year:'numeric'}).format(new Date(calendarSelectedDate+'T12:00:00'));if(!rows.length){box.innerHTML='No hay entrenamientos guardados este día.';return}box.innerHTML=rows.map(w=>{const idx=state.workouts.indexOf(w);return`<div class="calendar-session-card ${isOptionalWorkout(w)?'extra':''}"><div class="row" style="justify-content:space-between"><div><b>${esc(w.session)}</b> · B${blockNumber(w)} S${w.week}</div><span class="status-pill ${isWorkoutFinalized(w)?'final':'draft'}">${isWorkoutFinalized(w)?'FINALIZADO':'GUARDADO'}</span></div><div style="margin-top:7px">${(w.exercises||[]).map(e=>`<div class="cal-ex"><b>${esc(exerciseLabel(e.name,e.variant))}</b> · ${e.status==='skipped'?'<span class="skip-label">NO REALIZADO</span>':esc(compactExerciseSets(e))}</div>`).join('')||'<div class="small">Sin ejercicios registrados.</div>'}</div>${w.notes?`<div class="small" style="margin-top:7px"><b>Notas:</b> ${esc(w.notes)}</div>`:''}<button class="btn secondary" style="margin-top:8px" data-open-workout="${idx}">${isWorkoutFinalized(w)?'Ver entrenamiento':'Continuar / editar'}</button></div>`}).join('');box.querySelectorAll('[data-open-workout]').forEach(btn=>btn.addEventListener('click',()=>{const w=state.workouts[Number(btn.dataset.openWorkout)];openStoredWorkout(w,!isWorkoutFinalized(w))}))}
 function initSelectors(){
   el("athlete").innerHTML = `<option>${state.settings.athlete1}</option><option>${state.settings.athlete2}</option>`;
   el("week").innerHTML = Array.from({length:10},(_,i)=>`<option value="${i+1}">Semana ${i+1}</option>`).join("");
@@ -1453,11 +1393,10 @@ function initSelectors(){
   el("date").value=todayISO(); el("bwDate").value=todayISO(); if(el("activityDate"))el("activityDate").value=todayISO(); if(el("rmDate"))el("rmDate").value=todayISO();
   el("athlete1").value=state.settings.athlete1; el("athlete2").value=state.settings.athlete2;
   if(deviceAthlete && [...el("athlete").options].some(o=>o.value===deviceAthlete))el("athlete").value=deviceAthlete;
-  ensureWeekProgressState();
-  el("week").value=String(currentWeekFor(el("athlete").value));
-  renderDeviceControls();
-  renderCalendarControls();
+  ensureWeekProgressState();updateBlockSelector();const ath=el("athlete").value;el('block').value=String(currentBlockFor(ath));el("week").value=String(currentWeekFor(ath));
+  renderDeviceControls();renderCalendarControls();renderBlocksManager();renderHeaderStatus();
   el("goal1").value=state.settings.goal1; el("goal2").value=state.settings.goal2;
+  renderAIControls();
 }
 
 function getWeekSets(base,w){return w===6?Math.max(1,Math.ceil(base*0.55)):base}
@@ -1471,50 +1410,40 @@ function parseRestSeconds(rest){
 const exerciseVariants=["Barra","Mancuernas","Máquina","Máquina unilateral","Smith","Polea","Peso corporal","Trap bar","Otro"];
 function inferVariant(name){const n=(name||"").toLowerCase();if(n.includes("smith"))return "Smith";if(n.includes("unilateral"))return "Máquina unilateral";if(n.includes("mancuerna"))return "Mancuernas";if(n.includes("máquina")||n.includes("maquina")||n.includes("prensa")||n.includes("hack")||n.includes("peck deck"))return "Máquina";if(n.includes("polea")||n.includes("jalón")||n.includes("jalon"))return "Polea";if(n.includes("dominada")||n.includes("core")||n.includes("abdominal"))return "Peso corporal";if(n.includes("trap bar"))return "Trap bar";return "Barra"}
 function exerciseLabel(name,variant){return `${name} · ${variant||inferVariant(name)}`}
-function bestEstimated1RM(athlete,exercise,variant){let best=null,target=exerciseLabel(exercise,variant);state.workouts.filter(x=>x.athlete===athlete&&isWorkoutFinalized(x)).forEach(w=>(w.exercises||[]).forEach(e=>{if(exerciseLabel(e.name,e.variant)!==target)return;(e.sets||[]).forEach(s=>{const kg=parseFloat(s.kg),reps=parseInt(s.reps);if(kg>0&&reps>0){const e1rm=kg*(1+reps/30);if(!best||e1rm>best.e1rm)best={e1rm,kg,reps,date:w.date}}})}));return best}
-function lastExercisePerformance(athlete,session,exercise,variant){const target=exerciseLabel(exercise,variant),ws=state.workouts.filter(x=>x.athlete===athlete&&x.session===session&&isWorkoutFinalized(x)).sort((a,b)=>b.date.localeCompare(a.date));for(const w of ws){const ex=(w.exercises||[]).find(e=>exerciseLabel(e.name,e.variant)===target);if(ex)return ex}return null}
-function progressionSuggestion(athlete,session,exercise,variant,repRange,week){if(isOptionalSessionName(session))return "Sesión opcional: suma estímulo sin comprometer la recuperación.";if(week<=2)return "Prioridad: técnica y margen.";if(week===6)return "Descarga: peso cómodo y menos volumen.";const last=lastExercisePerformance(athlete,session,exercise,variant);if(!last)return "Primera referencia para esta variante.";const nums=String(repRange).match(/\d+/g)||[],maxRep=parseInt(nums[nums.length-1]||"0"),valid=(last.sets||[]).filter(s=>parseFloat(s.kg)>0&&parseInt(s.reps)>0);if(!valid.length)return "Sin datos suficientes.";const allTop=valid.every(s=>parseInt(s.reps)>=maxRep&&(s.rir===""||parseFloat(s.rir)<=1.5));if(allTop){const lower=/sentadilla|peso muerto|prensa|hack|búlgara|femoral|cuádriceps|gemelos/i.test(exercise);return `✓ Toca subir carga: +${lower?"2,5-5":"2-2,5"} kg aprox.`}return "Intenta mejorar 1-2 reps totales antes de subir peso."}
-
+function bestEstimated1RM(athlete,exercise,variant){let best=null,target=exerciseLabel(exercise,variant);state.workouts.filter(x=>x.athlete===athlete&&isWorkoutFinalized(x)).forEach(w=>(w.exercises||[]).forEach(e=>{if(exerciseLabel(e.name,e.variant)!==target||e.status==='skipped')return;(e.sets||[]).filter(setPerformed).forEach(st=>{const kg=parseFloat(st.kg),reps=parseInt(st.reps);if(kg>0&&reps>0){const e1rm=kg*(1+reps/30);if(!best||e1rm>best.e1rm)best={e1rm,kg,reps,date:w.date,block:blockNumber(w),week:Number(w.week)}}})}));return best}
+function lastVariantForSessionExercise(athlete,session,exercise){const exact=state.workouts.filter(w=>w.athlete===athlete&&w.session===session&&isWorkoutFinalized(w)).sort((a,b)=>String(b.date).localeCompare(String(a.date)));for(const w of exact){const ex=(w.exercises||[]).find(e=>e.name===exercise&&e.status!=='skipped');if(ex?.variant)return ex.variant}const any=state.workouts.filter(w=>w.athlete===athlete&&isWorkoutFinalized(w)).sort((a,b)=>String(b.date).localeCompare(String(a.date)));for(const w of any){const ex=(w.exercises||[]).find(e=>e.name===exercise&&e.status!=='skipped');if(ex?.variant)return ex.variant}return inferVariant(exercise)}
+function lastExercisePerformance(athlete,session,exercise,variant){const target=exerciseLabel(exercise,variant),ws=state.workouts.filter(x=>x.athlete===athlete&&x.session===session&&isWorkoutFinalized(x)).sort((a,b)=>b.date.localeCompare(a.date));for(const w of ws){const ex=(w.exercises||[]).find(e=>exerciseLabel(e.name,e.variant)===target&&e.status!=='skipped');if(ex&&(ex.sets||[]).some(setPerformed))return ex}return null}
+function progressionSuggestion(athlete,session,exercise,variant,repRange,week){if(isOptionalSessionName(session))return "Sesión opcional: suma estímulo sin comprometer la recuperación.";if(week<=2)return "Prioridad: técnica y margen.";if(week===6)return "Descarga: peso cómodo y menos volumen.";const last=lastExercisePerformance(athlete,session,exercise,variant);if(!last)return "Primera referencia para esta variante.";const nums=String(repRange).match(/\d+/g)||[],maxRep=parseInt(nums[nums.length-1]||"0"),valid=(last.sets||[]).filter(setPerformed).filter(st=>parseFloat(st.kg)>0&&parseInt(st.reps)>0);if(!valid.length)return "Sin datos suficientes.";const allTop=valid.every(st=>parseInt(st.reps)>=maxRep&&(st.rir===""||parseFloat(st.rir)<=1.5));if(allTop){const lower=/sentadilla|peso muerto|prensa|hack|búlgara|femoral|cuádriceps|gemelos/i.test(exercise);return `✓ Toca subir carga: +${lower?"2,5-5":"2-2,5"} kg aprox.`}return "Intenta mejorar 1-2 reps totales antes de subir peso."}
 function previousExerciseReference(athlete,exercise,variant,currentDate,currentSession){
-  const target=exerciseLabel(exercise,variant);
-  // La referencia anterior pertenece SIEMPRE al mismo tipo de sesión.
-  // Un Upper C opcional nunca sustituye la referencia de Upper A/B, y viceversa.
-  const candidates=state.workouts.filter(w=>w.athlete===athlete&&w.session===currentSession&&isWorkoutFinalized(w)&&w.date<=currentDate&&!(w.date===currentDate&&w.session===currentSession)).sort((a,b)=>b.date.localeCompare(a.date));
-  for(const w of candidates){
-    const ex=(w.exercises||[]).find(e=>exerciseLabel(e.name,e.variant)===target);
-    if(!ex)continue;
-    const valid=(ex.sets||[]).filter(s=>s.kg!==""&&s.kg!=null&&s.reps!==""&&s.reps!=null&&Number(s.reps)>0);
-    if(!valid.length)continue;
-    let best=null;
-    valid.forEach(s=>{const kg=Number(s.kg)||0,reps=Number(s.reps)||0,e1=kg>0?kg*(1+reps/30):reps;if(!best||e1>best.score)best={score:e1,kg,reps,rir:s.rir};});
-    return {date:w.date,sets:valid,best};
-  }
-  return null;
+  const target=exerciseLabel(exercise,variant),candidates=state.workouts.filter(w=>w.athlete===athlete&&w.session===currentSession&&isWorkoutFinalized(w)&&w.date<=currentDate&&!(w.date===currentDate&&w.session===currentSession)).sort((a,b)=>b.date.localeCompare(a.date));
+  for(const w of candidates){const ex=(w.exercises||[]).find(e=>exerciseLabel(e.name,e.variant)===target&&e.status!=='skipped');if(!ex)continue;const valid=(ex.sets||[]).filter(setPerformed);if(valid.length)return {date:w.date,sets:valid,block:blockNumber(w),week:Number(w.week)}}return null;
+}
+function bestHistoricalWeek(athlete,exercise,variant){
+  const target=exerciseLabel(exercise,variant),groups=new Map();
+  state.workouts.filter(w=>w.athlete===athlete&&isWorkoutFinalized(w)).forEach(w=>{const ex=(w.exercises||[]).find(e=>exerciseLabel(e.name,e.variant)===target&&e.status!=='skipped');if(!ex)return;const valid=(ex.sets||[]).filter(setPerformed).filter(st=>Number(st.kg)>0&&Number(st.reps)>0);if(!valid.length)return;const key=`${blockNumber(w)}|${Number(w.week)||1}`,g=groups.get(key)||{block:blockNumber(w),week:Number(w.week)||1,volume:0,sets:[],latestDate:w.date};valid.forEach(st=>{g.volume+=Number(st.kg)*Number(st.reps);g.sets.push({kg:Number(st.kg),reps:Number(st.reps),rir:st.rir})});if(String(w.date)>String(g.latestDate))g.latestDate=w.date;groups.set(key,g)});
+  const rows=[...groups.values()];if(!rows.length)return null;rows.sort((a,b)=>b.volume-a.volume||String(b.latestDate).localeCompare(String(a.latestDate)));return rows[0];
 }
 function previousReferenceHTML(athlete,exercise,variant,currentDate,currentSession){
-  const p=previousExerciseReference(athlete,exercise,variant,currentDate,currentSession);
-  if(!p)return '<b>Anterior:</b> N/A · 0 registros';
-  const compact=p.sets.map(s=>`${Number(s.kg)||0}×${Number(s.reps)||0}`).join(' · ');
-  const rir=p.best&&p.best.rir!==""&&p.best.rir!=null?` · RIR ${p.best.rir}`:"";
-  return `<b>Anterior (${p.date}):</b> ${compact}<br><b>Mejor serie:</b> ${p.best.kg}×${p.best.reps}${rir}`;
+  const p=previousExerciseReference(athlete,exercise,variant,currentDate,currentSession),best=bestHistoricalWeek(athlete,exercise,variant);let html=p?`<b>Anterior (${p.date} · B${p.block} S${p.week}):</b> ${p.sets.map(st=>`${Number(st.kg)||0}×${Number(st.reps)||0}`).join(' · ')}`:'<b>Anterior:</b> N/A · 0 registros';
+  html+=best?`<div class="best-week"><b>Mejor semana histórica · Bloque ${best.block} · Semana ${best.week}</b><br>${best.sets.map(st=>`${st.kg}×${st.reps}`).join(' · ')}</div>`:`<div class="best-week"><b>Mejor semana histórica:</b> N/A</div>`;return html;
 }
-function updateExerciseReference(box){
-  const variant=box.querySelector('.variant-select')?.value||inferVariant(box.dataset.name);
-  const node=box.querySelector('.prev-session');
-  if(node)node.innerHTML=previousReferenceHTML(el('athlete').value,box.dataset.name,variant,el('date').value,el('session').value);
+function updateExerciseReference(box){const variant=box.querySelector('.variant-select')?.value||inferVariant(box.dataset.name),node=box.querySelector('.prev-session');if(node)node.innerHTML=previousReferenceHTML(el('athlete').value,box.dataset.name,variant,el('date').value,el('session').value)}
+function templateModels(){const w=+el("week").value,ses=el("session").value,ath=el('athlete').value;if(isOptionalSessionName(ses)){const t=getOptionalTemplateBySession(ses);if(!t)return[];const key=Object.entries(optionalTemplates).find(([,x])=>x===t)?.[0];const models=key?optionalTemplateModels(key):[];return models.map(m=>({...m,variant:lastVariantForSessionExercise(ath,ses,m.name),sets:(m.sets||[]).map(st=>({...st,done:false}))}))}const p=program[ses];return p.exercises.map(e=>({name:e[0],baseSets:getWeekSets(e[1],w),targetReps:e[2],rest:e[3],variant:lastVariantForSessionExercise(ath,ses,e[0]),note:"",custom:false,status:'pending',sets:Array.from({length:getWeekSets(e[1],w)},()=>({kg:"",reps:"",rir:"",done:false}))}))}
+function makeSetRow(set={},idx=0){const done=!!set.done;return `<div class="setrow ${done?'done-row':'not-done'}"><button class="donebtn ${done?'done':''}" type="button" data-done="${idx}" title="Serie completada">✓</button><input type="number" step="0.5" inputmode="decimal" placeholder="kg" data-field="kg" value="${set.kg??""}"><input type="text" inputmode="numeric" placeholder="reps" data-field="reps" value="${set.reps??""}"><input type="number" step="1" min="0" max="5" placeholder="RIR" data-field="rir" value="${set.rir??""}"></div>`}
+function bindExerciseButtons(box){
+  box.querySelectorAll('.donebtn').forEach(btn=>{btn.onclick=()=>{btn.classList.toggle('done');const row=btn.closest('.setrow');row?.classList.toggle('done-row',btn.classList.contains('done'));row?.classList.toggle('not-done',!btn.classList.contains('done'));if(btn.classList.contains('done'))startTimer(+box.dataset.restSec,box.dataset.name)}});
+  const plus=box.querySelector('.add-set');if(plus)plus.onclick=()=>{const sets=box.querySelector('.sets');sets.insertAdjacentHTML('beforeend',makeSetRow({},sets.querySelectorAll('.setrow').length));bindExerciseButtons(box)};
+  const minus=box.querySelector('.remove-set');if(minus)minus.onclick=()=>{const rows=box.querySelectorAll('.setrow');if(rows.length<=1){alert('El ejercicio debe tener al menos una serie.');return}rows[rows.length-1].remove()};
+  const removeEx=box.querySelector('.remove-exercise');if(removeEx)removeEx.onclick=()=>{if(confirm(`¿Quitar ${box.dataset.name} de esta sesión?`))box.remove()};
+  const variant=box.querySelector('.variant-select');if(variant)variant.onchange=()=>{const athlete=el('athlete').value,name=box.dataset.name,targetReps=box.dataset.targetReps,week=+el('week').value,best=bestEstimated1RM(athlete,name,variant.value);box.querySelector('.pr').textContent=best?`Mejor e1RM (Epley): ${best.e1rm.toFixed(1)} kg (${best.kg}×${best.reps})`:'Sin e1RM para esta variante';box.querySelector('.suggest').textContent=progressionSuggestion(athlete,el('session').value,name,variant.value,targetReps,week);updateExerciseReference(box)}
 }
-
-function templateModels(){const w=+el("week").value,s=el("session").value;if(isOptionalSessionName(s)){const t=getOptionalTemplateBySession(s);if(!t)return[];const key=Object.entries(optionalTemplates).find(([,x])=>x===t)?.[0];return key?optionalTemplateModels(key):[]}const p=program[s];return p.exercises.map(e=>({name:e[0],baseSets:getWeekSets(e[1],w),targetReps:e[2],rest:e[3],variant:inferVariant(e[0]),note:"",custom:false,sets:Array.from({length:getWeekSets(e[1],w)},()=>({kg:"",reps:"",rir:""}))}))}
-function makeSetRow(set={},idx=0){return `<div class="setrow"><button class="donebtn" type="button" data-done="${idx}" title="Serie completada">✓</button><input type="number" step="0.5" inputmode="decimal" placeholder="kg" data-field="kg" value="${set.kg??""}"><input type="text" inputmode="numeric" placeholder="reps" data-field="reps" value="${set.reps??""}"><input type="number" step="1" min="0" max="5" placeholder="RIR" data-field="rir" value="${set.rir??""}"></div>`}
-function bindExerciseButtons(box){box.querySelectorAll(".donebtn").forEach(btn=>{btn.onclick=()=>{btn.classList.toggle("done");if(btn.classList.contains("done"))startTimer(+box.dataset.restSec,box.dataset.name)}});const plus=box.querySelector(".add-set");if(plus)plus.onclick=()=>{const sets=box.querySelector(".sets");sets.insertAdjacentHTML("beforeend",makeSetRow({},sets.querySelectorAll(".setrow").length));bindExerciseButtons(box)};const minus=box.querySelector(".remove-set");if(minus)minus.onclick=()=>{const rows=box.querySelectorAll(".setrow");if(rows.length<=1){alert("El ejercicio debe tener al menos una serie.");return}rows[rows.length-1].remove()};const removeEx=box.querySelector(".remove-exercise");if(removeEx)removeEx.onclick=()=>{if(confirm(`¿Quitar ${box.dataset.name} de esta sesión?`))box.remove()};const variant=box.querySelector(".variant-select");if(variant)variant.onchange=()=>{const athlete=el("athlete").value,name=box.dataset.name,targetReps=box.dataset.targetReps,week=+el("week").value,best=bestEstimated1RM(athlete,name,variant.value);box.querySelector(".pr").textContent=best?`Mejor e1RM (Epley): ${best.e1rm.toFixed(1)} kg (${best.kg}×${best.reps})`:"Sin e1RM para esta variante";box.querySelector(".suggest").textContent=progressionSuggestion(athlete,el("session").value,name,variant.value,targetReps,week);updateExerciseReference(box)}}
-function renderWorkout(models=null,{keepNotes=false}={}){if(models&&!Array.isArray(models))models=null;const w=+el("week").value,s=el("session").value,p=getSessionDefinition(s),athlete=el("athlete").value,wi=weekInfo[w],optional=isOptionalSessionName(s);if(!p){setWorkoutDockStatus("No se pudo cargar esta sesión.","bad");return}el("sessionTitle").textContent=s;el("sessionDesc").textContent=p.desc||"";el("rirBadge").textContent=optional?"OPCIONAL":wi[1];if(optional){el("weekNote").innerHTML=`<b>Semana ${w} · Sesión opcional</b><br>No sustituye a ninguna de las 4 sesiones programadas.`;const n=el("optionalWorkoutNotice");n.innerHTML=`<b>SESIÓN OPCIONAL</b> · No cuenta para adherencia. Sí cuenta para volumen, historial, e1RM y PRs. La referencia “Anterior” se mantiene separada de Upper/Lower A/B.`;n.classList.remove("hidden")}else{el("weekNote").innerHTML=`<b>Semana ${w} · ${wi[0]}</b><br>${wi[2]}`;el("optionalWorkoutNotice")?.classList.add("hidden")}const list=models||templateModels();el("exerciseList").innerHTML=list.map((m,idx)=>{const variant=m.variant||inferVariant(m.name),sets=(m.sets&&m.sets.length)?m.sets:Array.from({length:m.baseSets||3},()=>({kg:"",reps:"",rir:""})),best=bestEstimated1RM(athlete,m.name,variant),suggestion=progressionSuggestion(athlete,s,m.name,variant,m.targetReps||"8-12",w),restSec=parseRestSeconds(m.rest||"90 s");return `<div class="exercise ${m.custom?"custom-exercise":""}" data-ex="${idx}" data-name="${m.name.replaceAll('"','&quot;')}" data-target-reps="${m.targetReps||"8-12"}" data-rest-label="${m.rest||"90 s"}" data-rest-sec="${restSec}" data-custom="${m.custom?"1":"0"}"><div class="ex-head"><div><div class="ex-name">${m.name}</div><div class="ex-meta">${sets.length} series · ${m.targetReps||"8-12"} reps · descanso ${m.rest||"90 s"}</div><div class="pr">${best?`Mejor e1RM (Epley): ${best.e1rm.toFixed(1)} kg (${best.kg}×${best.reps})`:"Sin e1RM para esta variante"}</div><div class="suggest">${suggestion}</div><div class="prev-session">${previousReferenceHTML(athlete,m.name,variant,el("date").value,s)}</div></div><span class="badge">${m.rirTarget||wi[1]}</span></div><div class="variant-row"><div><label>Material / variante</label><select class="variant-select">${exerciseVariants.map(v=>`<option ${v===variant?"selected":""}>${v}</option>`).join("")}</select></div><div><label>Referencia</label><input value="${m.targetReps||"8-12"} reps · ${m.rest||"90 s"}" readonly></div></div><div class="sets">${sets.map((set,i)=>makeSetRow(set,i)).join("")}</div><div class="exercise-tools"><button class="btn secondary add-set" type="button">+ Serie</button><button class="btn secondary remove-set" type="button">− Serie</button>${m.custom?'<button class="btn danger remove-exercise" type="button">Quitar ejercicio</button>':""}</div><div class="exercise-note"><label>Nota de este ejercicio</label><input type="text" data-field="exnote" placeholder="Ajuste de máquina, sensaciones, agarre..." value="${(m.note||"").replaceAll('"','&quot;')}"></div></div>`}).join("");document.querySelectorAll(".exercise").forEach(bindExerciseButtons);if(!keepNotes)el("sessionNotes").value="";renderDeviceModeNotice()}
-
-function collectWorkout(){const s=el("session").value,exercises=[...document.querySelectorAll(".exercise")].map(box=>({name:box.dataset.name,variant:box.querySelector(".variant-select")?.value||inferVariant(box.dataset.name),targetReps:box.dataset.targetReps||"8-12",rest:box.dataset.restLabel||"90 s",note:box.querySelector('[data-field="exnote"]')?.value||"",custom:box.dataset.custom==="1",sets:[...box.querySelectorAll(".setrow")].map(row=>({kg:row.querySelector('[data-field="kg"]').value,reps:row.querySelector('[data-field="reps"]').value,rir:row.querySelector('[data-field="rir"]').value}))}));return{id:loadedWorkoutObject?.id||Date.now(),athlete:el("athlete").value,week:+el("week").value,session:s,date:el("date").value,notes:el("sessionNotes").value,exercises,isOptional:isOptionalSessionName(s),templateName:optionalTemplateNameFromSession(s),finalized:loadedWorkoutObject?isWorkoutFinalized(loadedWorkoutObject):false,finalizedAt:loadedWorkoutObject?.finalizedAt||null} }
+function renderWorkout(models=null,{keepNotes=false}={}){if(models&&!Array.isArray(models))models=null;const w=+el('week').value,b=Number(el('block')?.value)||currentBlockFor(el('athlete').value),ses=el('session').value,p=getSessionDefinition(ses),athlete=el('athlete').value,wi=weekInfo[w],optional=isOptionalSessionName(ses);if(!p){setWorkoutDockStatus('No se pudo cargar esta sesión.','bad');return}el('sessionTitle').textContent=ses;el('sessionDesc').textContent=p.desc||'';el('rirBadge').textContent=optional?'OPCIONAL':wi[1];if(optional){el('weekNote').innerHTML=`<b>Bloque ${b} · Semana ${w} · Sesión opcional</b><br>No sustituye a ninguna de las 4 sesiones programadas.`;const n=el('optionalWorkoutNotice');n.innerHTML='<b>SESIÓN OPCIONAL</b> · No cuenta para adherencia. Sí cuenta para volumen, historial, e1RM y PRs.';n.classList.remove('hidden')}else{el('weekNote').innerHTML=`<b>Bloque ${b} · Semana ${w} · ${wi[0]}</b><br>${wi[2]}`;el('optionalWorkoutNotice')?.classList.add('hidden')}const list=models||templateModels();el('exerciseList').innerHTML=list.map((m,idx)=>{const variant=m.variant||lastVariantForSessionExercise(athlete,ses,m.name),sets=(m.sets&&m.sets.length)?m.sets:Array.from({length:m.baseSets||3},()=>({kg:'',reps:'',rir:'',done:false})),best=bestEstimated1RM(athlete,m.name,variant),suggestion=progressionSuggestion(athlete,ses,m.name,variant,m.targetReps||'8-12',w),restSec=parseRestSeconds(m.rest||'90 s'),skipped=m.status==='skipped';return `<div class="exercise ${m.custom?'custom-exercise':''} ${skipped?'exercise-skipped':''}" data-ex="${idx}" data-name="${m.name.replaceAll('"','&quot;')}" data-target-reps="${m.targetReps||'8-12'}" data-rest-label="${m.rest||'90 s'}" data-rest-sec="${restSec}" data-custom="${m.custom?'1':'0'}"><div class="ex-head"><div><div class="ex-name">${m.name}${skipped?'<span class="skip-label">NO REALIZADO</span>':''}</div><div class="ex-meta">${sets.length} series · ${m.targetReps||'8-12'} reps · descanso ${m.rest||'90 s'}</div><div class="pr">${best?`Mejor e1RM (Epley): ${best.e1rm.toFixed(1)} kg (${best.kg}×${best.reps})`:'Sin e1RM para esta variante'}</div><div class="suggest">${suggestion}</div><div class="prev-session">${previousReferenceHTML(athlete,m.name,variant,el('date').value,ses)}</div></div><span class="badge">${m.rirTarget||wi[1]}</span></div><div class="variant-row"><div><label>Material / variante</label><select class="variant-select">${exerciseVariants.map(v=>`<option ${v===variant?'selected':''}>${v}</option>`).join('')}</select></div><div><label>Referencia</label><input value="${m.targetReps||'8-12'} reps · ${m.rest||'90 s'}" readonly></div></div><div class="sets">${sets.map((st,i)=>makeSetRow(st,i)).join('')}</div><div class="exercise-tools"><button class="btn secondary add-set" type="button">+ Serie</button><button class="btn secondary remove-set" type="button">− Serie</button>${m.custom?'<button class="btn danger remove-exercise" type="button">Quitar ejercicio</button>':''}</div><div class="exercise-note"><label>Nota de este ejercicio</label><input type="text" data-field="exnote" placeholder="Ajuste de máquina, sensaciones, agarre..." value="${(m.note||'').replaceAll('"','&quot;')}"></div></div>`}).join('');document.querySelectorAll('.exercise').forEach(bindExerciseButtons);if(!keepNotes)el('sessionNotes').value='';renderDeviceModeNotice();renderHeaderStatus()}
+function collectWorkout(){const ses=el('session').value,exercises=[...document.querySelectorAll('.exercise')].map(box=>{const sets=[...box.querySelectorAll('.setrow')].map(row=>({kg:row.querySelector('[data-field="kg"]').value,reps:row.querySelector('[data-field="reps"]').value,rir:row.querySelector('[data-field="rir"]').value,done:row.querySelector('.donebtn')?.classList.contains('done')||false}));return{name:box.dataset.name,variant:box.querySelector('.variant-select')?.value||inferVariant(box.dataset.name),targetReps:box.dataset.targetReps||'8-12',rest:box.dataset.restLabel||'90 s',note:box.querySelector('[data-field="exnote"]')?.value||'',custom:box.dataset.custom==='1',status:sets.some(setPerformed)?'performed':'pending',sets}});return{id:loadedWorkoutObject?.id||Date.now(),clientUid:loadedWorkoutObject?.clientUid||((crypto&&crypto.randomUUID)?crypto.randomUUID():`workout-${Date.now()}-${Math.random().toString(36).slice(2)}`),athlete:el('athlete').value,block:Number(el('block')?.value)||currentBlockFor(el('athlete').value),week:+el('week').value,session:ses,date:el('date').value,notes:el('sessionNotes').value,exercises,isOptional:isOptionalSessionName(ses),templateName:optionalTemplateNameFromSession(ses),finalized:loadedWorkoutObject?isWorkoutFinalized(loadedWorkoutObject):false,void:false,finalizedAt:loadedWorkoutObject?.finalizedAt||null}}
 
 function renderHistory(){
   const ath=el("athlete").value;
-  const rows=state.workouts.filter(x=>x.athlete===ath).sort((a,b)=>b.date.localeCompare(a.date));
-  el("history").innerHTML=rows.length?rows.map(x=>`<tr><td>${x.date}</td><td>${x.week}</td><td>${x.session}${isWorkoutFinalized(x)?"":" · BORRADOR"}</td><td>${x.athlete}</td></tr>`).join("")
+  const rows=state.workouts.filter(x=>x.athlete===ath&&!isWorkoutVoid(x)).sort((a,b)=>b.date.localeCompare(a.date));
+  el("history").innerHTML=rows.length?rows.map(x=>`<tr><td>${x.date}</td><td>B${blockNumber(x)} · S${x.week}</td><td>${x.session}${isWorkoutFinalized(x)?"":" · BORRADOR"}</td><td>${x.athlete}</td></tr>`).join("")
   :`<tr><td colspan="4" class="small">Todavía no hay entrenamientos guardados.</td></tr>`;
 
   const bw=state.bodyweights.filter(x=>x.athlete===ath).sort((a,b)=>a.date.localeCompare(b.date));
@@ -1537,7 +1466,7 @@ function renderWeeks(){
 }
 
 
-function loadPrevious(){const ath=el("athlete").value,ses=el("session").value,prev=state.workouts.filter(x=>x.athlete===ath&&x.session===ses).sort((a,b)=>b.date.localeCompare(a.date))[0];if(!prev){alert("No hay una sesión anterior de este día.");return}const models=(prev.exercises||[]).map(e=>({name:e.name,variant:e.variant||inferVariant(e.name),targetReps:e.targetReps||"8-12",rest:e.rest||"90 s",note:e.note||"",custom:!!e.custom,sets:(e.sets||[]).map(s=>({...s}))}));renderWorkout(models,{keepNotes:true});el("sessionNotes").value=prev.notes||"";setWorkoutDockStatus(`Cargada referencia del ${prev.date}.`,"ok")}
+function loadPrevious(){const ath=el('athlete').value,ses=el('session').value,currentKey=loadedWorkoutObject?.clientUid,prev=state.workouts.filter(x=>x.athlete===ath&&x.session===ses&&isWorkoutFinalized(x)&&x.clientUid!==currentKey).sort((a,b)=>String(b.date).localeCompare(String(a.date))||globalWeekNumber(blockNumber(b),b.week)-globalWeekNumber(blockNumber(a),a.week))[0];if(!prev){alert('No hay una sesión anterior de este día.');return}const models=workoutModelsFromStored(prev);renderWorkout(models,{keepNotes:true});el('sessionNotes').value=prev.notes||'';setWorkoutDockStatus(`Cargada referencia: B${blockNumber(prev)} S${prev.week} · ${prev.date}.`,'ok')}
 
 document.querySelectorAll(".tab").forEach(btn=>btn.addEventListener("click",()=>{
   activateTab(btn.dataset.tab);
@@ -1549,16 +1478,28 @@ document.querySelectorAll(".tab").forEach(btn=>btn.addEventListener("click",()=>
   if(btn.dataset.tab==="settings")renderPendingFinalize();
 }));
 
-function userChangedWorkoutSelector(){if(programmaticWorkoutLoad)return;if(historicalReadOnly||loadedWorkoutOriginalKey)clearHistoricalMode();renderWorkout();renderWeekStatus()}
-el("week").addEventListener("change",userChangedWorkoutSelector);
-el("session").addEventListener("change",userChangedWorkoutSelector);
-el("date").addEventListener("change",()=>{if(!programmaticWorkoutLoad&&(historicalReadOnly||loadedWorkoutOriginalKey))clearHistoricalMode();document.querySelectorAll(".exercise").forEach(updateExerciseReference)});
-el("athlete").addEventListener("change",()=>{if(!programmaticWorkoutLoad)clearHistoricalMode();programmaticWorkoutLoad=true;el('week').value=String(currentWeekFor(el('athlete').value));renderWorkout();programmaticWorkoutLoad=false;renderHistory();renderAnalytics();renderDeviceModeNotice();renderReportsControls();renderWeekStatus();renderCalendarControls()});
+async function userChangedPositionSelector(){
+  if(programmaticWorkoutLoad)return;if(historicalReadOnly||loadedWorkoutOriginalKey)clearHistoricalMode();
+  const ath=el('athlete').value,targetBlock=Number(el('block').value)||currentBlockFor(ath),targetWeek=Number(el('week').value)||currentWeekFor(ath);
+  const allowed=await ensureAdvanceAllowed(ath,targetBlock,targetWeek);
+  if(!allowed){programmaticWorkoutLoad=true;updateBlockSelector();el('block').value=String(currentBlockFor(ath));el('week').value=String(currentWeekFor(ath));renderWorkout();programmaticWorkoutLoad=false;renderWeekStatus();return}
+  renderWorkout();renderWeekStatus();renderHeaderStatus();
+}
+function userChangedSessionSelector(){if(programmaticWorkoutLoad)return;if(historicalReadOnly||loadedWorkoutOriginalKey)clearHistoricalMode();renderWorkout();renderWeekStatus()}
+el('block').addEventListener('change',userChangedPositionSelector);
+el('week').addEventListener('change',userChangedPositionSelector);
+el('session').addEventListener('change',userChangedSessionSelector);
+el('date').addEventListener('change',()=>{if(!programmaticWorkoutLoad&&(historicalReadOnly||loadedWorkoutOriginalKey))clearHistoricalMode();document.querySelectorAll('.exercise').forEach(updateExerciseReference)});
+el('athlete').addEventListener('change',()=>{
+  if(!programmaticWorkoutLoad)clearHistoricalMode();const ath=el('athlete').value;programmaticWorkoutLoad=true;updateBlockSelector();el('block').value=String(currentBlockFor(ath));el('week').value=String(currentWeekFor(ath));ensureSessionOption('Upper A');renderWorkout();programmaticWorkoutLoad=false;
+  renderHistory();renderAnalytics();renderDeviceModeNotice();renderReportsControls();renderWeekStatus();renderCalendarControls();renderHeaderStatus();renderAIControls();
+});
 
 el("saveWorkout").addEventListener("click",handleSaveWorkout);
 el("finishWorkout").addEventListener("click",handleFinishWorkout);
 
 el("loadPrevious").addEventListener("click",loadPrevious);
+el("loadPreviousTop")?.addEventListener("click",loadPrevious);
 
 el("saveBW").addEventListener("click",async()=>{
   const weight=parseFloat(el("bwValue").value);
@@ -1614,7 +1555,7 @@ el("importData").addEventListener("change",async e=>{
     state.workouts.forEach(x=>x._cloudDirty=true);
     state.bodyweights.forEach(x=>x._cloudDirty=true);
     (state.activity||[]).forEach(x=>x._cloudDirty=true);
-    (state.real1rms||[]).forEach(x=>x._cloudDirty=true);Object.values(state.weekProgress||{}).forEach(x=>x._cloudDirty=true);
+    (state.real1rms||[]).forEach(x=>x._cloudDirty=true);(state.blocks||[]).forEach(x=>x._cloudDirty=true);(state.weekClosures||[]).forEach(x=>x._cloudDirty=true);Object.values(state.weekProgress||{}).forEach(x=>x._cloudDirty=true);
     save(); initSelectors(); renderWorkout(); renderHistory(); renderAnalytics();
     await syncCloud({quiet:true});
     alert("Copia importada y enviada a Cloud Sync.");
@@ -1633,27 +1574,28 @@ el("resetData").addEventListener("click",()=>{
 
 
 
-function workoutVolume(w){let total=0;(w.exercises||[]).forEach(e=>(e.sets||[]).forEach(s=>{const kg=parseFloat(s.kg),reps=parseInt(s.reps);if(kg>0&&reps>0)total+=kg*reps}));return total}
+function workoutVolume(w){let total=0;(w.exercises||[]).forEach(e=>(e.sets||[]).filter(setPerformed).forEach(st=>{const kg=parseFloat(st.kg),reps=parseInt(st.reps);if(kg>0&&reps>0)total+=kg*reps}));return total}
 function allExerciseNames(){const labels=new Set();Object.values(program).forEach(p=>p.exercises.forEach(e=>labels.add(exerciseLabel(e[0],inferVariant(e[0])))));Object.values(optionalTemplates).forEach(t=>(t.exercises||[]).forEach(e=>labels.add(exerciseLabel(e[0],e[4]||inferVariant(e[0])))));state.workouts.forEach(w=>(w.exercises||[]).forEach(e=>labels.add(exerciseLabel(e.name,e.variant))));state.real1rms.forEach(r=>labels.add(exerciseLabel(r.exercise,r.variant)));return [...labels].sort()}
 function allBaseExerciseNames(){const names=new Set();Object.values(program).forEach(p=>p.exercises.forEach(e=>names.add(e[0])));state.workouts.forEach(w=>(w.exercises||[]).forEach(e=>names.add(e.name)));state.real1rms.forEach(r=>names.add(r.exercise));return [...names].sort()}
 function athleteGoal(ath){return ath===state.settings.athlete1?state.settings.goal1:state.settings.goal2}
-function getPRs(ath){const out={};state.workouts.filter(w=>w.athlete===ath&&isWorkoutFinalized(w)).forEach(w=>(w.exercises||[]).forEach(e=>(e.sets||[]).forEach(s=>{const kg=parseFloat(s.kg),reps=parseInt(s.reps);if(kg>0&&reps>0){const key=exerciseLabel(e.name,e.variant),e1rm=kg*(1+reps/30);if(!out[key]||e1rm>out[key].e1rm)out[key]={e1rm,kg,reps,date:w.date}}})));return out}
+function getPRs(ath){const out={};state.workouts.filter(w=>w.athlete===ath&&isWorkoutFinalized(w)).forEach(w=>(w.exercises||[]).forEach(e=>(e.sets||[]).filter(setPerformed).forEach(st=>{const kg=parseFloat(st.kg),reps=parseInt(st.reps);if(kg>0&&reps>0){const key=exerciseLabel(e.name,e.variant),e1rm=kg*(1+reps/30);if(!out[key]||e1rm>out[key].e1rm)out[key]={e1rm,kg,reps,date:w.date,block:blockNumber(w),week:w.week}}})));return out}
 function signedPct(v){if(v==null||!Number.isFinite(v))return 'N/A';return `${v>0?'+':''}${v.toFixed(1)} %`}
 function pctClass(v){return v==null?'neutral':v>0?'good':v<0?'bad':'neutral'}
-function bestE1RMInExercise(ex){let best=null;(ex.sets||[]).forEach(s=>{const kg=parseFloat(s.kg),reps=parseInt(s.reps);if(kg>0&&reps>0){const e1=kg*(1+reps/30);if(!best||e1>best.e1rm)best={e1rm:e1,kg,reps,rir:s.rir}}});return best}
-function validExerciseSets(ex){return (ex?.sets||[]).filter(s=>s.kg!==""&&s.kg!=null&&s.reps!==""&&s.reps!=null&&Number(s.reps)>0)}
+function bestE1RMInExercise(ex){let best=null;(ex.sets||[]).filter(setPerformed).forEach(st=>{const kg=parseFloat(st.kg),reps=parseInt(st.reps);if(kg>0&&reps>0){const e1=kg*(1+reps/30);if(!best||e1>best.e1rm)best={e1rm:e1,kg,reps,rir:st.rir}}});return best}
+function validExerciseSets(ex){return (ex?.sets||[]).filter(setPerformed)}
 function compactExerciseSets(ex){const sets=validExerciseSets(ex);return sets.length?sets.map(s=>`${Number(s.kg)||0}×${Number(s.reps)||0}`).join(' · '):'N/A'}
 function exerciseSessionRecords(ath,label,workouts=state.workouts){const rows=[];workouts.filter(w=>w.athlete===ath&&isWorkoutFinalized(w)).sort((a,b)=>a.date.localeCompare(b.date)||String(a.session).localeCompare(String(b.session))).forEach(w=>{const ex=(w.exercises||[]).find(e=>exerciseLabel(e.name,e.variant)===label);if(!ex)return;const best=bestE1RMInExercise(ex);if(best)rows.push({date:w.date,session:w.session,exercise:ex,best})});return rows}
 function exerciseSessionPoints(ath,label,workouts=state.workouts){return exerciseSessionRecords(ath,label,workouts).map(r=>({date:r.date,...r.best,session:r.session}))}
 function exerciseProgressRows(ath,workouts=state.workouts){const labels=new Set();workouts.filter(w=>w.athlete===ath).forEach(w=>(w.exercises||[]).forEach(e=>labels.add(exerciseLabel(e.name,e.variant))));return [...labels].map(label=>{const pts=exerciseSessionPoints(ath,label,workouts);if(!pts.length)return null;const first=pts[0],latest=pts[pts.length-1],best=pts.reduce((a,b)=>b.e1rm>a.e1rm?b:a,pts[0]);const actualPct=pts.length>=2?(latest.e1rm-first.e1rm)/first.e1rm*100:null,bestPct=pts.length>=2?(best.e1rm-first.e1rm)/first.e1rm*100:null;return{label,first,latest,best,actualPct,bestPct,count:pts.length}}).filter(Boolean).sort((a,b)=>(b.actualPct??-999)-(a.actualPct??-999))}
 function progressIndex(ath,workouts=state.workouts){const vals=exerciseProgressRows(ath,workouts).map(x=>x.actualPct).filter(x=>x!=null&&Number.isFinite(x));return vals.length?vals.reduce((a,b)=>a+b,0)/vals.length:null}
-function weekSessionCount(ath,week,workouts=state.workouts){const s=new Set(workouts.filter(w=>w.athlete===ath&&Number(w.week)===Number(week)&&!isOptionalWorkout(w)&&scheduledSessions.includes(w.session)&&isWorkoutFinalized(w)).map(w=>w.session));return s.size}
-function weekOptionalCount(ath,week,workouts=state.workouts){return workouts.filter(w=>w.athlete===ath&&Number(w.week)===Number(week)&&isOptionalWorkout(w)&&isWorkoutFinalized(w)).length}
+function weekSessionCount(ath,block,week,workouts=state.workouts){const set=new Set(workouts.filter(w=>w.athlete===ath&&blockNumber(w)===Number(block)&&Number(w.week)===Number(week)&&!isOptionalWorkout(w)&&scheduledSessions.includes(w.session)&&isWorkoutFinalized(w)).map(w=>w.session));return set.size}
+function weekOptionalCount(ath,block,week,workouts=state.workouts){return workouts.filter(w=>w.athlete===ath&&blockNumber(w)===Number(block)&&Number(w.week)===Number(week)&&isOptionalWorkout(w)&&isWorkoutFinalized(w)).length}
 function adherenceMetrics(ath,workouts=state.workouts){
-  const current=currentWeekFor(ath),currentDone=weekSessionCount(ath,current,workouts),currentExtras=weekOptionalCount(ath,current,workouts),blockComplete=current===10&&currentDone>=4,closedThrough=blockComplete?10:current-1;
-  if(closedThrough<1)return{done:0,expected:0,pct:null,closedWeeks:0,currentWeek:current,currentDone,currentExpected:4,currentPct:Math.min(100,currentDone/4*100),currentExtras};
-  const ws=workouts.filter(w=>w.athlete===ath&&!isOptionalWorkout(w)&&scheduledSessions.includes(w.session)&&isWorkoutFinalized(w)&&Number(w.week)>=1&&Number(w.week)<=closedThrough),unique=new Set(ws.map(w=>`${Number(w.week)}|${w.session}`)),expected=closedThrough*4,done=unique.size;
-  return{done,expected,pct:expected?done/expected*100:null,closedWeeks:closedThrough,currentWeek:current,currentDone,currentExpected:4,currentPct:Math.min(100,currentDone/4*100),currentExtras};
+  const cb=currentBlockFor(ath),cw=currentWeekFor(ath),currentDone=weekSessionCount(ath,cb,cw,workouts),currentExtras=weekOptionalCount(ath,cb,cw,workouts),closed=[];
+  ensureBlocks();
+  for(const b of state.blocks){const bn=Number(b.number);if(bn>cb)continue;for(let w=1;w<=BLOCK_WEEKS;w++){const before=positionCompare(bn,w,cb,cw)<0,same=bn===cb&&w===cw,complete=weekSessionCount(ath,bn,w,workouts)>=4,explicit=!!weekClosureFor(ath,bn,w);if(before||explicit||(same&&complete))closed.push({block:bn,week:w,done:weekSessionCount(ath,bn,w,workouts)})}}
+  const uniq=new Map();closed.forEach(x=>uniq.set(positionKey(x.block,x.week),x));const rows=[...uniq.values()],done=rows.reduce((sum,x)=>sum+x.done,0),expected=rows.length*4;
+  return{done,expected,pct:expected?done/expected*100:null,closedWeeks:rows.length,currentBlock:cb,currentWeek:cw,currentDone,currentExpected:4,currentPct:Math.min(100,currentDone/4*100),currentExtras};
 }
 function goalProgressMetrics(ath,bodyweights=state.bodyweights){const bw=bodyweights.filter(x=>x.athlete===ath).sort((a,b)=>a.date.localeCompare(b.date)),goal=Number(athleteGoal(ath));if(!bw.length||!Number.isFinite(goal))return null;const start=Number(bw[0].weight),current=Number(bw[bw.length-1].weight),den=goal-start,pct=Math.abs(den)<1e-9?null:(current-start)/den*100;return{start,current,goal,pct,remaining:goal-current}}
 function nearestBodyweight(ath,date){const rows=state.bodyweights.filter(x=>x.athlete===ath&&Number(x.weight)>0);if(!rows.length)return null;const t=new Date(date+'T12:00:00').getTime();let best=null;rows.forEach(x=>{const d=Math.abs(new Date(x.date+'T12:00:00').getTime()-t);if(!best||d<best.dist)best={dist:d,weight:Number(x.weight),date:x.date}});return best}
@@ -1723,10 +1665,10 @@ function renderAnalytics(){
   el('kpiVolume').textContent=Math.round(workouts.reduce((s,w)=>s+workoutVolume(w),0)).toLocaleString('es-ES')+' kg';
   el('kpiAdherence').textContent=adh.pct==null?'N/A':adh.pct.toFixed(1)+' %';
   el('kpiAdherenceDetail').textContent=adh.closedWeeks?`${adh.done}/${adh.expected} sesiones · ${adh.closedWeeks} semana${adh.closedWeeks===1?'':'s'} cerrada${adh.closedWeeks===1?'':'s'}`:'La semana en curso no penaliza';
-  const fallbackWeek=Number(el('week')?.value)||1,currentWeek=adh.currentWeek||fallbackWeek,currentDone=adh.currentWeek?adh.currentDone:weekSessionCount(ath,fallbackWeek);
-  const currentExtras=adh.currentWeek?adh.currentExtras:weekOptionalCount(ath,fallbackWeek);
+  const fallbackWeek=Number(el('week')?.value)||1,currentWeek=adh.currentWeek||fallbackWeek,currentDone=adh.currentWeek?adh.currentDone:weekSessionCount(ath,Number(el('block')?.value)||currentBlockFor(ath),fallbackWeek);
+  const currentExtras=adh.currentWeek?adh.currentExtras:weekOptionalCount(ath,Number(el('block')?.value)||currentBlockFor(ath),fallbackWeek);
   el('kpiCurrentWeek').textContent=`${currentDone} / 4${currentExtras?` · +${currentExtras} extra${currentExtras===1?'':'s'}`:''}`;
-  el('kpiCurrentWeekDetail').textContent=`Semana ${currentWeek} · ${Math.min(100,currentDone/4*100).toFixed(0)} % programado completado${currentExtras?` · ${currentExtras} opcional${currentExtras===1?'':'es'}`:''}`;
+  el('kpiCurrentWeekDetail').textContent=`Bloque ${adh.currentBlock||currentBlockFor(ath)} · Semana ${currentWeek} · ${Math.min(100,currentDone/4*100).toFixed(0)} % programado completado${currentExtras?` · ${currentExtras} opcional${currentExtras===1?'':'es'}`:''}`;
   el('kpiProgressIndex').textContent=idx==null?'N/A':signedPct(idx);el('kpiProgressIndex').className=idx==null?'neutral':pctClass(idx);
   const gp=goalProgressMetrics(ath);if(gp){el('goalStartWeight').textContent=gp.start.toFixed(1)+' kg';el('goalCurrentWeight').textContent=gp.current.toFixed(1)+' kg';el('goalTargetWeight').textContent=gp.goal.toFixed(1)+' kg';el('goalProgressText').textContent=`${signedPct(gp.pct)} del camino al objetivo`;el('goalProgressText').className=pctClass(gp.pct);el('goalRemainingText').textContent=Math.abs(gp.remaining)<0.05?'Objetivo alcanzado':`${Math.abs(gp.remaining).toFixed(1)} kg ${gp.remaining>0?'por subir':'por bajar'}`;el('goalProgressBar').style.width=`${Math.max(0,Math.min(100,gp.pct??0))}%`}else{['goalStartWeight','goalCurrentWeight','goalTargetWeight'].forEach(id=>el(id).textContent='—');el('goalProgressText').textContent='Sin datos suficientes';el('goalProgressText').className='neutral';el('goalRemainingText').textContent='';el('goalProgressBar').style.width='0%'}
   const bw=state.bodyweights.filter(x=>x.athlete===ath).sort((a,b)=>a.date.localeCompare(b.date));drawLineChart(el('weightChart'),bw.map(x=>({label:x.date.slice(5),y:+x.weight})),' kg');const acts=state.activity.filter(x=>x.athlete===ath).sort((a,b)=>a.date.localeCompare(b.date));drawLineChart(el('stepsChart'),acts.map(x=>({label:x.date.slice(5),y:+x.steps})),'');
@@ -1741,9 +1683,51 @@ el('refreshAnalytics').addEventListener('click',renderAnalytics);el('strengthExe
 el('rmAthlete').addEventListener('change',renderPRs);el('rmExercise').addEventListener('change',renderRMVariantOptions);
 el('saveRealRM').addEventListener('click',async()=>{const athlete=el('rmAthlete').value,exercise=el('rmExercise').value,variant=el('rmVariant').value,date=el('rmDate').value,weight=Number(el('rmWeight').value),notes=el('rmNotes').value.trim();if(!athlete||!exercise||!variant||!date||!(weight>0)){alert('Completa atleta, ejercicio, variante, fecha y un 1RM válido.');return}const near=nearestBodyweight(athlete,date),rec={clientUid:rmUid(),athlete,exercise,variant,date,weight,bodyweightAtTest:near?.weight??null,notes};state.real1rms.push(rec);save();const ok=await saveRealRMToCloud(rec);el('rmWeight').value='';el('rmNotes').value='';renderPRs();renderAnalytics();alert(ok?'1RM real registrado y sincronizado.':'1RM real guardado localmente; pendiente de sincronizar.')});
 
+// -------- Coach IA --------
+const coachPinKey='ironBlockCoachPin';
+function renderAIControls(){
+  const s=el('aiAthlete');if(!s)return;const prev=s.value||el('athlete')?.value||state.settings.athlete1;s.innerHTML=`<option>${state.settings.athlete1}</option><option>${state.settings.athlete2}</option>`;s.value=[state.settings.athlete1,state.settings.athlete2].includes(prev)?prev:state.settings.athlete1;
+  const pin=localStorage.getItem(coachPinKey)||'';if(el('coachPin')&&document.activeElement!==el('coachPin'))el('coachPin').value=pin;
+  if(el('aiStatus'))el('aiStatus').textContent=pin?'Coach preparado en este dispositivo. Gemini responderá cuando la Edge Function tenga configurados GEMINI_API_KEY e IRON_BLOCK_COACH_PIN.':'Configura el PIN del Coach en Ajustes. La clave de Gemini se guarda únicamente como secreto en Supabase.';
+}
+function aiExerciseSummary(ath,workouts){
+  const labels=new Set();workouts.forEach(w=>(w.exercises||[]).forEach(e=>{if(e.status!=='skipped')labels.add(exerciseLabel(e.name,e.variant))}));
+  return [...labels].map(label=>{const pts=exerciseSessionPoints(ath,label,workouts);if(!pts.length)return null;const first=pts[0],last=pts[pts.length-1],best=pts.reduce((a,b)=>b.e1rm>a.e1rm?b:a,pts[0]);return{exercise:label,first:{date:first.date,e1rm:+first.e1rm.toFixed(1),set:`${first.kg}x${first.reps}`},latest:{date:last.date,e1rm:+last.e1rm.toFixed(1),set:`${last.kg}x${last.reps}`},best:{date:best.date,e1rm:+best.e1rm.toFixed(1),set:`${best.kg}x${best.reps}`}}}).filter(Boolean).slice(0,35);
+}
+function aiWorkoutCompact(w){return{date:w.date,block:blockNumber(w),week:Number(w.week),globalWeek:globalWeekNumber(blockNumber(w),w.week),session:w.session,optional:isOptionalWorkout(w),exercises:(w.exercises||[]).map(e=>({name:e.name,variant:e.variant,status:e.status||'performed',sets:validExerciseSets(e).map(st=>({kg:Number(st.kg),reps:Number(st.reps),rir:String(st.rir??'')}))})).filter(e=>e.status!=='skipped'||e.sets.length)}}
+function buildAIContext(ath,scope){
+  const cb=currentBlockFor(ath),cw=currentWeekFor(ath);let workouts=state.workouts.filter(w=>w.athlete===ath&&isWorkoutFinalized(w)).sort((a,b)=>String(a.date).localeCompare(String(b.date))||globalWeekNumber(blockNumber(a),a.week)-globalWeekNumber(blockNumber(b),b.week));
+  const all=workouts;
+  if(scope==='block')workouts=workouts.filter(w=>blockNumber(w)===cb);else if(scope==='recent')workouts=workouts.slice(-12);
+  const bw=state.bodyweights.filter(x=>x.athlete===ath).sort((a,b)=>a.date.localeCompare(b.date));
+  const rms=state.real1rms.filter(x=>x.athlete===ath).sort((a,b)=>a.date.localeCompare(b.date));
+  const adh=adherenceMetrics(ath),recent=workouts.slice(-16).map(aiWorkoutCompact),summary=aiExerciseSummary(ath,scope==='all'?all:workouts);
+  return{athlete:ath,position:{block:cb,week:cw,globalWeek:globalWeekNumber(cb,cw)},scope,adherence:{closedWeeks:adh.closedWeeks,done:adh.done,expected:adh.expected,pct:adh.pct==null?null:+adh.pct.toFixed(1),current:`${adh.currentDone}/4`,extras:adh.currentExtras},bodyweight:bw.length?{first:bw[0],latest:bw[bw.length-1],goal:Number(athleteGoal(ath))}:null,real1RM:rms.slice(-20),exerciseProgress:summary,recentWorkouts:recent};
+}
+function appendCoachBubble(role,text){const chat=el('aiChat');if(!chat)return;const empty=chat.querySelector('.small');if(empty&&chat.children.length===1)chat.innerHTML='';const d=document.createElement('div');d.className=`ai-bubble ${role}`;d.textContent=text;chat.appendChild(d);d.scrollIntoView({behavior:'smooth',block:'end'});}
+async function askCoach(){
+  const q=el('aiQuestion').value.trim(),ath=el('aiAthlete').value,scope=el('aiScope').value,pin=localStorage.getItem(coachPinKey)||'';if(!q){alert('Escribe una pregunta.');return}if(!pin){alert('Primero configura el PIN del Coach en Ajustes.');return}
+  appendCoachBubble('user',q);el('aiQuestion').value='';el('askCoach').disabled=true;el('aiStatus').textContent='Pensando con tus datos de IRON BLOCK…';
+  try{
+    const res=await fetch(`${SUPABASE_URL}/functions/v1/iron-block-coach`,{method:'POST',headers:{'Content-Type':'application/json','apikey':SUPABASE_KEY,'x-iron-block-pin':pin},body:JSON.stringify({question:q,athlete:ath,scope,context:buildAIContext(ath,scope)})});
+    const data=await res.json().catch(()=>({}));if(!res.ok)throw new Error(data.error||`Coach ${res.status}`);appendCoachBubble('assistant',data.answer||'No he podido generar una respuesta.');el('aiStatus').textContent='Respuesta generada · esta conversación no se guarda.';
+  }catch(e){appendCoachBubble('assistant',`No se pudo consultar el Coach IA. ${String(e.message||e)}`);el('aiStatus').textContent='Coach IA no disponible. Tus datos de entrenamiento siguen intactos.';}finally{el('askCoach').disabled=false}
+}
+
 // -------- Informes --------
-function renderReportsControls(){const s=el('reportAthlete');if(!s)return;const prev=s.value||el('athlete')?.value||state.settings.athlete1;s.innerHTML=`<option>${state.settings.athlete1}</option><option>${state.settings.athlete2}</option><option value="__both__">Ambos</option>`;if([...s.options].some(o=>o.value===prev))s.value=prev;const target=s.value==='__both__'?`${state.settings.athlete1} + ${state.settings.athlete2}`:s.value;el('reportPreview').innerHTML=`Informe para <b>${target}</b>. Incluye series reales iniciales/actuales, e1RM, gráficas por ejercicio, 1RM reales, peso, pasos, volumen programado/opcional y adherencia basada solo en semanas cerradas.`}
-function reportRange(){const mode=el('reportPeriod').value;if(mode==='custom')return{start:el('reportStart').value||'0000-01-01',end:el('reportEnd').value||'9999-12-31',label:`${el('reportStart').value||'inicio'} → ${el('reportEnd').value||'hoy'}`};if(mode==='4w'){const end=todayISO(),d=new Date(end+'T12:00:00');d.setDate(d.getDate()-27);return{start:d.toISOString().slice(0,10),end,label:'Últimas 4 semanas'}}return{start:'0000-01-01',end:'9999-12-31',label:'Todo el bloque'} }
+function renderReportsControls(){
+  const s=el('reportAthlete');if(!s)return;const prev=s.value||el('athlete')?.value||state.settings.athlete1;s.innerHTML=`<option>${state.settings.athlete1}</option><option>${state.settings.athlete2}</option><option value="__both__">Ambos</option>`;if([...s.options].some(o=>o.value===prev))s.value=prev;
+  const period=el('reportPeriod'),old=period?.value||`block-${currentBlockFor(el('athlete')?.value||state.settings.athlete1)}`;if(period){ensureBlocks();period.innerHTML=`<option value="all">Todo el historial</option>`+state.blocks.map(b=>`<option value="block-${b.number}">${esc(b.name||`Bloque ${b.number}`)} · semanas ${globalWeekNumber(b.number,1)}-${globalWeekNumber(b.number,10)}</option>`).join('')+`<option value="4w">Últimas 4 semanas</option><option value="custom">Personalizado</option>`;period.value=[...period.options].some(o=>o.value===old)?old:`block-${currentBlockFor(el('athlete')?.value||state.settings.athlete1)}`;}
+  const target=s.value==='__both__'?`${state.settings.athlete1} + ${state.settings.athlete2}`:s.value;el('reportPreview').innerHTML=`Informe para <b>${target}</b>. Puedes analizar cada bloque por separado o todo el historial. Incluye series reales, e1RM, 1RM reales, peso, pasos, volumen y adherencia.`;
+  const custom=period?.value==='custom';el('reportStartWrap')?.classList.toggle('hidden',!custom);el('reportEndWrap')?.classList.toggle('hidden',!custom);
+}
+function reportRange(){
+  const mode=el('reportPeriod').value;
+  if(mode.startsWith('block-')){const block=Number(mode.split('-')[1])||1;return{start:'0000-01-01',end:'9999-12-31',block,label:blockMeta(block).name||`Bloque ${block}`}}
+  if(mode==='custom')return{start:el('reportStart').value||'0000-01-01',end:el('reportEnd').value||'9999-12-31',block:null,label:`${el('reportStart').value||'inicio'} → ${el('reportEnd').value||'hoy'}`};
+  if(mode==='4w'){const end=todayISO(),d=new Date(end+'T12:00:00');d.setDate(d.getDate()-27);const start=localISO(d.getFullYear(),d.getMonth(),d.getDate());return{start,end,block:null,label:'Últimas 4 semanas'}}
+  return{start:'0000-01-01',end:'9999-12-31',block:null,label:'Todo el historial'};
+}
 function betweenDate(x,start,end){return x.date>=start&&x.date<=end}
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function reportSvg(points,suffix=''){if(!points.length)return '<div class="empty">Sin datos suficientes</div>';const W=720,H=190,p=35,ys=points.map(x=>Number(x.y)),mn=Math.min(...ys),mx=Math.max(...ys),lo=mn===mx?mn-1:mn,hi=mn===mx?mx+1:mx,step=points.length===1?0:(W-p*2)/(points.length-1),yp=v=>H-p-(v-lo)/(hi-lo)*(H-p*2),coords=points.map((x,i)=>`${p+i*step},${yp(x.y)}`).join(' '),circles=points.map((x,i)=>`<circle cx="${p+i*step}" cy="${yp(x.y)}" r="4" fill="#20b873"/>`).join('');return`<svg viewBox="0 0 ${W} ${H}" width="100%" height="190"><line x1="${p}" y1="${p}" x2="${p}" y2="${H-p}" stroke="#c8ced8"/><line x1="${p}" y1="${H-p}" x2="${W-p}" y2="${H-p}" stroke="#c8ced8"/><polyline points="${coords}" fill="none" stroke="#20b873" stroke-width="3"/>${circles}<text x="3" y="${p}" font-size="11" fill="#5f6978">${hi.toFixed(1)}${suffix}</text><text x="3" y="${H-p}" font-size="11" fill="#5f6978">${lo.toFixed(1)}${suffix}</text><text x="${p}" y="${H-7}" font-size="11" fill="#5f6978">${esc(points[0].label)}</text><text x="${W-p-50}" y="${H-7}" font-size="11" fill="#5f6978">${esc(points[points.length-1].label)}</text></svg>`}
@@ -1755,7 +1739,22 @@ function exerciseReportDetails(ath,workouts,rms){
   const labels=new Set();workouts.filter(w=>w.athlete===ath).forEach(w=>(w.exercises||[]).forEach(e=>labels.add(exerciseLabel(e.name,e.variant))));
   return [...labels].map(label=>{const sessions=exerciseSessionRecords(ath,label,workouts);if(!sessions.length)return null;const first=sessions[0],latest=sessions[sessions.length-1],best=sessions.reduce((a,b)=>b.best.e1rm>a.best.e1rm?b:a,sessions[0]),actualPct=sessions.length>=2?(latest.best.e1rm-first.best.e1rm)/first.best.e1rm*100:null,bestPct=sessions.length>=2?(best.best.e1rm-first.best.e1rm)/first.best.e1rm*100:null,realRows=rms.filter(r=>r.athlete===ath&&exerciseLabel(r.exercise,r.variant)===label).sort((a,b)=>a.date.localeCompare(b.date)),bestReal=realRows.length?realRows.reduce((a,b)=>Number(b.weight)>Number(a.weight)?b:a,realRows[0]):null;return{label,sessions,first,latest,best,actualPct,bestPct,realRows,bestReal}}).filter(Boolean).sort((a,b)=>a.label.localeCompare(b.label));
 }
-function reportMetrics(ath,start,end){const workouts=state.workouts.filter(w=>w.athlete===ath&&isWorkoutFinalized(w)&&betweenDate(w,start,end)),scheduledWorkouts=workouts.filter(w=>!isOptionalWorkout(w)),optionalWorkouts=workouts.filter(isOptionalWorkout),bw=state.bodyweights.filter(x=>x.athlete===ath&&betweenDate(x,start,end)).sort((a,b)=>a.date.localeCompare(b.date)),activity=state.activity.filter(x=>x.athlete===ath&&betweenDate(x,start,end)).sort((a,b)=>a.date.localeCompare(b.date)),rms=state.real1rms.filter(x=>x.athlete===ath&&betweenDate(x,start,end)).sort((a,b)=>a.date.localeCompare(b.date)),prog=exerciseProgressRows(ath,workouts),adh=adherenceMetrics(ath,workouts),idx=progressIndex(ath,workouts),goal=goalProgressMetrics(ath,state.bodyweights),exerciseDetails=exerciseReportDetails(ath,workouts,rms),volumeProgrammed=scheduledWorkouts.reduce((s,w)=>s+workoutVolume(w),0),volumeOptional=optionalWorkouts.reduce((s,w)=>s+workoutVolume(w),0);return{ath,workouts,scheduledWorkouts,optionalWorkouts,bw,activity,rms,prog,adh,idx,goal,exerciseDetails,volumeProgrammed,volumeOptional,volume:volumeProgrammed+volumeOptional}}
+function adherenceMetricsForReport(ath,workouts,blockFilter=null){
+  if(blockFilter==null)return adherenceMetrics(ath,workouts);
+  const b=Number(blockFilter),currentB=currentBlockFor(ath),currentW=currentWeekFor(ath),rows=[];
+  for(let w=1;w<=BLOCK_WEEKS;w++){
+    const done=weekSessionCount(ath,b,w,workouts),explicit=!!weekClosureFor(ath,b,w),before=positionCompare(b,w,currentB,currentW)<0,complete=done>=4;
+    if(explicit||before||complete)rows.push({week:w,done});
+  }
+  const done=rows.reduce((a,x)=>a+x.done,0),expected=rows.length*4,isCurrent=b===currentB,currentDone=isCurrent?weekSessionCount(ath,b,currentW,workouts):0,currentExtras=isCurrent?weekOptionalCount(ath,b,currentW,workouts):0;
+  return{done,expected,pct:expected?done/expected*100:null,closedWeeks:rows.length,currentBlock:b,currentWeek:isCurrent?currentW:null,currentDone,currentExpected:4,currentPct:isCurrent?Math.min(100,currentDone/4*100):0,currentExtras};
+}
+function reportMetrics(ath,start,end,blockFilter=null){
+  const workouts=state.workouts.filter(w=>w.athlete===ath&&isWorkoutFinalized(w)&&betweenDate(w,start,end)&&(blockFilter==null||blockNumber(w)===Number(blockFilter))),scheduledWorkouts=workouts.filter(w=>!isOptionalWorkout(w)),optionalWorkouts=workouts.filter(isOptionalWorkout);
+  const dates=workouts.map(w=>w.date).filter(Boolean).sort(),rangeStart=blockFilter!=null&&dates.length?dates[0]:start,rangeEnd=blockFilter!=null&&dates.length?dates[dates.length-1]:end;
+  const bw=state.bodyweights.filter(x=>x.athlete===ath&&betweenDate(x,rangeStart,rangeEnd)).sort((a,b)=>a.date.localeCompare(b.date)),activity=state.activity.filter(x=>x.athlete===ath&&betweenDate(x,rangeStart,rangeEnd)).sort((a,b)=>a.date.localeCompare(b.date)),rms=state.real1rms.filter(x=>x.athlete===ath&&betweenDate(x,rangeStart,rangeEnd)).sort((a,b)=>a.date.localeCompare(b.date)),prog=exerciseProgressRows(ath,workouts),adh=adherenceMetricsForReport(ath,workouts,blockFilter),idx=progressIndex(ath,workouts),goal=goalProgressMetrics(ath,bw.length?bw:state.bodyweights),exerciseDetails=exerciseReportDetails(ath,workouts,rms),volumeProgrammed=scheduledWorkouts.reduce((s,w)=>s+workoutVolume(w),0),volumeOptional=optionalWorkouts.reduce((s,w)=>s+workoutVolume(w),0);
+  return{ath,workouts,scheduledWorkouts,optionalWorkouts,bw,activity,rms,prog,adh,idx,goal,exerciseDetails,volumeProgrammed,volumeOptional,volume:volumeProgrammed+volumeOptional,blockFilter};
+}
 function reportExerciseHTML(x,ath){
   const est=x.sessions.map(s=>({date:s.date,y:s.best.e1rm})),real=x.realRows.map(r=>({date:r.date,y:Number(r.weight)}));
   const firstSets=compactExerciseSets(x.first.exercise),latestSets=compactExerciseSets(x.latest.exercise),bestSets=compactExerciseSets(x.best.exercise);
@@ -1766,15 +1765,15 @@ function reportAthleteHTML(m){
   const g=m.goal,steps=m.activity.map(x=>Number(x.steps)||0),avgSteps=steps.length?Math.round(steps.reduce((a,b)=>a+b,0)/steps.length):null;
   const rmHist=m.rms.length?m.rms.map(r=>`<tr><td>${r.date}</td><td>${esc(exerciseLabel(r.exercise,r.variant))}</td><td>${Number(r.weight).toFixed(1)} kg</td><td>${realRMRelative(r)?realRMRelative(r).toFixed(2)+'× BW':'N/A'}</td></tr>`).join(''):'<tr><td colspan="4">Sin 1RM reales en el periodo</td></tr>';
   const progRows=m.prog.length?m.prog.map(x=>{const real=bestRealRMForLabel(m.ath,x.label,m.rms);return`<tr><td>${esc(x.label)}</td><td>${x.first.e1rm.toFixed(1)} kg</td><td>${x.latest.e1rm.toFixed(1)} kg</td><td class="${pctClass(x.actualPct)}">${signedPct(x.actualPct)}</td><td>${x.best.e1rm.toFixed(1)} kg</td><td class="${pctClass(x.bestPct)}">${signedPct(x.bestPct)}</td><td>${real?Number(real.weight).toFixed(1)+' kg':'N/A'}</td></tr>`}).join(''):'<tr><td colspan="7">Sin datos suficientes</td></tr>';
-  const currentWeek=m.adh.currentWeek?`Semana ${m.adh.currentWeek}: ${m.adh.currentDone}/4`:'Sin semana iniciada';
+  const currentWeek=m.adh.currentWeek?`B${m.adh.currentBlock||1} · Semana ${m.adh.currentWeek}: ${m.adh.currentDone}/4`:(m.blockFilter?`Bloque ${m.blockFilter} cerrado/histórico`:'Sin semana iniciada');
   const exerciseBlocks=m.exerciseDetails.length?m.exerciseDetails.map(x=>reportExerciseHTML(x,m.ath)).join(''):'<div class="empty">Sin ejercicios con datos en este periodo.</div>';
   return`<section class="athlete-page"><div class="brand">IRON BLOCK <span>Progress Report</span></div><h1>${esc(m.ath)}</h1><div class="metrics"><div><small>Sesiones programadas</small><b>${m.scheduledWorkouts.length}</b></div><div><small>Sesiones opcionales</small><b>+${m.optionalWorkouts.length}</b></div><div><small>Volumen programado</small><b>${Math.round(m.volumeProgrammed).toLocaleString('es-ES')} kg</b></div><div><small>Volumen opcional</small><b>${Math.round(m.volumeOptional).toLocaleString('es-ES')} kg</b></div><div><small>Adherencia · semanas cerradas</small><b>${m.adh.pct==null?'N/A':m.adh.pct.toFixed(1)+' %'}</b><em>${m.adh.closedWeeks} semana${m.adh.closedWeeks===1?'':'s'} cerrada${m.adh.closedWeeks===1?'':'s'}</em></div><div><small>Semana actual</small><b>${currentWeek}${m.adh.currentExtras?` · +${m.adh.currentExtras} extra${m.adh.currentExtras===1?'':'s'}`:''}</b></div><div><small>Índice progreso</small><b>${signedPct(m.idx)}</b></div><div><small>Peso actual</small><b>${g?g.current.toFixed(1)+' kg':'N/A'}</b></div><div><small>Objetivo</small><b>${g?g.goal.toFixed(1)+' kg':'N/A'}</b></div><div><small>Objetivo completado</small><b>${g?signedPct(g.pct):'N/A'}</b></div><div><small>Pasos medios</small><b>${avgSteps==null?'N/A':avgSteps.toLocaleString('es-ES')}</b></div></div><div class="method"><b>Cómo se calcula el e1RM:</b> IRON BLOCK usa la fórmula de Epley: <b>e1RM = peso × (1 + repeticiones / 30)</b>. Ejemplo: 100×6 → 120 kg de e1RM. Es una estimación para comparar rendimiento; no equivale a un 1RM real testado.</div><h2>Peso corporal</h2>${reportSvg(m.bw.map(x=>({label:x.date.slice(5),y:Number(x.weight)})),' kg')}<h2>Pasos</h2>${reportSvg(m.activity.map(x=>({label:x.date.slice(5),y:Number(x.steps)})),'')}<h2>Resumen de fuerza</h2><table><thead><tr><th>Ejercicio</th><th>e1RM inicial</th><th>e1RM actual</th><th>Actual vs inicio</th><th>Mejor e1RM</th><th>Mejor vs inicio</th><th>Mejor 1RM real</th></tr></thead><tbody>${progRows}</tbody></table><h2>Evolución por ejercicio</h2>${exerciseBlocks}<h2>1RM reales testados</h2><table><thead><tr><th>Fecha</th><th>Ejercicio</th><th>1RM real</th><th>Fuerza relativa</th></tr></thead><tbody>${rmHist}</tbody></table></section>`
 }
 function generateProgressReport(){
   const win=window.open('','_blank');if(!win){alert('Chrome ha bloqueado la ventana del informe. Permite ventanas emergentes para IRON BLOCK y vuelve a intentarlo.');return}
-  const range=reportRange(),selection=el('reportAthlete').value,aths=selection==='__both__'?[state.settings.athlete1,state.settings.athlete2]:[selection],metrics=aths.map(a=>reportMetrics(a,range.start,range.end));
+  const range=reportRange(),selection=el('reportAthlete').value,aths=selection==='__both__'?[state.settings.athlete1,state.settings.athlete2]:[selection],metrics=aths.map(a=>reportMetrics(a,range.start,range.end,range.block));
   let comparison='';if(metrics.length===2){comparison=`<section class="cover"><div class="brand big">IRON BLOCK</div><h1>Progress Report</h1><p>${esc(range.label)}</p><h2>Resumen comparativo</h2><table><thead><tr><th>Atleta</th><th>Programadas</th><th>Extras</th><th>Vol. programado</th><th>Vol. extra</th><th>Adherencia cerrada</th><th>Semana actual</th><th>Índice progreso</th><th>Objetivo peso</th></tr></thead><tbody>${metrics.map(m=>`<tr><td><b>${esc(m.ath)}</b></td><td>${m.scheduledWorkouts.length}</td><td>+${m.optionalWorkouts.length}</td><td>${Math.round(m.volumeProgrammed).toLocaleString('es-ES')} kg</td><td>${Math.round(m.volumeOptional).toLocaleString('es-ES')} kg</td><td>${m.adh.pct==null?'N/A':m.adh.pct.toFixed(1)+' %'}</td><td>${m.adh.currentWeek?`S${m.adh.currentWeek} · ${m.adh.currentDone}/4${m.adh.currentExtras?` · +${m.adh.currentExtras} extra${m.adh.currentExtras===1?'':'s'}`:''}`:'N/A'}</td><td>${signedPct(m.idx)}</td><td>${m.goal?signedPct(m.goal.pct):'N/A'}</td></tr>`).join('')}</tbody></table></section>`}else{comparison=`<section class="cover"><div class="brand big">IRON BLOCK</div><h1>Progress Report</h1><p>${esc(metrics[0].ath)} · ${esc(range.label)}</p><div class="hero">Fuerza · hipertrofia · progreso medible</div></section>`}
-  const doc=`<!doctype html><html><head><meta charset="utf-8"><title>IRON BLOCK Progress Report</title><style>@page{size:A4;margin:11mm}*{box-sizing:border-box}body{font-family:Arial,sans-serif;color:#101827;margin:0;-webkit-print-color-adjust:exact;print-color-adjust:exact}.cover{min-height:260mm;display:flex;flex-direction:column;justify-content:center}.brand{font-weight:900;letter-spacing:2px;color:#0c8050}.brand span{color:#4c6078}.brand.big{font-size:34px}.cover h1{font-size:42px;margin:8px 0}.cover p{font-size:18px;color:#637083}.hero{margin-top:30px;border-left:5px solid #20b873;padding:14px 18px;background:#eef9f4;font-weight:700}.athlete-page{page-break-before:always}h1{font-size:30px;margin:8px 0 18px}h2{font-size:17px;margin:22px 0 8px;color:#22334b;border-bottom:2px solid #dfe6ee;padding-bottom:5px}h3{font-size:14px;margin:0 0 8px}.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.metrics div{border:1px solid #dfe6ee;border-radius:9px;padding:8px;background:#f8fafc}.metrics small{display:block;color:#6b7788;font-size:9px}.metrics b{display:block;font-size:14px;margin-top:3px}.metrics em{display:block;font-size:8px;color:#7b8491;font-style:normal;margin-top:2px}.method{margin:14px 0;padding:10px 12px;background:#eef6ff;border-left:4px solid #378ddd;border-radius:6px;font-size:10px;line-height:1.5}table{width:100%;border-collapse:collapse;font-size:9px}th,td{border-bottom:1px solid #e1e6ec;text-align:left;padding:5px;vertical-align:top}th{background:#f1f5f8}.good{color:#087849;font-weight:700}.bad{color:#c83e3e;font-weight:700}.neutral{color:#6b7788}.empty{padding:18px;background:#f6f8fa;color:#7a8594;border-radius:8px;font-size:10px}.exercise-report{border:1px solid #dfe6ee;border-radius:10px;padding:10px;margin:0 0 12px;break-inside:avoid-page;page-break-inside:avoid}.series-table{margin-top:5px}.exercise-summary{background:#f7f9fb;border-radius:6px;padding:7px;margin-top:7px;font-size:9px}.legendline{display:flex;gap:18px;font-size:8px;color:#657286;margin:2px 0 7px}.dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:4px}.dot.est{background:#20b873}.dot.real{background:#378ddd}.page-note{font-size:8px;color:#7b8491;margin-top:12px}@media print{button{display:none}}</style></head><body>${comparison}${metrics.map(reportAthleteHTML).join('')}<div class="page-note">Generado por IRON BLOCK V4.3 · ${new Date().toLocaleString('es-ES')} · e1RM calculado con fórmula de Epley.</div><script>setTimeout(()=>window.print(),700)<\/script></body></html>`;
+  const doc=`<!doctype html><html><head><meta charset="utf-8"><title>IRON BLOCK Progress Report</title><style>@page{size:A4;margin:11mm}*{box-sizing:border-box}body{font-family:Arial,sans-serif;color:#101827;margin:0;-webkit-print-color-adjust:exact;print-color-adjust:exact}.cover{min-height:260mm;display:flex;flex-direction:column;justify-content:center}.brand{font-weight:900;letter-spacing:2px;color:#0c8050}.brand span{color:#4c6078}.brand.big{font-size:34px}.cover h1{font-size:42px;margin:8px 0}.cover p{font-size:18px;color:#637083}.hero{margin-top:30px;border-left:5px solid #20b873;padding:14px 18px;background:#eef9f4;font-weight:700}.athlete-page{page-break-before:always}h1{font-size:30px;margin:8px 0 18px}h2{font-size:17px;margin:22px 0 8px;color:#22334b;border-bottom:2px solid #dfe6ee;padding-bottom:5px}h3{font-size:14px;margin:0 0 8px}.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.metrics div{border:1px solid #dfe6ee;border-radius:9px;padding:8px;background:#f8fafc}.metrics small{display:block;color:#6b7788;font-size:9px}.metrics b{display:block;font-size:14px;margin-top:3px}.metrics em{display:block;font-size:8px;color:#7b8491;font-style:normal;margin-top:2px}.method{margin:14px 0;padding:10px 12px;background:#eef6ff;border-left:4px solid #378ddd;border-radius:6px;font-size:10px;line-height:1.5}table{width:100%;border-collapse:collapse;font-size:9px}th,td{border-bottom:1px solid #e1e6ec;text-align:left;padding:5px;vertical-align:top}th{background:#f1f5f8}.good{color:#087849;font-weight:700}.bad{color:#c83e3e;font-weight:700}.neutral{color:#6b7788}.empty{padding:18px;background:#f6f8fa;color:#7a8594;border-radius:8px;font-size:10px}.exercise-report{border:1px solid #dfe6ee;border-radius:10px;padding:10px;margin:0 0 12px;break-inside:avoid-page;page-break-inside:avoid}.series-table{margin-top:5px}.exercise-summary{background:#f7f9fb;border-radius:6px;padding:7px;margin-top:7px;font-size:9px}.legendline{display:flex;gap:18px;font-size:8px;color:#657286;margin:2px 0 7px}.dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:4px}.dot.est{background:#20b873}.dot.real{background:#378ddd}.page-note{font-size:8px;color:#7b8491;margin-top:12px}@media print{button{display:none}}</style></head><body>${comparison}${metrics.map(reportAthleteHTML).join('')}<div class="page-note">Generado por IRON BLOCK V5 · ${new Date().toLocaleString('es-ES')} · e1RM calculado con fórmula de Epley.</div><script>setTimeout(()=>window.print(),700)<\/script></body></html>`;
   win.document.open();win.document.write(doc);win.document.close();
 }
 
@@ -1900,11 +1899,18 @@ document.addEventListener("DOMContentLoaded",()=>{
   });
 
   const syncBtn=el("syncCloudBtn");if(syncBtn)syncBtn.addEventListener("click",()=>syncCloud());
+  el('menuToggle')?.addEventListener('click',openMenu);
+  el('menuClose')?.addEventListener('click',closeMenu);
+  el('menuOverlay')?.addEventListener('click',closeMenu);
+  el('askCoach')?.addEventListener('click',askCoach);
+  el('clearCoach')?.addEventListener('click',()=>{el('aiChat').innerHTML='<div class="small">Las preguntas y respuestas solo viven en esta pantalla y no se guardan en la base de datos.</div>';el('aiStatus').textContent='Conversación local limpiada.'});
+  el('saveCoachPin')?.addEventListener('click',()=>{const pin=el('coachPin').value.trim();if(!pin){localStorage.removeItem(coachPinKey);alert('PIN local eliminado.');}else{localStorage.setItem(coachPinKey,pin);alert('PIN guardado solo en este dispositivo.');}renderAIControls()});
+
   el("dockSaveWorkout")?.addEventListener("click",()=>el("saveWorkout")?.click());
   el("dockFinishWorkout")?.addEventListener("click",()=>el("finishWorkout")?.click());
   el("dockSyncCloud")?.addEventListener("click",()=>syncCloud());
   el("editHistoricalWorkout")?.addEventListener("click",()=>{if(loadedWorkoutObject)setHistoricalMode(loadedWorkoutObject,false)});
-  el("exitHistoricalWorkout")?.addEventListener("click",()=>{clearHistoricalMode();programmaticWorkoutLoad=true;el("week").value=String(currentWeekFor(el("athlete").value));ensureSessionOption("Upper A");el("date").value=todayISO();renderWorkout();programmaticWorkoutLoad=false;renderWeekStatus()});
+  el('exitHistoricalWorkout')?.addEventListener('click',()=>{clearHistoricalMode();programmaticWorkoutLoad=true;const ath=el('athlete').value;updateBlockSelector();el('block').value=String(currentBlockFor(ath));el('week').value=String(currentWeekFor(ath));ensureSessionOption('Upper A');el('date').value=todayISO();renderWorkout();programmaticWorkoutLoad=false;renderWeekStatus()});
   el("conflictCancel")?.addEventListener("click",()=>resolveConflict("cancel"));
   el("conflictView")?.addEventListener("click",()=>resolveConflict("view"));
   el("conflictOverwrite")?.addEventListener("click",()=>resolveConflict("overwrite"));
@@ -1923,7 +1929,7 @@ document.addEventListener("DOMContentLoaded",()=>{
   el("cancelCustomExercise")?.addEventListener("click",()=>el("exerciseModal").classList.add("hidden"));
   el("confirmCustomExercise")?.addEventListener("click",()=>{const catalog=el("customExCatalog").value,name=(catalog==="__custom__"?el("customExName").value.trim():catalog);if(!name){alert("Elige o escribe un ejercicio.");return}const model={name,variant:el("customExVariant").value,targetReps:el("customExReps").value.trim()||"8-12",rest:el("customExRest").value.trim()||"90 s",rirTarget:`RIR ${el("customExRir").value.trim()||"1-2"}`,custom:true,note:"",sets:Array.from({length:Math.max(1,parseInt(el("customExSets").value)||3)},()=>({kg:"",reps:"",rir:""}))},current=collectWorkout().exercises.map(e=>({...e})),general=el("sessionNotes").value;current.push(model);renderWorkout(current,{keepNotes:true});el("sessionNotes").value=general;el("exerciseModal").classList.add("hidden");el("customExName").value="";setWorkoutDockStatus(`Añadido: ${name}`,"ok")});
   el("saveDeviceAthlete")?.addEventListener("click",()=>{saveDeviceAthleteValue(el("deviceAthleteSelect").value);alert(`${deviceAthlete} será el perfil predeterminado al abrir este dispositivo.`)});
-  bootPersistentState();renderCloudStatus();setTimeout(()=>{ensureDeviceAthlete();refreshAthleteSelectorPreserve();if(deviceAthlete&&el("athlete")){el("athlete").value=deviceAthlete;el("week").value=String(currentWeekFor(deviceAthlete));renderWorkout()}renderDeviceModeNotice();renderWeekStatus();setWorkoutDockStatus(`Listo · perfil predeterminado: ${deviceAthlete||"sin elegir"}.`,"ok");syncCloud({quiet:true})},250);
+  bootPersistentState();renderCloudStatus();setTimeout(()=>{ensureDeviceAthlete();refreshAthleteSelectorPreserve();if(deviceAthlete&&el('athlete')){programmaticWorkoutLoad=true;el('athlete').value=deviceAthlete;updateBlockSelector();el('block').value=String(currentBlockFor(deviceAthlete));el('week').value=String(currentWeekFor(deviceAthlete));renderWorkout();programmaticWorkoutLoad=false}renderDeviceModeNotice();renderWeekStatus();renderHeaderStatus();setWorkoutDockStatus(`Listo · perfil predeterminado: ${deviceAthlete||'sin elegir'}.`,'ok');syncCloud({quiet:true})},250);
 });
 </script>
 
