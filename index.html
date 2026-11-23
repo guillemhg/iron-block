@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <link rel="manifest" href="manifest.webmanifest" />
 <link rel="icon" href="icon-192.png" />
-<title>Iron Block V5.1 · Blocks & Coach</title>
+<title>Iron Block V5.2 · Blocks & Coach</title>
 <style>
 :root{
   --bg:#0b1020; --panel:#121a2e; --panel2:#18233c; --text:#f4f7fb;
@@ -76,7 +76,7 @@ table{width:100%;border-collapse:collapse;font-size:12px}th,td{padding:8px;borde
 .timerinner{max-width:900px;margin:0 auto;padding:10px 14px;display:flex;gap:8px;align-items:center}
 .timerdisplay{font-weight:900;font-size:23px;letter-spacing:1px;min-width:72px;text-align:center}
 .timerlabel{flex:1;min-width:100px}.timerlabel b{display:block}.timerlabel span{font-size:11px;color:var(--muted)}
-.donebtn{width:42px;height:42px;border-radius:12px;border:1px solid var(--border);background:#0e1729;color:var(--accent);font-size:20px;font-weight:900;display:inline-flex;align-items:center;justify-content:center;cursor:default}.donebtn:disabled{opacity:1;cursor:default}
+.donebtn{width:42px;height:42px;border-radius:12px;border:1px solid var(--border);background:#0e1729;color:var(--accent);font-size:20px;font-weight:900;display:inline-flex;align-items:center;justify-content:center;cursor:default}.donebtn{user-select:none;pointer-events:none}
 .donebtn.done{background:var(--accent);color:#06130c}
 .pr{font-size:11px;color:var(--warn);font-weight:800;margin-top:4px}
 .suggest{font-size:11px;color:var(--accent2);margin-top:4px}
@@ -193,7 +193,7 @@ canvas{width:100%;height:220px;display:block}
 <header>
   <div class="app-header">
     <div class="header-brand">
-      <h1>IRON BLOCK V5.1</h1>
+      <h1>IRON BLOCK V5.2</h1>
       <div class="page-title-mini" id="currentSectionTitle">Entreno</div>
       <div class="header-meta"><span id="headerBlockWeek">Bloque 1 · Semana 1/10</span><span class="cloud-dot" id="headerCloudDot"></span><span id="headerCloudText">Nube</span></div>
     </div>
@@ -710,7 +710,7 @@ canvas{width:100%;height:220px;display:block}
     </div>
     <div id="storageDetail" class="persist-detail small">Esperando carga inicial...</div>
     <p class="small" style="margin-top:10px">
-      Para que los datos sobrevivan de forma fiable entre cierres, abre IRON BLOCK V5.1 desde una URL HTTPS estable o instálala como PWA.
+      Para que los datos sobrevivan de forma fiable entre cierres, abre IRON BLOCK V5.2 desde una URL HTTPS estable o instálala como PWA.
       Si la abres directamente desde Descargas como <code>file://</code> o <code>content://</code>, Android/Chrome puede aislar el almacenamiento entre aperturas.
     </p>
   </div>
@@ -739,7 +739,7 @@ canvas{width:100%;height:220px;display:block}
   </div>
 </section>
 
-<div class="footer-note">IRON BLOCK V5.1 · Entrenad duro, progresad con cabeza y registrad todo.</div>
+<div class="footer-note">IRON BLOCK V5.2 · Entrenad duro, progresad con cabeza y registrad todo.</div>
 </div>
 
 <div class="timerbar">
@@ -1439,10 +1439,10 @@ function previousReferenceHTML(athlete,exercise,variant,currentDate,currentSessi
 }
 function updateExerciseReference(box){const variant=box.querySelector('.variant-select')?.value||inferVariant(box.dataset.name),node=box.querySelector('.prev-session');if(node)node.innerHTML=previousReferenceHTML(el('athlete').value,box.dataset.name,variant,el('date').value,el('session').value)}
 function templateModels(){const w=+el("week").value,ses=el("session").value,ath=el('athlete').value;if(isOptionalSessionName(ses)){const t=getOptionalTemplateBySession(ses);if(!t)return[];const key=Object.entries(optionalTemplates).find(([,x])=>x===t)?.[0];const models=key?optionalTemplateModels(key):[];return models.map(m=>({...m,variant:lastVariantForSessionExercise(ath,ses,m.name),sets:(m.sets||[]).map(st=>({...st,done:false}))}))}const p=program[ses];return p.exercises.map(e=>({name:e[0],baseSets:getWeekSets(e[1],w),targetReps:e[2],rest:e[3],variant:lastVariantForSessionExercise(ath,ses,e[0]),note:"",custom:false,status:'pending',sets:Array.from({length:getWeekSets(e[1],w)},()=>({kg:"",reps:"",rir:"",done:false}))}))}
-function makeSetRow(set={},idx=0){const done=setPerformed(set);return `<div class="setrow ${done?'done-row':'not-done'}"><button class="donebtn ${done?'done':''}" type="button" data-done="${idx}" title="Se marca automáticamente con peso + reps + RIR" disabled>✓</button><input type="number" step="0.5" inputmode="decimal" placeholder="kg" data-field="kg" value="${set.kg??""}"><input type="text" inputmode="numeric" placeholder="reps" data-field="reps" value="${set.reps??""}"><input type="number" step="1" min="0" max="5" placeholder="RIR" data-field="rir" value="${set.rir??""}"></div>`}
+function makeSetRow(set={},idx=0){const done=setPerformed(set);return `<div class="setrow ${done?'done-row':'not-done'}"><span class="donebtn ${done?'done':''}" data-done="${idx}" title="Realizada automáticamente al completar peso + reps + RIR" aria-label="${done?'Serie realizada':'Serie pendiente'}">✓</span><input type="number" step="0.5" inputmode="decimal" placeholder="kg" data-field="kg" value="${set.kg??""}"><input type="text" inputmode="numeric" placeholder="reps" data-field="reps" value="${set.reps??""}"><input type="number" step="1" min="0" max="5" placeholder="RIR" data-field="rir" value="${set.rir??""}"></div>`}
 function updateAutoDoneRow(row,{startRest=false}={}){
   if(!row)return false;const payload={kg:row.querySelector('[data-field="kg"]')?.value??'',reps:row.querySelector('[data-field="reps"]')?.value??'',rir:row.querySelector('[data-field="rir"]')?.value??''},done=setPerformed(payload),btn=row.querySelector('.donebtn'),was=btn?.classList.contains('done');
-  btn?.classList.toggle('done',done);row.classList.toggle('done-row',done);row.classList.toggle('not-done',!done);
+  btn?.classList.toggle('done',done);if(btn)btn.setAttribute('aria-label',done?'Serie realizada':'Serie pendiente');row.classList.toggle('done-row',done);row.classList.toggle('not-done',!done);
   if(done&&!was&&startRest)startTimer(+row.closest('.exercise')?.dataset.restSec||90,row.closest('.exercise')?.dataset.name||'Descanso');
   return done;
 }
@@ -1729,12 +1729,15 @@ async function coachFetch(url,options={},timeoutMs=30000){
 async function testCoachConnection({silent=false}={}){
   const status=el('coachConnectionStatus');if(status)status.textContent='Comprobando conexión con Supabase…';
   try{
-    const res=await coachFetch(`${SUPABASE_URL}/functions/v1/iron-block-coach`,{method:'GET'},12000);
+    const res=await coachFetch(`${SUPABASE_URL}/functions/v1/iron-block-coach?probe=1`,{method:'GET'},18000);
     const data=await res.json().catch(()=>({}));
     if(!res.ok)throw new Error(data.error||`HTTP ${res.status}`);
-    const msg=data.configured?`✓ Edge Function conectada · Gemini configurado · ${data.model||'modelo listo'}`:'⚠ Edge Function conectada, pero falta GEMINI_API_KEY en Supabase.';
-    if(status){status.textContent=msg;status.className=`persist-detail small ${data.configured?'storage-ok':'storage-warn'}`}
-    if(!silent)alert(msg);return !!data.configured;
+    let msg,ok=false;
+    if(!data.configured){msg='⚠ Edge Function conectada, pero falta GEMINI_API_KEY en Supabase.';}
+    else if(data.provider_ok){ok=true;msg=`✓ Coach IA operativo · ${data.model||'Gemini'} respondió correctamente.`;}
+    else{msg=`⚠ Edge Function conectada, pero Gemini no respondió: ${data.error||'error desconocido'}`;}
+    if(status){status.textContent=msg;status.className=`persist-detail small ${ok?'storage-ok':'storage-warn'}`}
+    if(!silent)alert(msg);return ok;
   }catch(e){const msg=`✗ No se pudo llegar a la Edge Function: ${String(e?.name==='AbortError'?'tiempo de espera agotado':e?.message||e)}`;if(status){status.textContent=msg;status.className='persist-detail small storage-bad'}if(!silent)alert(msg);return false}
 }
 async function askCoach(){
@@ -1807,7 +1810,7 @@ function generateProgressReport(){
   const win=window.open('','_blank');if(!win){alert('Chrome ha bloqueado la ventana del informe. Permite ventanas emergentes para IRON BLOCK y vuelve a intentarlo.');return}
   const range=reportRange(),selection=el('reportAthlete').value,aths=selection==='__both__'?[state.settings.athlete1,state.settings.athlete2]:[selection],metrics=aths.map(a=>reportMetrics(a,range.start,range.end,range.block));
   let comparison='';if(metrics.length===2){comparison=`<section class="cover"><div class="brand big">IRON BLOCK</div><h1>Progress Report</h1><p>${esc(range.label)}</p><h2>Resumen comparativo</h2><table><thead><tr><th>Atleta</th><th>Programadas</th><th>Extras</th><th>Vol. programado</th><th>Vol. extra</th><th>Adherencia cerrada</th><th>Semana actual</th><th>Índice progreso</th><th>Objetivo peso</th></tr></thead><tbody>${metrics.map(m=>`<tr><td><b>${esc(m.ath)}</b></td><td>${m.scheduledWorkouts.length}</td><td>+${m.optionalWorkouts.length}</td><td>${Math.round(m.volumeProgrammed).toLocaleString('es-ES')} kg</td><td>${Math.round(m.volumeOptional).toLocaleString('es-ES')} kg</td><td>${m.adh.pct==null?'N/A':m.adh.pct.toFixed(1)+' %'}</td><td>${m.adh.currentWeek?`S${m.adh.currentWeek} · ${m.adh.currentDone}/4${m.adh.currentExtras?` · +${m.adh.currentExtras} extra${m.adh.currentExtras===1?'':'s'}`:''}`:'N/A'}</td><td>${signedPct(m.idx)}</td><td>${m.goal?signedPct(m.goal.pct):'N/A'}</td></tr>`).join('')}</tbody></table></section>`}else{comparison=`<section class="cover"><div class="brand big">IRON BLOCK</div><h1>Progress Report</h1><p>${esc(metrics[0].ath)} · ${esc(range.label)}</p><div class="hero">Fuerza · hipertrofia · progreso medible</div></section>`}
-  const doc=`<!doctype html><html><head><meta charset="utf-8"><title>IRON BLOCK Progress Report</title><style>@page{size:A4;margin:11mm}*{box-sizing:border-box}body{font-family:Arial,sans-serif;color:#101827;margin:0;-webkit-print-color-adjust:exact;print-color-adjust:exact}.cover{min-height:260mm;display:flex;flex-direction:column;justify-content:center}.brand{font-weight:900;letter-spacing:2px;color:#0c8050}.brand span{color:#4c6078}.brand.big{font-size:34px}.cover h1{font-size:42px;margin:8px 0}.cover p{font-size:18px;color:#637083}.hero{margin-top:30px;border-left:5px solid #20b873;padding:14px 18px;background:#eef9f4;font-weight:700}.athlete-page{page-break-before:always}h1{font-size:30px;margin:8px 0 18px}h2{font-size:17px;margin:22px 0 8px;color:#22334b;border-bottom:2px solid #dfe6ee;padding-bottom:5px}h3{font-size:14px;margin:0 0 8px}.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.metrics div{border:1px solid #dfe6ee;border-radius:9px;padding:8px;background:#f8fafc}.metrics small{display:block;color:#6b7788;font-size:9px}.metrics b{display:block;font-size:14px;margin-top:3px}.metrics em{display:block;font-size:8px;color:#7b8491;font-style:normal;margin-top:2px}.method{margin:14px 0;padding:10px 12px;background:#eef6ff;border-left:4px solid #378ddd;border-radius:6px;font-size:10px;line-height:1.5}table{width:100%;border-collapse:collapse;font-size:9px}th,td{border-bottom:1px solid #e1e6ec;text-align:left;padding:5px;vertical-align:top}th{background:#f1f5f8}.good{color:#087849;font-weight:700}.bad{color:#c83e3e;font-weight:700}.neutral{color:#6b7788}.empty{padding:18px;background:#f6f8fa;color:#7a8594;border-radius:8px;font-size:10px}.exercise-report{border:1px solid #dfe6ee;border-radius:10px;padding:10px;margin:0 0 12px;break-inside:avoid-page;page-break-inside:avoid}.series-table{margin-top:5px}.exercise-summary{background:#f7f9fb;border-radius:6px;padding:7px;margin-top:7px;font-size:9px}.legendline{display:flex;gap:18px;font-size:8px;color:#657286;margin:2px 0 7px}.dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:4px}.dot.est{background:#20b873}.dot.real{background:#378ddd}.page-note{font-size:8px;color:#7b8491;margin-top:12px}@media print{button{display:none}}</style></head><body>${comparison}${metrics.map(reportAthleteHTML).join('')}<div class="page-note">Generado por IRON BLOCK V5.1 · ${new Date().toLocaleString('es-ES')} · e1RM calculado con fórmula de Epley.</div><script>setTimeout(()=>window.print(),700)<\/script></body></html>`;
+  const doc=`<!doctype html><html><head><meta charset="utf-8"><title>IRON BLOCK Progress Report</title><style>@page{size:A4;margin:11mm}*{box-sizing:border-box}body{font-family:Arial,sans-serif;color:#101827;margin:0;-webkit-print-color-adjust:exact;print-color-adjust:exact}.cover{min-height:260mm;display:flex;flex-direction:column;justify-content:center}.brand{font-weight:900;letter-spacing:2px;color:#0c8050}.brand span{color:#4c6078}.brand.big{font-size:34px}.cover h1{font-size:42px;margin:8px 0}.cover p{font-size:18px;color:#637083}.hero{margin-top:30px;border-left:5px solid #20b873;padding:14px 18px;background:#eef9f4;font-weight:700}.athlete-page{page-break-before:always}h1{font-size:30px;margin:8px 0 18px}h2{font-size:17px;margin:22px 0 8px;color:#22334b;border-bottom:2px solid #dfe6ee;padding-bottom:5px}h3{font-size:14px;margin:0 0 8px}.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.metrics div{border:1px solid #dfe6ee;border-radius:9px;padding:8px;background:#f8fafc}.metrics small{display:block;color:#6b7788;font-size:9px}.metrics b{display:block;font-size:14px;margin-top:3px}.metrics em{display:block;font-size:8px;color:#7b8491;font-style:normal;margin-top:2px}.method{margin:14px 0;padding:10px 12px;background:#eef6ff;border-left:4px solid #378ddd;border-radius:6px;font-size:10px;line-height:1.5}table{width:100%;border-collapse:collapse;font-size:9px}th,td{border-bottom:1px solid #e1e6ec;text-align:left;padding:5px;vertical-align:top}th{background:#f1f5f8}.good{color:#087849;font-weight:700}.bad{color:#c83e3e;font-weight:700}.neutral{color:#6b7788}.empty{padding:18px;background:#f6f8fa;color:#7a8594;border-radius:8px;font-size:10px}.exercise-report{border:1px solid #dfe6ee;border-radius:10px;padding:10px;margin:0 0 12px;break-inside:avoid-page;page-break-inside:avoid}.series-table{margin-top:5px}.exercise-summary{background:#f7f9fb;border-radius:6px;padding:7px;margin-top:7px;font-size:9px}.legendline{display:flex;gap:18px;font-size:8px;color:#657286;margin:2px 0 7px}.dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:4px}.dot.est{background:#20b873}.dot.real{background:#378ddd}.page-note{font-size:8px;color:#7b8491;margin-top:12px}@media print{button{display:none}}</style></head><body>${comparison}${metrics.map(reportAthleteHTML).join('')}<div class="page-note">Generado por IRON BLOCK V5.2 · ${new Date().toLocaleString('es-ES')} · e1RM calculado con fórmula de Epley.</div><script>setTimeout(()=>window.print(),700)<\/script></body></html>`;
   win.document.open();win.document.write(doc);win.document.close();
 }
 
