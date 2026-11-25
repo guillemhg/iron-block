@@ -218,7 +218,7 @@ canvas{width:100%;height:220px;display:block}
 <section id="today" class="view">
   <div class="card">
     <div id="weekStatusCard" class="week-status-card"></div>
-    <div id="historicalModeBar" class="historical-bar hidden"><div id="historicalModeText"></div><div class="row"><button class="btn secondary" id="editHistoricalWorkout">Editar entrenamiento</button><button class="btn secondary" id="exitHistoricalWorkout">Volver al entreno actual</button></div></div>
+    <div id="historicalModeBar" class="historical-bar hidden"><div id="historicalModeText"></div><div class="row"><button class="btn secondary" id="editHistoricalWorkout">Editar entrenamiento</button><button class="btn danger" id="deleteHistoricalWorkout">Eliminar entrenamiento</button><button class="btn secondary" id="exitHistoricalWorkout">Volver al entreno actual</button></div></div>
     <div class="grid2">
       <div><label>Atleta</label><select id="athlete"></select></div>
       <div><label>Bloque</label><select id="block"></select></div>
@@ -1088,24 +1088,35 @@ async function saveWeekProgressToCloud(athlete){const p=state.weekProgress?.[ath
 async function saveWeekClosureToCloud(c){if(!c)return true;c._cloudDirty=true;save();try{await cloudUpsertWeekClosure(c);delete c._cloudDirty;save();return true}catch(e){renderCloudStatus('Cierre semanal pendiente de nube.');return false}}
 async function saveBlocksToCloud(){let ok=true;for(const b of state.blocks||[]){if(!b._cloudDirty)continue;try{await cloudUpsertBlock(b);delete b._cloudDirty}catch(e){ok=false}}save();return ok}
 async function saveWorkoutToCloud(w,originalKey=null){w._cloudDirty=true;save();try{await cloudUpsertWorkout(w);delete w._cloudDirty;cloudOnline=true;lastCloudSync=Date.now();save();renderCloudStatus("Entrenamiento subido.");return true}catch(err){cloudOnline=false;renderCloudStatus("Entrenamiento guardado localmente; pendiente de subir.");return false}}
+async function cloudDeleteWorkout(w){
+  if(!w?.clientUid)throw new Error('El entrenamiento no tiene identificador cloud.');
+  await cloudRequest(`iron_block_workouts?client_uid=eq.${encodeURIComponent(w.clientUid)}`,{method:'DELETE',prefer:'return=minimal'});
+}
 async function deleteWorkoutSafely(w){
   if(!w)return false;
   const label=`${w.athlete} · B${blockNumber(w)} S${w.week} · ${w.session} · ${w.date}`;
-  if(!confirm(`¿Eliminar este entrenamiento?\n\n${label}\n\nDejará de aparecer en calendario, historial, analítica y adherencia.`))return false;
-  if(!confirm(`CONFIRMACIÓN FINAL\n\n¿Seguro que quieres eliminar ${w.session} del ${w.date}?\n\nEsta acción no se puede deshacer desde la app.`))return false;
-  const oldFinalized=w.finalized,oldFinalizedAt=w.finalizedAt,oldVoid=w.void;
-  w.void=true;w.finalized=false;w.finalizedAt=null;w._cloudDirty=true;save();
+  if(!confirm(`¿Eliminar este entrenamiento?\n\n${label}\n\nSe borrará del calendario, historial, analítica y adherencia.`))return false;
+  if(!confirm(`CONFIRMACIÓN FINAL\n\n¿Seguro que quieres eliminar definitivamente ${w.session} del ${w.date}?\n\nEsta acción no se puede deshacer.`))return false;
+
+  setWorkoutDockStatus('Eliminando entrenamiento de la nube…','warn');
   try{
-    await cloudUpsertWorkout(w);
-    delete w._cloudDirty;
-    if(loadedWorkoutObject?.clientUid===w.clientUid){loadedWorkoutObject=null;loadedWorkoutOriginalKey=null;historicalReadOnly=false}
-    save();renderHistory();renderAnalytics();renderPendingFinalize();renderCalendar();renderWeekStatus();
-    alert('Entrenamiento eliminado correctamente.');
+    await cloudDeleteWorkout(w);
+    state.workouts=(state.workouts||[]).filter(x=>x!==w&&x.clientUid!==w.clientUid);
+    const wasLoaded=loadedWorkoutObject?.clientUid===w.clientUid;
+    if(wasLoaded){loadedWorkoutObject=null;loadedWorkoutOriginalKey=null;historicalReadOnly=false;clearHistoricalMode()}
+    save();
+    renderHistory();renderAnalytics();renderPendingFinalize();renderCalendar();renderWeekStatus();renderHeaderStatus();
+    if(wasLoaded){
+      programmaticWorkoutLoad=true;
+      const ath=el('athlete').value;updateBlockSelector();el('block').value=String(currentBlockFor(ath));el('week').value=String(currentWeekFor(ath));ensureSessionOption('Upper A');el('date').value=todayISO();renderWorkout();
+      programmaticWorkoutLoad=false;
+    }
+    setWorkoutDockStatus('✓ Entrenamiento eliminado.','ok');
+    alert('Entrenamiento eliminado definitivamente.');
     return true;
   }catch(err){
-    w.void=oldVoid;w.finalized=oldFinalized;w.finalizedAt=oldFinalizedAt;delete w._cloudDirty;save();
-    renderCalendar();renderHistory();renderAnalytics();renderWeekStatus();
-    alert('No se pudo eliminar porque la nube no respondió. No se ha cambiado el entrenamiento.');
+    setWorkoutDockStatus('No se pudo eliminar · no se ha cambiado nada.','bad');
+    alert('No se pudo eliminar el entrenamiento de la nube. No se ha borrado nada.\n\n'+String(err.message||err));
     return false;
   }
 }
@@ -1507,25 +1518,35 @@ function renderWeeks(){
 function loadPrevious(){
   const ath=el('athlete').value,ses=el('session').value,b=Number(el('block')?.value)||currentBlockFor(ath),w=Number(el('week').value)||currentWeekFor(ath),currentDate=el('date').value,currentKey=loadedWorkoutObject?.clientUid;
 
-  // 1) Si existe un guardado a medias de ESTA posición, recuperar exactamente ese entrenamiento.
-  const draft=state.workouts.filter(x=>x.athlete===ath&&x.session===ses&&blockNumber(x)===b&&Number(x.week)===w&&!isWorkoutFinalized(x)&&!isWorkoutVoid(x))
-    .sort((a,z)=>String(z.date).localeCompare(String(a.date)))[0];
-  if(draft){
-    openStoredWorkout(draft,true);
-    setWorkoutDockStatus(`✓ Recuperado entrenamiento guardado a medias · B${b} S${w} · ${ses} · ${draft.date}.`,'ok');
+  const drafts=state.workouts
+    .filter(x=>x.athlete===ath&&x.session===ses&&!isWorkoutFinalized(x)&&!isWorkoutVoid(x)&&x.clientUid!==currentKey)
+    .sort((a,z)=>positionCompare(blockNumber(z),Number(z.week),blockNumber(a),Number(a.week))||String(z.date).localeCompare(String(a.date)));
+
+  const exactDraft=drafts.find(x=>blockNumber(x)===b&&Number(x.week)===w);
+  if(exactDraft){
+    openStoredWorkout(exactDraft,true);
+    setWorkoutDockStatus(`✓ Recuperado entrenamiento a medias · B${blockNumber(exactDraft)} S${exactDraft.week} · ${ses} · ${exactDraft.date}.`,'ok');
     return;
   }
 
-  // 2) Si no hay borrador, usar la última sesión FINALIZADA equivalente como referencia.
-  let candidates=state.workouts.filter(x=>x.athlete===ath&&x.session===ses&&isWorkoutFinalized(x)&&x.clientUid!==currentKey);
+  if(drafts.length){
+    const draft=drafts[0];
+    const recover=confirm(`Hay un ${ses} guardado sin finalizar:\n\nBloque ${blockNumber(draft)} · Semana ${draft.week} · ${draft.date}\n\n¿Quieres recuperar ese entrenamiento a medias?\n\nCancelar = cargar la última ${ses} finalizada como referencia.`);
+    if(recover){
+      openStoredWorkout(draft,true);
+      setWorkoutDockStatus(`✓ Recuperado entrenamiento a medias · B${blockNumber(draft)} S${draft.week} · ${ses} · ${draft.date}.`,'ok');
+      return;
+    }
+  }
+
+  let candidates=state.workouts.filter(x=>x.athlete===ath&&x.session===ses&&isWorkoutFinalized(x)&&!isWorkoutVoid(x)&&x.clientUid!==currentKey);
   const before=candidates.filter(x=>positionCompare(blockNumber(x),Number(x.week),b,w)<0||(blockNumber(x)===b&&Number(x.week)===w&&String(x.date)<String(currentDate)));
   if(before.length)candidates=before;
   const prev=candidates.sort((a,z)=>positionCompare(blockNumber(z),Number(z.week),blockNumber(a),Number(a.week))||String(z.date).localeCompare(String(a.date)))[0];
   if(!prev){alert(`No hay una sesión anterior guardada de ${ses}.`);return}
-  const models=workoutModelsFromStored(prev);
-  renderWorkout(models,{keepNotes:true});
+  renderWorkout(workoutModelsFromStored(prev),{keepNotes:true});
   el('sessionNotes').value=prev.notes||'';
-  setWorkoutDockStatus(`Cargada última ${ses}: B${blockNumber(prev)} S${prev.week} · ${prev.date}.`,'ok');
+  setWorkoutDockStatus(`Cargada última ${ses} finalizada: B${blockNumber(prev)} S${prev.week} · ${prev.date}.`,'ok');
 }
 
 document.querySelectorAll(".tab").forEach(btn=>btn.addEventListener("click",()=>{
@@ -1992,6 +2013,7 @@ document.addEventListener("DOMContentLoaded",()=>{
   el("dockFinishWorkout")?.addEventListener("click",()=>el("finishWorkout")?.click());
   el("dockSyncCloud")?.addEventListener("click",()=>syncCloud());
   el("editHistoricalWorkout")?.addEventListener("click",()=>{if(loadedWorkoutObject)setHistoricalMode(loadedWorkoutObject,false)});
+  el("deleteHistoricalWorkout")?.addEventListener("click",async()=>{if(loadedWorkoutObject)await deleteWorkoutSafely(loadedWorkoutObject)});
   el('exitHistoricalWorkout')?.addEventListener('click',()=>{clearHistoricalMode();programmaticWorkoutLoad=true;const ath=el('athlete').value;updateBlockSelector();el('block').value=String(currentBlockFor(ath));el('week').value=String(currentWeekFor(ath));ensureSessionOption('Upper A');el('date').value=todayISO();renderWorkout();programmaticWorkoutLoad=false;renderWeekStatus()});
   el("conflictCancel")?.addEventListener("click",()=>resolveConflict("cancel"));
   el("conflictView")?.addEventListener("click",()=>resolveConflict("view"));
